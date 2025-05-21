@@ -1,0 +1,27 @@
+name: modular
+
+# repository:
+# command:
+#   version:
+#     linkToCommits: true
+#     workspaceChangelog: true
+
+packages:
+  - .
+
+scripts:
+  postbootstrap: >
+    melos exec -- puro flutter pub get && 
+    puro dart pub global activate flutter_gen &&
+    melos run build_runner
+
+  postclean: >
+    melos exec -- puro flutter clean
+
+  analyze:
+    run: melos exec -- puro flutter analyze .
+    description: Run `dart analyze` in all packages.
+
+  build_runner:
+    run: |
+      melos exec -- "puro flutter pub run build_runner build --delete-conflicting-outputs"
