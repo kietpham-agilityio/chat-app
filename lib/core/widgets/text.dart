@@ -208,7 +208,7 @@ class CATitleMediumText extends StatelessWidget {
         color: color,
         fontWeight: fontWeight,
         overflow: overflow,
-        fontSize: context.textTheme.titleMedium?.fontSize ?? 20,
+        fontSize: context.textTheme.titleMedium?.fontSize ?? 16,
       ),
     );
   }
@@ -264,7 +264,7 @@ class CABodyLargeText extends StatelessWidget {
         color: color,
         fontWeight: fontWeight,
         overflow: overflow,
-        fontSize: context.textTheme.bodyLarge?.fontSize ?? 20,
+        fontSize: context.textTheme.bodyLarge?.fontSize ?? 16,
       ),
     );
   }
@@ -320,7 +320,7 @@ class CABodyMediumText extends StatelessWidget {
         color: color,
         fontWeight: fontWeight,
         overflow: overflow,
-        fontSize: context.textTheme.bodyMedium?.fontSize ?? 20,
+        fontSize: context.textTheme.bodyMedium?.fontSize ?? 14,
       ),
     );
   }
@@ -376,7 +376,7 @@ class CABodySmallText extends StatelessWidget {
         color: color,
         fontWeight: fontWeight,
         overflow: overflow,
-        fontSize: context.textTheme.bodySmall?.fontSize ?? 20,
+        fontSize: context.textTheme.bodySmall?.fontSize ?? 12,
       ),
     );
   }
