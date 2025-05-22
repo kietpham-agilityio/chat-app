@@ -32,6 +32,12 @@ class CATheme {
           }),
         ),
       ),
+
+      /// Divider Theme
+      dividerTheme: _dividerTheme,
+
+      /// ListTile Theme
+      listTileTheme: _listTileTheme,
     );
   }
 
@@ -118,5 +124,33 @@ class CATheme {
         ),
       ),
     ),
+  );
+
+  static final _dividerTheme = DividerThemeData(color: CAPalette.grey[2]);
+
+  static final _listTileTheme = ListTileThemeData(
+    horizontalTitleGap: 8,
+    titleTextStyle: TextStyle(
+      fontFamily: CATypography.fontSFProText,
+      fontSize: CATypography.fontSizeBodyLarge,
+      fontWeight: FontWeight.w400,
+      height: CATypography.heightBodyLarge,
+      color: CAPalette.grey[5],
+    ),
+    subtitleTextStyle: TextStyle(
+      fontFamily: CATypography.fontSFProText,
+      fontSize: CATypography.fontSizeBodyMedium,
+      fontWeight: FontWeight.w400,
+      height: CATypography.heightBodyMedium,
+      color: CAPalette.grey[4],
+    ),
+    leadingAndTrailingTextStyle: TextStyle(
+      fontFamily: CATypography.fontSFProText,
+      fontSize: CATypography.fontSizeBodyMedium,
+      fontWeight: FontWeight.w400,
+      height: CATypography.heightBodyMedium,
+      color: CAPalette.grey[4],
+    ),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 24),
   );
 }
