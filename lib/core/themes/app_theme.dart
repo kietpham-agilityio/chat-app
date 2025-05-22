@@ -11,6 +11,11 @@ class CATheme {
       colorScheme: CAColor.light,
 
       scaffoldBackgroundColor: CAPalette.genericWhite,
+
+      /// Icon Theme
+      iconTheme: _iconTheme,
     );
   }
+
+  static final _iconTheme = IconThemeData(size: 24, color: CAPalette.grey[6]);
 }
