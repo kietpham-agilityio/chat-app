@@ -17,6 +17,21 @@ class CATheme {
 
       // / Text Theme
       textTheme: _textTheme,
+
+      /// Button Theme
+      elevatedButtonTheme: _buttonTheme,
+
+      textButtonTheme: TextButtonThemeData(
+        style: ButtonStyle(
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
+          foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.pressed)) {
+              return CAPalette.primaryBlue.withValues(alpha: 0.5);
+            }
+            return CAPalette.primaryBlue;
+          }),
+        ),
+      ),
     );
   }
 
@@ -64,6 +79,44 @@ class CATheme {
       fontWeight: FontWeight.w400,
       height: CATypography.heightBodySmall,
       color: CAPalette.genericBlack,
+    ),
+  );
+
+  static final _buttonTheme = ElevatedButtonThemeData(
+    style: ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return CAPalette.primaryBlue.withValues(
+            alpha: 0.5, // Fully opaque
+          );
+        }
+
+        return CAPalette.primaryBlue; // Default background color
+      }),
+      overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+        if (states.contains(WidgetState.pressed)) {
+          return CAPalette.genericWhite.withValues(alpha: 0.12);
+        }
+
+        return null;
+      }),
+      foregroundColor: WidgetStatePropertyAll<Color>(CAPalette.genericWhite),
+      minimumSize: WidgetStatePropertyAll<Size>(Size.fromHeight(48)),
+      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12), // 12px radius for corners
+        ),
+      ),
+      elevation: WidgetStateProperty.all<double>(0), // No built-in elevation
+      textStyle: WidgetStateProperty.all<TextStyle>(
+        TextStyle(
+          fontFamily: CATypography.fontSFProText,
+          fontSize: CATypography.fontSizeTitleMedium,
+          fontWeight: FontWeight.w700,
+          height: CATypography.heightTitleMedium,
+          color: CAPalette.genericWhite,
+        ),
+      ),
     ),
   );
 }
