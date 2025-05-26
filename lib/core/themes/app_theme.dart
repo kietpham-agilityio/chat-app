@@ -96,15 +96,6 @@ class CATheme {
 
   static final _buttonTheme = ElevatedButtonThemeData(
     style: ButtonStyle(
-      backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-        if (states.contains(WidgetState.disabled)) {
-          return CAPalette.primaryBlue.withValues(
-            alpha: 0.5, // Fully opaque
-          );
-        }
-
-        return CAPalette.primaryBlue; // Default background color
-      }),
       overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
         if (states.contains(WidgetState.pressed)) {
           return CAPalette.genericWhite.withValues(alpha: 0.12);
