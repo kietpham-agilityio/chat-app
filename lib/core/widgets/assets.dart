@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/resources/assets_generated/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -141,10 +140,8 @@ class _CAImageLoader extends StatelessWidget {
       case ImageLoaderType.assetSVG:
         return SvgPicture.asset(
           url,
-          colorFilter: ColorFilter.mode(
-            color ?? context.colorScheme.onSurface,
-            BlendMode.srcIn,
-          ),
+          colorFilter:
+              color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
           fit: boxFit ?? BoxFit.contain,
           placeholderBuilder: (BuildContext context) {
             return errorBuilder ?? Icon(Icons.broken_image, size: width);
@@ -242,7 +239,7 @@ class _CAArrowLeftImage extends StatelessWidget {
       path: Assets.icons.icArrowLeft.path,
       width: width ?? 24,
       height: height ?? 24,
-      color: color ?? context.colorScheme.primary,
+      color: color,
     );
   }
 }
@@ -262,7 +259,7 @@ class _CABellImage extends StatelessWidget {
       path: Assets.icons.icBell.path,
       width: width ?? 24,
       height: height ?? 24,
-      color: color ?? context.colorScheme.primary,
+      color: color,
     );
   }
 }
@@ -282,7 +279,7 @@ class _CAErrorImage extends StatelessWidget {
       path: Assets.icons.icError.path,
       width: width ?? 16,
       height: height ?? 16,
-      color: color ?? context.colorScheme.primary,
+      color: color,
     );
   }
 }
@@ -302,7 +299,7 @@ class _CAGalleryImage extends StatelessWidget {
       path: Assets.icons.icGallery.path,
       width: width ?? 24,
       height: height ?? 24,
-      color: color ?? context.colorScheme.primary,
+      color: color,
     );
   }
 }
@@ -322,7 +319,7 @@ class _CALogOutImage extends StatelessWidget {
       path: Assets.icons.icLogOut.path,
       width: width ?? 24,
       height: height ?? 24,
-      color: color ?? context.colorScheme.primary,
+      color: color,
     );
   }
 }
@@ -342,7 +339,7 @@ class _CAMoreHorizontalImage extends StatelessWidget {
       path: Assets.icons.icMoreHorizontal.path,
       width: width ?? 24,
       height: height ?? 24,
-      color: color ?? context.colorScheme.primary,
+      color: color,
     );
   }
 }
@@ -362,7 +359,7 @@ class _CAPlusImage extends StatelessWidget {
       path: Assets.icons.icPlus.path,
       width: width ?? 24,
       height: height ?? 24,
-      color: color ?? context.colorScheme.primary,
+      color: color,
     );
   }
 }
@@ -382,7 +379,7 @@ class _CASearchImage extends StatelessWidget {
       path: Assets.icons.icSearch.path,
       width: width ?? 24,
       height: height ?? 24,
-      color: color ?? context.colorScheme.primary,
+      color: color,
     );
   }
 }
@@ -402,7 +399,7 @@ class _CAThumbsUpImage extends StatelessWidget {
       path: Assets.icons.icThumbsUp.path,
       width: width ?? 24,
       height: height ?? 24,
-      color: color ?? context.colorScheme.primary,
+      color: color,
     );
   }
 }
@@ -422,7 +419,7 @@ class _CAUserImage extends StatelessWidget {
       path: Assets.icons.icUser.path,
       width: width ?? 24,
       height: height ?? 24,
-      color: color ?? context.colorScheme.primary,
+      color: color,
     );
   }
 }
