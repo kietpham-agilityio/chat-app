@@ -41,6 +41,9 @@ class CATheme {
 
       /// AppBar Theme
       appBarTheme: _appBarTheme,
+
+      /// Input decoration Theme
+      inputDecorationTheme: _inputDecorationTheme,
     );
   }
 
@@ -168,5 +171,45 @@ class CATheme {
       height: CATypography.heightTitleMedium,
       color: CAPalette.grey[6],
     ),
+  );
+
+  static final _inputDecorationTheme = InputDecorationTheme(
+    /// The Cursor color use the value of ColorScheme.primary
+    filled: true,
+    fillColor: CAPalette.grey[7],
+    prefixIconColor: CAPalette.genericWhite,
+    suffixIconColor: CAPalette.genericWhite,
+    constraints: BoxConstraints.tight(const Size.fromHeight(48)),
+
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+
+    border: const OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(8)),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: CAPalette.grey[3]!),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: CAPalette.grey[3]!),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
+    ),
+    floatingLabelBehavior: FloatingLabelBehavior.never,
+    errorBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: CAPalette.error, width: 2),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: CAPalette.error, width: 2),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
+    ),
+    hintStyle: TextStyle(
+      fontFamily: CATypography.fontSFProText,
+      fontSize: CATypography.fontSizeBodyLarge,
+      fontWeight: FontWeight.w400,
+      height: CATypography.heightBodyLarge,
+      color: CAPalette.grey[4],
+    ),
+    errorStyle: TextStyle(height: -1),
   );
 }
