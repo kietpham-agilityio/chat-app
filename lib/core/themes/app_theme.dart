@@ -38,6 +38,9 @@ class CATheme {
 
       /// ListTile Theme
       listTileTheme: _listTileTheme,
+
+      /// AppBar Theme
+      appBarTheme: _appBarTheme,
     );
   }
 
@@ -152,5 +155,18 @@ class CATheme {
       color: CAPalette.grey[4],
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+  );
+
+  static final _appBarTheme = AppBarTheme(
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    foregroundColor: CAPalette.grey[6],
+    titleTextStyle: TextStyle(
+      fontFamily: CATypography.fontSFProText,
+      fontSize: CATypography.fontSizeTitleMedium,
+      fontWeight: FontWeight.w700,
+      height: CATypography.heightTitleMedium,
+      color: CAPalette.grey[6],
+    ),
   );
 }
