@@ -30,6 +30,15 @@ class CATheme {
             }
             return CAPalette.primaryBlue;
           }),
+          textStyle: WidgetStateProperty.resolveWith<TextStyle>((states) {
+            return TextStyle(
+              fontFamily: CATypography.fontSFProText,
+              fontSize: CATypography.fontSizeTitleMedium,
+              fontWeight: FontWeight.w600,
+              height: CATypography.heightTitleMedium,
+              color: CAPalette.primaryBlue,
+            );
+          }),
         ),
       ),
 
