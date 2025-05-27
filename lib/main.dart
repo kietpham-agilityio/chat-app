@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'core/app/app_provider.dart';
+import 'core/router/app_router.dart';
 import 'core/themes/themes.dart';
 
 void main() {
@@ -12,19 +14,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: CATheme.light,
-      home: const MyHomePage(),
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: AppProvider(
+        child: MaterialApp.router(
+          theme: CATheme.light,
+          debugShowCheckedModeBanner: false,
+          routerConfig: AppRouter.router,
+        ),
+      ),
     );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
   }
 }
