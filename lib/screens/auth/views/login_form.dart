@@ -17,6 +17,7 @@ class _LoginForm extends StatelessWidget {
               CAHeadlineSmallText(text: S.of(context).loginTitle),
               SizedBox(height: 64),
               _EmailInput(),
+              SizedBox(height: 4),
               _PasswordInput(),
               _LoginBtn(),
               SizedBox(height: 16),
@@ -96,11 +97,15 @@ class _LoginBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isValid = context.select((LoginCubit cubit) => cubit.state.isValid);
-    return CAElevatedButton(
-      text: S.of(context).loginBtn,
-      isDisabled: !isValid,
-      onPressed: () {},
+    return BlocBuilder<LoginCubit, LoginState>(
+      buildWhen: (previous, current) => previous.isValid != current.isValid,
+      builder: (context, state) {
+        return CAElevatedButton(
+          text: S.of(context).loginBtn,
+          isDisabled: !state.isValid,
+          onPressed: () {},
+        );
+      },
     );
   }
 }

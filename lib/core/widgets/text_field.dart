@@ -110,6 +110,13 @@ class _CATextFieldState extends State<CATextField> {
           onChanged: widget.onChanged,
           onSubmitted: widget.onSubmitted,
           keyboardType: widget.keyboardType,
+          style: TextStyle(
+            fontFamily: CATypography.fontSFProText,
+            fontSize: CATypography.fontSizeBodyLarge,
+            fontWeight: FontWeight.w400,
+            height: CATypography.heightBodyLarge,
+            color: CAPalette.grey[5],
+          ),
         ),
         if (widget.errorMessage != null) ...[
           Row(
