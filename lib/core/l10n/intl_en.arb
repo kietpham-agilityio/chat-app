@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "errorUnknown": "Something went wrong",
+  "errorInvalidEmail": "Invalid email",
+  "generalEmailAddress": "Email Address",
+  "generalPassword": "Password",
+  "loginTitle": "Welcome to Chat",
+  "loginBtn": "Login",
+  "loginCreateAccountBtn": "Create a new account",
+  "loginForgotPasswordBtn": "Forgot your password?"
+}

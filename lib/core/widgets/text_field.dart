@@ -5,10 +5,16 @@ import 'package:flutter/material.dart';
 
 class CATextField extends StatefulWidget {
   const CATextField({
+    this.obscureText = false,
     this.errorMessage,
     this.title,
     this.hintText,
     this.suffixIcon,
+    this.onChanged,
+    this.onSubmitted,
+    this.keyboardType,
+    this.focusNode,
+    this.onFocusLost,
     super.key,
   });
 
@@ -25,11 +31,65 @@ class CATextField extends StatefulWidget {
   /// The suffix icon of the text field, displayed as an icon suffix.
   final Widget? suffixIcon;
 
+  /// A callback that is called when the text changes.
+  ///
+  /// This callback is useful for validating the user's input or for
+  /// performing some action when the text changes.
+  final ValueChanged<String>? onChanged;
+
+  /// A callback that is called when the text is submitted.
+  ///
+  /// This callback is useful for submitting the user's input or for
+  /// performing some action when the text is submitted.
+  final ValueChanged<String>? onSubmitted;
+
+  /// The type of keyboard to display for the text field.
+  ///
+  /// This value is useful for constraining the user's input to a specific
+  /// type of data, such as a phone number or a password.
+  final TextInputType? keyboardType;
+
+  /// The focus node of the text field.
+  ///
+  /// This value is useful for customizing the focus behavior of the text
+  /// field or for observing the focus state of the text field.
+  final FocusNode? focusNode;
+
+  /// A callback that is called when the text field loses focus.
+  ///
+  /// This callback is useful for performing some action when the text
+  /// field loses focus, such as validating the user's input.
+  final VoidCallback? onFocusLost;
+
+  /// A boolean that indicates whether the text is obscured or not.
+  ///
+  /// This value is useful for creating password fields that obscure the
+  /// user's input.
+  final bool obscureText;
+
   @override
   State<CATextField> createState() => _CATextFieldState();
 }
 
 class _CATextFieldState extends State<CATextField> {
+  late final FocusNode? _focusNode = widget.focusNode;
+
+  @override
+  void initState() {
+    _focusNode?.addListener(() {
+      if (!_focusNode.hasFocus) {
+        widget.onFocusLost?.call();
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _focusNode?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -40,14 +100,25 @@ class _CATextFieldState extends State<CATextField> {
           SizedBox(height: 8),
         ],
         TextField(
+          focusNode: widget.focusNode,
+          obscureText: widget.obscureText,
           decoration: InputDecoration(
             hintText: widget.hintText,
             errorText: widget.errorMessage == null ? null : '',
             suffixIcon: widget.suffixIcon,
           ),
+          onChanged: widget.onChanged,
+          onSubmitted: widget.onSubmitted,
+          keyboardType: widget.keyboardType,
+          style: TextStyle(
+            fontFamily: CATypography.fontSFProText,
+            fontSize: CATypography.fontSizeBodyLarge,
+            fontWeight: FontWeight.w400,
+            height: CATypography.heightBodyLarge,
+            color: CAPalette.grey[5],
+          ),
         ),
         if (widget.errorMessage != null) ...[
-          SizedBox(height: 8),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -60,7 +131,7 @@ class _CATextFieldState extends State<CATextField> {
             ],
           ),
         ] else
-          SizedBox(height: 28),
+          SizedBox(height: 20),
       ],
     );
   }

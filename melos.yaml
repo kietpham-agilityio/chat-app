@@ -25,3 +25,7 @@ scripts:
   build_runner:
     run: |
       melos exec -- "puro flutter pub run build_runner build --delete-conflicting-outputs"
+
+  dev:generate:i10n:
+    run: melos exec -- "puro flutter pub run intl_utils:generate"
+    description: "Generation localizations"

@@ -20,6 +20,27 @@ dependencies:
   # Flutter library to load and cache network images. Can also be used with placeholder and error widgets.
   cached_network_image: ^3.4.1
 
+  # A declarative router for Flutter based on Navigation 2 supporting deep linking, data-driven routes and more
+  go_router: ^15.1.2
+
+  # Flutter widgets that make it easy to implement the BLoC (Business Logic Component) design pattern. Built to be used with the bloc state management package.
+  flutter_bloc: ^9.1.1
+
+  # A simple package to simplify screen management. When loading any async task, this package prevent the user from interacting with the screen until the async task finishes.
+  loader_overlay: ^5.0.0
+
+  # Contains code to deal with internationalized/localized messages, date and number formatting and parsing, bi-directional text, and other internationalization issues.
+  intl: 0.19.0
+
+  # # Package is a dart library that generates Dart localization code from ARB file. Generated code relies on Intl library.
+  intl_utils: ^2.8.10
+
+  # A unified form representation in Dart which aims to simplify form representation and validation in a generic way.
+  formz: ^0.8.0
+
+  # A Dart package that helps to implement value based equality without needing to explicitly override == and hashCode.
+  equatable: ^2.0.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -52,6 +73,11 @@ flutter:
           weight: 400
         - asset: assets/fonts/SF-Pro-Text-Semibold.otf
           weight: 600
+
+flutter_intl:
+  enabled: true
+  arb_dir: lib/core/l10n
+  output_dir: lib/core/resources/l10n_generated
 
 # Config gen assets
 flutter_gen:
