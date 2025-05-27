@@ -1,3 +1,4 @@
+import 'package:chat_app/core/resources/l10n_generated/l10n.dart' show S;
 import 'package:flutter/material.dart';
 
 import 'core/app/app_provider.dart';
@@ -23,6 +24,13 @@ class MyApp extends StatelessWidget {
           theme: CATheme.light,
           debugShowCheckedModeBanner: false,
           routerConfig: AppRouter.router,
+          locale: const Locale('en', 'US'),
+
+          localizationsDelegates: const [S.delegate],
+          supportedLocales: [
+            ...S.delegate.supportedLocales,
+            const Locale('en', ''),
+          ],
         ),
       ),
     );

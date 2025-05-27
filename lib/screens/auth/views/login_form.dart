@@ -1,0 +1,120 @@
+part of 'login_screen.dart';
+
+class _LoginForm extends StatelessWidget {
+  const _LoginForm();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CAAssets.logo(),
+              SizedBox(height: 28),
+              CAHeadlineSmallText(text: S.of(context).loginTitle),
+              SizedBox(height: 64),
+              _EmailInput(),
+              _PasswordInput(),
+              _LoginBtn(),
+              SizedBox(height: 16),
+              _CreateNewAccountBtn(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmailInput extends StatelessWidget {
+  const _EmailInput();
+
+  @override
+  Widget build(BuildContext context) {
+    final focusNode = FocusNode();
+
+    return BlocBuilder<LoginCubit, LoginState>(
+      buildWhen: (previous, current) => previous.email != current.email,
+      builder: (context, state) {
+        return CATextField(
+          key: const Key('loginForm_emailInput_textField'),
+          keyboardType: TextInputType.emailAddress,
+          focusNode: focusNode,
+          onChanged: (value) => context.read<LoginCubit>().emailChanged(value),
+          hintText: S.of(context).generalEmailAddress,
+          errorMessage:
+              state.email.displayError != null
+                  ? S.of(context).errorInvalidEmail
+                  : null,
+          onFocusLost:
+              () =>
+                  context.read<LoginCubit>().emailValidation(state.email.value),
+        );
+      },
+    );
+  }
+}
+
+class _PasswordInput extends StatelessWidget {
+  const _PasswordInput();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<LoginCubit, LoginState>(
+      buildWhen:
+          (previous, current) =>
+              previous.password != current.password ||
+              previous.isObscured != current.isObscured,
+      builder: (context, state) {
+        return CATextField(
+          key: const Key('loginForm_passwordInput_textField'),
+          hintText: S.of(context).generalPassword,
+          obscureText: state.isObscured,
+          onChanged:
+              (password) =>
+                  context.read<LoginCubit>().passwordChanged(password),
+          suffixIcon: IconButton(
+            onPressed: context.read<LoginCubit>().passwordVisibilityChanged,
+            icon: Icon(
+              !state.isObscured
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+              color: CAPalette.grey[5],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _LoginBtn extends StatelessWidget {
+  const _LoginBtn();
+
+  @override
+  Widget build(BuildContext context) {
+    final isValid = context.select((LoginCubit cubit) => cubit.state.isValid);
+    return CAElevatedButton(
+      text: S.of(context).loginBtn,
+      isDisabled: !isValid,
+      onPressed: () {},
+    );
+  }
+}
+
+class _CreateNewAccountBtn extends StatelessWidget {
+  const _CreateNewAccountBtn();
+
+  @override
+  Widget build(BuildContext context) {
+    return CAElevatedButton(
+      backgroundColor: CAPalette.grey[2],
+      foregroundColor: CAPalette.grey[5],
+      text: S.of(context).loginCreateAccountBtn,
+      onPressed: () => context.pushNamed(AppPaths.signUp.name),
+    );
+  }
+}
