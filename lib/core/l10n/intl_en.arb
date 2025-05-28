@@ -1,6 +1,11 @@
 {
   "@@locale": "en",
-  "errorUnknown": "Something went wrong",
+  "errorUnknown": "An unknown exception occurred. Please try again.",
+  "errorUserDisabled": "This user has been disabled. Please contact support for help.",
+  "errorEmailAlreadyInUse": "An account already exists for that email.",
+  "errorOperationNotAllowed": "Operation is not allowed. Please contact support.",
+  "errorUserNotFound": "Email is not found, please create an account.",
+  "errorWrongPassword": "Incorrect password, please try again.",
   "errorInvalidEmail": "Invalid email format. Example: email@domain",
   "errorInvalidPassword": "Must be at 8 characters with letters and numbers",
   "errorInvalidConfirmedPassword": "Passwords do not match",

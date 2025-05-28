@@ -54,11 +54,61 @@ class S {
     return Localizations.of<S>(context, S);
   }
 
-  /// `Something went wrong`
+  /// `An unknown exception occurred. Please try again.`
   String get errorUnknown {
     return Intl.message(
-      'Something went wrong',
+      'An unknown exception occurred. Please try again.',
       name: 'errorUnknown',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This user has been disabled. Please contact support for help.`
+  String get errorUserDisabled {
+    return Intl.message(
+      'This user has been disabled. Please contact support for help.',
+      name: 'errorUserDisabled',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `An account already exists for that email.`
+  String get errorEmailAlreadyInUse {
+    return Intl.message(
+      'An account already exists for that email.',
+      name: 'errorEmailAlreadyInUse',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Operation is not allowed. Please contact support.`
+  String get errorOperationNotAllowed {
+    return Intl.message(
+      'Operation is not allowed. Please contact support.',
+      name: 'errorOperationNotAllowed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Email is not found, please create an account.`
+  String get errorUserNotFound {
+    return Intl.message(
+      'Email is not found, please create an account.',
+      name: 'errorUserNotFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Incorrect password, please try again.`
+  String get errorWrongPassword {
+    return Intl.message(
+      'Incorrect password, please try again.',
+      name: 'errorWrongPassword',
       desc: '',
       args: [],
     );

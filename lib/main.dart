@@ -1,11 +1,16 @@
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart' show S;
+import 'package:firebase_core/firebase_core.dart' show Firebase;
 import 'package:flutter/material.dart';
 
 import 'core/app/app_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/themes/themes.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+
   runApp(const MyApp());
 }
 

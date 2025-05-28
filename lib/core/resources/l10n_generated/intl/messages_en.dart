@@ -31,6 +31,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "createAccountTitle": MessageLookupByLibrary.simpleMessage(
       "Create account",
     ),
+    "errorEmailAlreadyInUse": MessageLookupByLibrary.simpleMessage(
+      "An account already exists for that email.",
+    ),
     "errorInvalidConfirmedPassword": MessageLookupByLibrary.simpleMessage(
       "Passwords do not match",
     ),
@@ -46,8 +49,20 @@ class MessageLookup extends MessageLookupByLibrary {
     "errorInvalidPhoneNumber": MessageLookupByLibrary.simpleMessage(
       "Phone number format (e.g., 0981234567)",
     ),
+    "errorOperationNotAllowed": MessageLookupByLibrary.simpleMessage(
+      "Operation is not allowed. Please contact support.",
+    ),
     "errorUnknown": MessageLookupByLibrary.simpleMessage(
-      "Something went wrong",
+      "An unknown exception occurred. Please try again.",
+    ),
+    "errorUserDisabled": MessageLookupByLibrary.simpleMessage(
+      "This user has been disabled. Please contact support for help.",
+    ),
+    "errorUserNotFound": MessageLookupByLibrary.simpleMessage(
+      "Email is not found, please create an account.",
+    ),
+    "errorWrongPassword": MessageLookupByLibrary.simpleMessage(
+      "Incorrect password, please try again.",
     ),
     "generalConfirmedPassword": MessageLookupByLibrary.simpleMessage(
       "Confirmed Password",
