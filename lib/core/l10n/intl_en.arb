@@ -1,11 +1,26 @@
 {
   "@@locale": "en",
   "errorUnknown": "Something went wrong",
-  "errorInvalidEmail": "Invalid email",
+  "errorInvalidEmail": "Invalid email format. Example: email@domain",
+  "errorInvalidPassword": "Must be at 8 characters with letters and numbers",
+  "errorInvalidConfirmedPassword": "Passwords do not match",
+  "errorInvalidPhoneNumber": "Phone number format (e.g., 0981234567)",
+  "errorInvalidFullName": "Full name must be at least two words",
   "generalEmailAddress": "Email Address",
+  "generalEmailAddressHint": "Enter your email address",
   "generalPassword": "Password",
+  "generalPasswordHint": "Enter your password",
+  "generalConfirmedPassword": "Confirmed Password",
+  "generalConfirmedPasswordHint": "Re-enter your password",
+  "generalFullName": "Full Name",
+  "generalFullNameHint": "Enter your full name",
+  "generalPhoneNumber": "Phone Number",
+  "generalPhoneNumberHint": "Enter your phone number",
   "loginTitle": "Welcome to Chat",
   "loginBtn": "Login",
   "loginCreateAccountBtn": "Create a new account",
-  "loginForgotPasswordBtn": "Forgot your password?"
+  "loginForgotPasswordBtn": "Forgot your password?",
+  "createAccountTitle": "Create account",
+  "createAccountSubTitle": "Create a new account to start chatting",
+  "createAccountBtn": "Create an account"
 }

@@ -22,14 +22,57 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
-    "errorInvalidEmail": MessageLookupByLibrary.simpleMessage("Invalid email"),
+    "createAccountBtn": MessageLookupByLibrary.simpleMessage(
+      "Create an account",
+    ),
+    "createAccountSubTitle": MessageLookupByLibrary.simpleMessage(
+      "Create a new account to start chatting",
+    ),
+    "createAccountTitle": MessageLookupByLibrary.simpleMessage(
+      "Create account",
+    ),
+    "errorInvalidConfirmedPassword": MessageLookupByLibrary.simpleMessage(
+      "Passwords do not match",
+    ),
+    "errorInvalidEmail": MessageLookupByLibrary.simpleMessage(
+      "Invalid email format. Example: email@domain",
+    ),
+    "errorInvalidFullName": MessageLookupByLibrary.simpleMessage(
+      "Full name must be at least two words",
+    ),
+    "errorInvalidPassword": MessageLookupByLibrary.simpleMessage(
+      "Must be at 8 characters with letters and numbers",
+    ),
+    "errorInvalidPhoneNumber": MessageLookupByLibrary.simpleMessage(
+      "Phone number format (e.g., 0981234567)",
+    ),
     "errorUnknown": MessageLookupByLibrary.simpleMessage(
       "Something went wrong",
+    ),
+    "generalConfirmedPassword": MessageLookupByLibrary.simpleMessage(
+      "Confirmed Password",
+    ),
+    "generalConfirmedPasswordHint": MessageLookupByLibrary.simpleMessage(
+      "Re-enter your password",
     ),
     "generalEmailAddress": MessageLookupByLibrary.simpleMessage(
       "Email Address",
     ),
+    "generalEmailAddressHint": MessageLookupByLibrary.simpleMessage(
+      "Enter your email address",
+    ),
+    "generalFullName": MessageLookupByLibrary.simpleMessage("Full Name"),
+    "generalFullNameHint": MessageLookupByLibrary.simpleMessage(
+      "Enter your full name",
+    ),
     "generalPassword": MessageLookupByLibrary.simpleMessage("Password"),
+    "generalPasswordHint": MessageLookupByLibrary.simpleMessage(
+      "Enter your password",
+    ),
+    "generalPhoneNumber": MessageLookupByLibrary.simpleMessage("Phone Number"),
+    "generalPhoneNumberHint": MessageLookupByLibrary.simpleMessage(
+      "Enter your phone number",
+    ),
     "loginBtn": MessageLookupByLibrary.simpleMessage("Login"),
     "loginCreateAccountBtn": MessageLookupByLibrary.simpleMessage(
       "Create a new account",
