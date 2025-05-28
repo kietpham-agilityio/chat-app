@@ -1,7 +1,9 @@
 import 'package:chat_app/core/router/app_router.dart';
 import 'package:chat_app/core/widgets/widgets.dart'
     show CAAppBar, CAAssets, CAElevatedButton, CAIconButtons, CATitleMediumText;
+import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -25,6 +27,13 @@ class ProfileScreen extends StatelessWidget {
               text: 'Go to My Account',
               onPressed: () {
                 context.pushNamed(AppPaths.myAccount.name);
+              },
+            ),
+            SizedBox(height: 16),
+            CAElevatedButton(
+              text: 'Log Out',
+              onPressed: () {
+                context.read<AuthRepository>().signOut();
               },
             ),
           ],

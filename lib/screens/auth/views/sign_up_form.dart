@@ -241,7 +241,7 @@ class _CreateAccountBtn extends StatelessWidget {
         return CAElevatedButton(
           text: S.of(context).loginBtn,
           isDisabled: !state.isValid,
-          onPressed: () {},
+          onPressed: context.read<SignUpCubit>().signUpFormSubmitted,
         );
       },
     );

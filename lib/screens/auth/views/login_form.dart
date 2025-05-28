@@ -103,7 +103,7 @@ class _LoginBtn extends StatelessWidget {
         return CAElevatedButton(
           text: S.of(context).loginBtn,
           isDisabled: !state.isValid,
-          onPressed: () {},
+          onPressed: context.read<LoginCubit>().logInWithCredentials,
         );
       },
     );
