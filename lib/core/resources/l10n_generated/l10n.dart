@@ -64,11 +64,51 @@ class S {
     );
   }
 
-  /// `Invalid email`
+  /// `Invalid email format. Example: email@domain`
   String get errorInvalidEmail {
     return Intl.message(
-      'Invalid email',
+      'Invalid email format. Example: email@domain',
       name: 'errorInvalidEmail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Must be at 8 characters with letters and numbers`
+  String get errorInvalidPassword {
+    return Intl.message(
+      'Must be at 8 characters with letters and numbers',
+      name: 'errorInvalidPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Passwords do not match`
+  String get errorInvalidConfirmedPassword {
+    return Intl.message(
+      'Passwords do not match',
+      name: 'errorInvalidConfirmedPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Phone number format (e.g., 0981234567)`
+  String get errorInvalidPhoneNumber {
+    return Intl.message(
+      'Phone number format (e.g., 0981234567)',
+      name: 'errorInvalidPhoneNumber',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Full name must be at least two words`
+  String get errorInvalidFullName {
+    return Intl.message(
+      'Full name must be at least two words',
+      name: 'errorInvalidFullName',
       desc: '',
       args: [],
     );
@@ -84,11 +124,91 @@ class S {
     );
   }
 
+  /// `Enter your email address`
+  String get generalEmailAddressHint {
+    return Intl.message(
+      'Enter your email address',
+      name: 'generalEmailAddressHint',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Password`
   String get generalPassword {
     return Intl.message(
       'Password',
       name: 'generalPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter your password`
+  String get generalPasswordHint {
+    return Intl.message(
+      'Enter your password',
+      name: 'generalPasswordHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Confirmed Password`
+  String get generalConfirmedPassword {
+    return Intl.message(
+      'Confirmed Password',
+      name: 'generalConfirmedPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Re-enter your password`
+  String get generalConfirmedPasswordHint {
+    return Intl.message(
+      'Re-enter your password',
+      name: 'generalConfirmedPasswordHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Full Name`
+  String get generalFullName {
+    return Intl.message(
+      'Full Name',
+      name: 'generalFullName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter your full name`
+  String get generalFullNameHint {
+    return Intl.message(
+      'Enter your full name',
+      name: 'generalFullNameHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Phone Number`
+  String get generalPhoneNumber {
+    return Intl.message(
+      'Phone Number',
+      name: 'generalPhoneNumber',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter your phone number`
+  String get generalPhoneNumberHint {
+    return Intl.message(
+      'Enter your phone number',
+      name: 'generalPhoneNumberHint',
       desc: '',
       args: [],
     );
@@ -124,6 +244,36 @@ class S {
     return Intl.message(
       'Forgot your password?',
       name: 'loginForgotPasswordBtn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create account`
+  String get createAccountTitle {
+    return Intl.message(
+      'Create account',
+      name: 'createAccountTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create a new account to start chatting`
+  String get createAccountSubTitle {
+    return Intl.message(
+      'Create a new account to start chatting',
+      name: 'createAccountSubTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create an account`
+  String get createAccountBtn {
+    return Intl.message(
+      'Create an account',
+      name: 'createAccountBtn',
       desc: '',
       args: [],
     );

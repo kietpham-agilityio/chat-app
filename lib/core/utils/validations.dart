@@ -48,3 +48,64 @@ class Password extends FormzInput<String, ValidationError> {
         : ValidationError.invalid;
   }
 }
+
+class ConfirmedPassword extends FormzInput<String, ValidationError> {
+  // Constructor for pure ConfirmedPassword input, representing an unmodified input.
+  const ConfirmedPassword.pure({this.password = '', String value = ''})
+    : super.pure(value);
+
+  // Constructor for dirty ConfirmedPassword input, representing a modified input.
+  const ConfirmedPassword.dirty({required this.password, String value = ''})
+    : super.dirty(value);
+
+  final String password;
+
+  // The original password to compare against.
+  @override
+  ValidationError? validator(String? value) {
+    return password == value ? null : ValidationError.invalid;
+  }
+}
+
+// FullName class extends FormzInput to handle full name validation.
+// It checks for at least two words, each with a minimum of 2 letters,
+// using alphabetic characters only (including Vietnamese accents).
+class FullName extends FormzInput<String, ValidationError> {
+  // Constructor for pure FullName input, representing an unmodified input.
+  const FullName.pure([super.value = '']) : super.pure();
+
+  // Constructor for dirty FullName input, representing a modified input.
+  const FullName.dirty([super.value = '']) : super.dirty();
+
+  // Regular expression to validate full name structure.
+  static final _fullNameRegExp = RegExp(
+    r'^[A-Za-zÀ-ỹà-ỹ]{2,}(?: [A-Za-zÀ-ỹà-ỹ]{2,})+$',
+  );
+
+  @override
+  ValidationError? validator(String? value) {
+    // Check if the value matches the full name criteria.
+    return _fullNameRegExp.hasMatch(value?.trim() ?? '')
+        ? null
+        : ValidationError.invalid;
+  }
+}
+
+// PhoneNumber class extends FormzInput to handle phone number validation.
+// It checks if the number starts with '0' and has exactly 10 digits.
+class PhoneNumber extends FormzInput<String, ValidationError> {
+  // Constructor for pure PhoneNumber input, representing an unmodified input.
+  const PhoneNumber.pure([super.value = '']) : super.pure();
+
+  // Constructor for dirty PhoneNumber input, representing a modified input.
+  const PhoneNumber.dirty([super.value = '']) : super.dirty();
+
+  // Regular expression to validate phone number format (e.g., 0981234567).
+  static final _phoneRegExp = RegExp(r'^0\d{9}$');
+
+  @override
+  ValidationError? validator(String? value) {
+    // Check if the value matches the phone number format.
+    return _phoneRegExp.hasMatch(value ?? '') ? null : ValidationError.invalid;
+  }
+}
