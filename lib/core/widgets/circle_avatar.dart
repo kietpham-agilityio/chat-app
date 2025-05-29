@@ -8,19 +8,38 @@ import 'assets.dart' show CAAssets, CACachedNetworkImage;
 /// If the image fails to load, it displays a default user avatar.
 /// The avatar is a 40x40 image.
 class CACircleAvatar extends StatelessWidget {
-  const CACircleAvatar({super.key, required this.url});
+  const CACircleAvatar({
+    super.key,
+    required this.url,
+    this.avatarSize = 40.0,
+    this.onTap,
+  });
 
   /// The URL of the image to display.
   final String url;
+  final double avatarSize;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ClipOval(
-      child: Container(
-        color: CAPalette.grey[1],
-        child: CACachedNetworkImage(
-          url: url,
-          errorBuilder: CAAssets.user(width: 40, height: 40),
+    return GestureDetector(
+      onTap: onTap,
+      child: CircleAvatar(
+        backgroundColor: Colors.transparent,
+        child: ClipOval(
+          child: Container(
+            height: avatarSize,
+            width: avatarSize,
+            color: CAPalette.grey[1],
+            child: CACachedNetworkImage(
+              url: url,
+              errorBuilder: CAAssets.user(
+                width: avatarSize,
+                height: avatarSize,
+                boxFit: BoxFit.scaleDown,
+              ),
+            ),
+          ),
         ),
       ),
     );

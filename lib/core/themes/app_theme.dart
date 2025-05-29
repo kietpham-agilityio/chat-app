@@ -59,9 +59,16 @@ class CATheme {
   static final _iconTheme = IconThemeData(size: 24, color: CAPalette.grey[6]);
 
   static final _textTheme = TextTheme(
+    headlineMedium: TextStyle(
+      fontFamily: CATypography.fontSFProText,
+      fontSize: CATypography.fontSizeHeadlineMedium,
+      fontWeight: FontWeight.w600,
+      height: CATypography.heightHeadlineMedium,
+      color: CAPalette.genericBlack,
+    ),
     headlineSmall: TextStyle(
       fontFamily: CATypography.fontSFProText,
-      fontSize: CATypography.fontSizeTitleLarge,
+      fontSize: CATypography.fontSizeHeadlineSmall,
       fontWeight: FontWeight.w600,
       height: CATypography.heightHeadlineSmall,
       color: CAPalette.genericBlack,
@@ -182,6 +189,8 @@ class CATheme {
     constraints: BoxConstraints.tight(const Size.fromHeight(48)),
 
     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+
+    suffixIconConstraints: const BoxConstraints(minWidth: 24, minHeight: 24),
 
     border: const OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(8)),

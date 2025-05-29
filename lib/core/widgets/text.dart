@@ -46,6 +46,62 @@ class CAText extends StatelessWidget {
   }
 }
 
+//MARK: - Headline Medium Text
+/// A widget that displays text in the headline medium style.
+///
+/// The [CAHeadlineMediumText] widget is a convenience wrapper around the [CAText]
+/// widget, using the headline medium style from the [TextTheme].
+///
+/// You can customize the text color, alignment, font weight, and overflow
+/// behavior of the widget.
+class CAHeadlineMediumText extends StatelessWidget {
+  const CAHeadlineMediumText({
+    required this.text,
+    this.color,
+    this.textAlign,
+    this.fontWeight,
+    this.overflow,
+    super.key,
+  });
+
+  /// The text to display.
+  final String text;
+
+  /// The color to use for the text.
+  ///
+  /// If null, the text will use the default text color from the [TextTheme].
+  final Color? color;
+
+  /// How the text should be aligned horizontally.
+  ///
+  /// If null, the text will be aligned according to the default alignment.
+  final TextAlign? textAlign;
+
+  /// The font weight to use for the text.
+  ///
+  /// If null, the text will use the default font weight from the [TextTheme].
+  final FontWeight? fontWeight;
+
+  /// The behavior to use when the text overflows the available space.
+  ///
+  /// If null, the text will use the default overflow behavior from the [TextTheme].
+  final TextOverflow? overflow;
+
+  @override
+  Widget build(BuildContext context) {
+    return CAText(
+      text: text,
+      textAlign: textAlign,
+      style: context.textTheme.headlineMedium?.copyWith(
+        color: color,
+        fontWeight: fontWeight,
+        overflow: overflow,
+        fontSize: context.textTheme.headlineMedium?.fontSize ?? 24,
+      ),
+    );
+  }
+}
+
 //MARK: - Headline Small Text
 /// A widget that displays text in the headline small style.
 ///
@@ -96,7 +152,7 @@ class CAHeadlineSmallText extends StatelessWidget {
         color: color,
         fontWeight: fontWeight,
         overflow: overflow,
-        fontSize: context.textTheme.headlineSmall?.fontSize ?? 24,
+        fontSize: context.textTheme.headlineSmall?.fontSize ?? 20,
       ),
     );
   }
@@ -152,7 +208,7 @@ class CATitleLargeText extends StatelessWidget {
         color: color,
         fontWeight: fontWeight,
         overflow: overflow,
-        fontSize: context.textTheme.titleLarge?.fontSize ?? 20,
+        fontSize: context.textTheme.titleLarge?.fontSize ?? 18,
       ),
     );
   }
