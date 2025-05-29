@@ -1,0 +1,46 @@
+// ignore_for_file: unused_import
+import 'package:chat_app/core/app/app_provider.dart';
+import 'package:chat_app/core/app/env.dart';
+import 'package:chat_app/core/extensions/context_extensions.dart';
+import 'package:chat_app/core/resources/assets_generated/assets.gen.dart';
+import 'package:chat_app/core/resources/assets_generated/fonts.gen.dart';
+import 'package:chat_app/core/resources/l10n_generated/intl/messages_all.dart';
+import 'package:chat_app/core/resources/l10n_generated/intl/messages_en.dart';
+import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
+import 'package:chat_app/core/router/app_router.dart';
+import 'package:chat_app/core/router/router_guard.dart';
+import 'package:chat_app/core/themes/app_colors.dart';
+import 'package:chat_app/core/themes/app_palette.dart';
+import 'package:chat_app/core/themes/app_theme.dart';
+import 'package:chat_app/core/themes/themes.dart';
+import 'package:chat_app/core/themes/typography.dart';
+import 'package:chat_app/core/utils/validations.dart';
+import 'package:chat_app/core/widgets/app_bar.dart';
+import 'package:chat_app/core/widgets/assets.dart';
+import 'package:chat_app/core/widgets/buttons.dart';
+import 'package:chat_app/core/widgets/circle_avatar.dart';
+import 'package:chat_app/core/widgets/dialog.dart';
+import 'package:chat_app/core/widgets/divider.dart';
+import 'package:chat_app/core/widgets/list_tile.dart';
+import 'package:chat_app/core/widgets/snackbar.dart';
+import 'package:chat_app/core/widgets/text.dart';
+import 'package:chat_app/core/widgets/text_field.dart';
+import 'package:chat_app/core/widgets/widgets.dart';
+import 'package:chat_app/firebase_options.dart';
+import 'package:chat_app/main.dart';
+import 'package:chat_app/models/models.dart';
+import 'package:chat_app/models/user_model.dart';
+import 'package:chat_app/repositories/auth_repository.dart';
+import 'package:chat_app/repositories/base_repository.dart';
+import 'package:chat_app/repositories/repositories.dart';
+import 'package:chat_app/screens/auth/states/auth_bloc.dart';
+import 'package:chat_app/screens/auth/states/login_cubit.dart';
+import 'package:chat_app/screens/auth/states/sign_up_cubit.dart';
+import 'package:chat_app/screens/auth/views/login_screen.dart';
+import 'package:chat_app/screens/auth/views/sign_up_screen.dart';
+import 'package:chat_app/screens/chat/views/chat_screen.dart';
+import 'package:chat_app/screens/home/views/home_screen.dart';
+import 'package:chat_app/screens/my_account/views/my_account_screen.dart';
+import 'package:chat_app/screens/profile/views/profile_screen.dart';
+
+void main() {}
