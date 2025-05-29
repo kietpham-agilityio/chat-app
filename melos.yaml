@@ -29,3 +29,39 @@ scripts:
   dev:generate:i10n:
     run: melos exec -- "puro flutter pub run intl_utils:generate"
     description: "Generation localizations"
+
+  test:selective_unit_test:
+    run: |
+      melos exec -- \
+      "full_coverage; \
+      puro flutter test --fail-fast --no-pub --coverage -r expanded || exit 1; \
+      lcov --remove coverage/lcov.info \
+        $(echo ' 
+        lib/core/app/*
+        lib/core/extensions/* 
+        lib/core/l10n/*
+        lib/core/resources/*
+        lib/core/router/*
+        lib/core/themes/*
+        lib/core/widgets/*
+        lib/core/utils/*
+        lib/main.dart
+        lib/firebase_options.dart
+        lib/screens/auth/views/*
+        lib/screens/chat/views/*
+        lib/screens/home/views/*
+        lib/screens/my_account/views/*
+        lib/screens/profile/views/*
+        ' | xargs) -o coverage/lcov.info; \
+      genhtml coverage/lcov.info --output=coverage/html; \
+      open coverage/html/index.html"
+    description: Run Flutter unit tests and generate coverage reports.
+
+  test:
+    run: melos run test:selective_unit_test --no-select
+    description: Run all Flutter tests in this project.
+
+  # Run unit test and generate html coverage (MacOS support for now)
+  coverage:
+    run: brew install lcov && melos run test
+    description: Run unit testing and generate html coverage report.

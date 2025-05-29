@@ -71,6 +71,12 @@ dev_dependencies:
   # The Flutter code generator for your assets, fonts, colors, … — Get rid of all String-based APIs.
   flutter_gen_runner: ^5.10.0
 
+  # A mocking library for Dart, used for creating mock objects in tests.
+  mocktail: ^1.0.4
+
+  # A testing library which makes it easy to test blocs. Built to be used with the bloc state management package.
+  bloc_test: ^10.0.0
+
 flutter:
   uses-material-design: true
 
