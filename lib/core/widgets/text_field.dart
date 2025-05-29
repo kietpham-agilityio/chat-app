@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 class CATextField extends StatefulWidget {
   const CATextField({
     this.obscureText = false,
+    this.readOnly = false,
+    this.autofocus = false,
     this.errorMessage,
     this.title,
     this.hintText,
@@ -15,6 +17,7 @@ class CATextField extends StatefulWidget {
     this.keyboardType,
     this.focusNode,
     this.onFocusLost,
+    this.ontap,
     super.key,
   });
 
@@ -67,6 +70,27 @@ class CATextField extends StatefulWidget {
   /// user's input.
   final bool obscureText;
 
+  /// A boolean that indicates whether the text field is read-only or not.
+  ///
+  /// If this value is `true`, the text field is read-only and the user
+  /// cannot edit the text. If this value is `false`, the text field is
+  /// editable and the user can edit the text.
+  final bool readOnly;
+
+  /// A boolean that indicates whether the text field should receive focus
+  /// immediately when it is created.
+  ///
+  /// If this value is `true`, the text field receives focus immediately when
+  /// it is created. If this value is `false`, the text field does not receive
+  /// focus immediately when it is created.
+  final bool autofocus;
+
+  /// A callback that is called when the user taps on the text field.
+  ///
+  /// This callback is useful for customizing the behavior of the text field
+  /// when the user taps on it.
+  final VoidCallback? ontap;
+
   @override
   State<CATextField> createState() => _CATextFieldState();
 }
@@ -102,6 +126,8 @@ class _CATextFieldState extends State<CATextField> {
         TextField(
           focusNode: widget.focusNode,
           obscureText: widget.obscureText,
+          readOnly: widget.readOnly,
+          autofocus: widget.autofocus,
           decoration: InputDecoration(
             hintText: widget.hintText,
             errorText: widget.errorMessage == null ? null : '',
@@ -117,6 +143,7 @@ class _CATextFieldState extends State<CATextField> {
             height: CATypography.heightBodyLarge,
             color: CAPalette.grey[5],
           ),
+          onTap: widget.ontap,
         ),
         if (widget.errorMessage != null) ...[
           Row(

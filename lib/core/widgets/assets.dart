@@ -202,8 +202,13 @@ class CAAssets {
   static Widget Function({Color? color, double? width, double? height})
   thumpsUp = _CAThumbsUpImage.new;
 
-  static Widget Function({Color? color, double? width, double? height}) user =
-      _CAUserImage.new;
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    BoxFit? boxFit,
+  })
+  user = _CAUserImage.new;
 }
 
 // MARK: Logo
@@ -406,17 +411,19 @@ class _CAThumbsUpImage extends StatelessWidget {
 
 // MARK: User
 class _CAUserImage extends StatelessWidget {
-  const _CAUserImage({this.color, this.width, this.height});
+  const _CAUserImage({this.color, this.width, this.height, this.boxFit});
 
   final Color? color;
   final double? width;
   final double? height;
+  final BoxFit? boxFit;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icUser.path,
+      boxFit: boxFit,
       width: width ?? 24,
       height: height ?? 24,
       color: color,
