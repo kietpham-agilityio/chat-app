@@ -5,16 +5,20 @@ import 'package:chat_app/core/widgets/widgets.dart'
     show
         CAAppBar,
         CAAssets,
+        CABodyLargeText,
         CACircleAvatar,
         CADivider,
         CAHeadlineMediumText,
         CAListTile,
         CATextField,
         CATitleMediumText;
+import 'package:chat_app/repositories/repositories.dart' show ChatRepository;
 import 'package:chat_app/screens/home/cubit/home_bloc.dart';
 import 'package:chat_app/screens/search/views/search_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart' show BlocBuilder, BlocProvider;
+import 'package:flutter_bloc/flutter_bloc.dart'
+    show BlocBuilder, BlocProvider, ReadContext;
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -23,7 +27,11 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeBloc()..add(HomeInitializeEvent('123')),
+      create:
+          (context) => HomeBloc(chatRepository: context.read<ChatRepository>())
+            ..add(
+              HomeInitializeEvent(FirebaseAuth.instance.currentUser?.uid ?? ''),
+            ),
       child: Scaffold(
         appBar: CAAppBar(
           title: CATitleMediumText(text: 'Chats'),
@@ -84,13 +92,23 @@ class HomeScreen extends StatelessWidget {
                 builder: (context, state) {
                   if (state.status == HomeStatus.success &&
                       state.chats.isEmpty) {
-                    return Column(
-                      children: [
-                        SizedBox(height: 100),
-                        CAAssets.logo(),
-                        SizedBox(height: 28),
-                        CAHeadlineMediumText(text: 'Let\'s start chatting'),
-                      ],
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CAAssets.logo(),
+                          SizedBox(height: 28),
+                          CAHeadlineMediumText(text: 'Let\'s start chatting'),
+                          CABodyLargeText(
+                            text:
+                                'Type in the search bar to find and select a contact to start a new chat.',
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 100),
+                        ],
+                      ),
                     );
                   }
 
