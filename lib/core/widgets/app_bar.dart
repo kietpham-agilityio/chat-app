@@ -6,6 +6,7 @@ class CAAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.toolbarHeight = 44,
     this.leading,
     this.trailing,
+    this.titleSpacing,
     super.key,
   });
 
@@ -31,6 +32,8 @@ class CAAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// displayed on the right side of the app bar.
   final List<Widget>? trailing;
 
+  final double? titleSpacing;
+
   @override
   Size get preferredSize => Size.fromHeight(toolbarHeight);
 
@@ -43,8 +46,11 @@ class CAAppBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           AppBar(
             toolbarHeight: toolbarHeight,
+            automaticallyImplyLeading: false,
             leading: leading,
+            leadingWidth: toolbarHeight,
             actions: [if (trailing != null) ...trailing!],
+            titleSpacing: titleSpacing,
             title: title,
           ),
           Divider(height: 0),

@@ -99,9 +99,8 @@ class CAIconButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      padding: EdgeInsets.zero,
       style: IconButton.styleFrom(backgroundColor: backgroundColor),
-      constraints: BoxConstraints(minWidth: size ?? 40, minHeight: size ?? 40),
+      constraints: BoxConstraints(maxWidth: size ?? 40, maxHeight: size ?? 40),
       icon: icon,
       onPressed: onPressed,
     );
