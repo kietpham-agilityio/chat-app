@@ -45,7 +45,6 @@ class SearchScreen extends StatelessWidget {
               leading: CAIconButtons(
                 icon: CAAssets.arrowLeft(),
                 onPressed: () => Navigator.of(context).pop(),
-                // size: ,
               ),
             ),
             body: Column(
