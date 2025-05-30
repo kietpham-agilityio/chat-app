@@ -24,19 +24,23 @@ class CACircleAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: CircleAvatar(
-        backgroundColor: Colors.transparent,
-        child: ClipOval(
-          child: Container(
-            height: avatarSize,
-            width: avatarSize,
-            color: CAPalette.grey[1],
-            child: CACachedNetworkImage(
-              url: url,
-              errorBuilder: CAAssets.user(
-                width: avatarSize,
-                height: avatarSize,
-                boxFit: BoxFit.scaleDown,
+      child: SizedBox(
+        height: avatarSize,
+        width: avatarSize,
+        child: CircleAvatar(
+          backgroundColor: Colors.transparent,
+          child: ClipOval(
+            child: Container(
+              height: avatarSize,
+              width: avatarSize,
+              color: CAPalette.grey[1],
+              child: CACachedNetworkImage(
+                url: url,
+                errorBuilder: CAAssets.user(
+                  width: avatarSize,
+                  height: avatarSize,
+                  boxFit: BoxFit.scaleDown,
+                ),
               ),
             ),
           ),

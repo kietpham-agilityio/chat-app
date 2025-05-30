@@ -32,6 +32,10 @@ class AppProvider extends StatelessWidget {
           lazy: false,
           create: (context) => AuthRepository(),
         ),
+        RepositoryProvider<ChatRepository>(
+          lazy: true,
+          create: (context) => ChatRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
