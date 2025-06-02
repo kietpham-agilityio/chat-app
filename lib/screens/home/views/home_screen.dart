@@ -1,4 +1,5 @@
 import 'package:chat_app/core/extensions/context_extensions.dart';
+import 'package:chat_app/core/extensions/string_extensions.dart';
 import 'package:chat_app/core/router/app_router.dart' show AppPaths;
 import 'package:chat_app/core/themes/themes.dart' show CAPalette;
 import 'package:chat_app/core/widgets/widgets.dart'
@@ -6,12 +7,14 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAAppBar,
         CAAssets,
         CABodyLargeText,
+        CABodyMediumText,
         CACircleAvatar,
         CADivider,
         CAHeadlineMediumText,
         CAListTile,
         CATextField,
         CATitleMediumText;
+import 'package:chat_app/models/models.dart' show ChatRoomModel;
 import 'package:chat_app/repositories/repositories.dart' show ChatRepository;
 import 'package:chat_app/screens/home/cubit/home_bloc.dart';
 import 'package:chat_app/screens/search/views/search_screen.dart';
@@ -112,56 +115,33 @@ class HomeScreen extends StatelessWidget {
                     );
                   }
 
-                  return ListView.separated(
+                  return ListView.builder(
                     itemCount: state.chats.length,
-                    separatorBuilder:
-                        (BuildContext context, int index) => CADivider(),
                     itemBuilder: (_, index) {
-                      if (index == state.chats.length - 1) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CAListTile(
-                              leading: CACircleAvatar(
-                                url:
-                                    'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-                                avatarSize: 48,
-                              ),
-                              trailing: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: context.colorScheme.primary,
-                                ),
-                                width: 10,
-                                height: 10,
-                              ),
-                              title: Text('Title $index'),
-                              subtitle: Text('Subtitle $index'),
-                              onTap:
-                                  () => context.pushNamed(AppPaths.chat.name),
-                            ),
-                            CADivider(),
-                          ],
-                        );
-                      }
-
-                      return CAListTile(
-                        leading: CACircleAvatar(
-                          url:
-                              'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-                          avatarSize: 48,
-                        ),
-                        trailing: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: context.colorScheme.primary,
-                          ),
-                          width: 10,
-                          height: 10,
-                        ),
-                        title: Text('Title $index'),
-                        subtitle: Text('Subtitle $index'),
-                        onTap: () => context.pushNamed(AppPaths.chat.name),
+                      return ChatListTile(
+                        chatRoom: state.chats[index],
+                        currentUserId:
+                            FirebaseAuth.instance.currentUser?.uid ?? '',
+                        onTap: () {
+                          final otherUserId = state.chats[index].participants
+                              .firstWhere(
+                                (id) =>
+                                    id !=
+                                    FirebaseAuth.instance.currentUser?.uid,
+                              );
+                          final outherUserName =
+                              state
+                                  .chats[index]
+                                  .participantsName?[otherUserId] ??
+                              "Unknown";
+                          context.pushNamed(
+                            AppPaths.chat.name,
+                            queryParameters: {
+                              'receiverId': otherUserId,
+                              'receiverName': outherUserName,
+                            },
+                          );
+                        },
                       );
                     },
                   );
@@ -171,6 +151,80 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class ChatListTile extends StatelessWidget {
+  const ChatListTile({
+    super.key,
+    required this.chatRoom,
+    required this.currentUserId,
+    required this.onTap,
+  });
+
+  final ChatRoomModel chatRoom;
+  final String currentUserId;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isMe = chatRoom.lastMessageSenderId == currentUserId;
+
+    String getOtherUsername() {
+      try {
+        final otherUserId = chatRoom.participants.firstWhere(
+          (id) => id != currentUserId,
+          orElse: () => 'Unknown User',
+        );
+        return chatRoom.participantsName?[otherUserId] ?? "Unknown User";
+      } catch (e) {
+        return "Unknown User";
+      }
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CAListTile(
+          leading: CACircleAvatar(
+            url:
+                'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
+            avatarSize: 40,
+          ),
+          trailing: StreamBuilder<bool>(
+            stream: context.read<ChatRepository>().getUnreadCount(
+              chatRoom.id,
+              FirebaseAuth.instance.currentUser?.uid ?? '',
+            ),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData || snapshot.data == false) {
+                return const SizedBox();
+              }
+
+              return Container(
+                height: 10,
+                width: 10,
+                decoration: BoxDecoration(
+                  color: context.colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+              );
+            },
+          ),
+          title: CATitleMediumText(
+            text: getOtherUsername().capitalizeEachWord(),
+          ),
+          subtitle: CABodyMediumText(
+            text:
+                isMe
+                    ? 'You: ${chatRoom.lastMessage ?? ''}'
+                    : chatRoom.lastMessage ?? '',
+          ),
+          onTap: onTap,
+        ),
+        CADivider(),
+      ],
     );
   }
 }

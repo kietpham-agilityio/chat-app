@@ -38,7 +38,15 @@ class AppRouter {
           GoRoute(
             name: AppPaths.chat.name,
             path: AppPaths.chat.path,
-            builder: (_, state) => const ChatMessageScreen(),
+            builder: (_, state) {
+              final receiverName = state.uri.queryParameters['receiverName'];
+              final receiverId = state.uri.queryParameters['receiverId'];
+
+              return ChatMessageScreen(
+                receiverId: receiverId ?? '',
+                receiverName: receiverName ?? '',
+              );
+            },
           ),
           GoRoute(
             name: AppPaths.profile.name,

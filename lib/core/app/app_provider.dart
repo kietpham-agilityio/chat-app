@@ -1,4 +1,5 @@
-import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
+import 'package:chat_app/repositories/repositories.dart'
+    show AuthRepository, ChatRepository;
 import 'package:chat_app/screens/auth/states/auth_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseFirestore;
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;

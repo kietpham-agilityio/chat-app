@@ -8,6 +8,7 @@ class CATextField extends StatefulWidget {
     this.obscureText = false,
     this.readOnly = false,
     this.autofocus = false,
+    this.hasValidation = true,
     this.errorMessage,
     this.title,
     this.hintText,
@@ -18,6 +19,7 @@ class CATextField extends StatefulWidget {
     this.focusNode,
     this.onFocusLost,
     this.ontap,
+    this.controller,
     super.key,
   });
 
@@ -91,12 +93,17 @@ class CATextField extends StatefulWidget {
   /// when the user taps on it.
   final VoidCallback? ontap;
 
+  final TextEditingController? controller;
+
+  final bool hasValidation;
+
   @override
   State<CATextField> createState() => _CATextFieldState();
 }
 
 class _CATextFieldState extends State<CATextField> {
   late final FocusNode? _focusNode = widget.focusNode;
+  late final TextEditingController? _controller = widget.controller;
 
   @override
   void initState() {
@@ -125,6 +132,7 @@ class _CATextFieldState extends State<CATextField> {
         ],
         TextField(
           focusNode: widget.focusNode,
+          controller: _controller,
           obscureText: widget.obscureText,
           readOnly: widget.readOnly,
           autofocus: widget.autofocus,
@@ -145,20 +153,22 @@ class _CATextFieldState extends State<CATextField> {
           ),
           onTap: widget.ontap,
         ),
-        if (widget.errorMessage != null) ...[
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CAAssets.error(),
-              SizedBox(width: 8),
-              CABodyMediumText(
-                text: widget.errorMessage!,
-                color: CAPalette.error,
-              ),
-            ],
-          ),
-        ] else
-          SizedBox(height: 20),
+        if (widget.hasValidation) ...[
+          if (widget.errorMessage != null) ...[
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CAAssets.error(),
+                SizedBox(width: 8),
+                CABodyMediumText(
+                  text: widget.errorMessage!,
+                  color: CAPalette.error,
+                ),
+              ],
+            ),
+          ] else
+            SizedBox(height: 20),
+        ],
       ],
     );
   }
