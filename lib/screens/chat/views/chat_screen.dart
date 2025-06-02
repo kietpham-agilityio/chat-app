@@ -1,4 +1,7 @@
+import 'package:chat_app/core/extensions/datetime_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
+import 'package:chat_app/core/extensions/timestamp_extensions.dart';
+import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/themes/themes.dart';
 import 'package:chat_app/core/widgets/text.dart';
 import 'package:chat_app/core/widgets/widgets.dart'
@@ -6,6 +9,10 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAAppBar,
         CAAssets,
         CACircleAvatar,
+        CADialog,
+        CADialogManager,
+        CADivider,
+        CAElevatedButton,
         CAIconButtons,
         CATextField,
         CATitleMediumText;
@@ -14,12 +21,13 @@ import 'package:chat_app/repositories/repositories.dart' show ChatRepository;
 import 'package:chat_app/screens/chat/cubit/chat_cubit.dart'
     show ChatCubit, ChatState, ChatStatus;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
-class ChatMessageScreen extends StatelessWidget {
+class ChatMessageScreen extends StatefulWidget {
   const ChatMessageScreen({
     required this.receiverId,
     required this.receiverName,
@@ -30,14 +38,26 @@ class ChatMessageScreen extends StatelessWidget {
   final String receiverName;
 
   @override
+  State<ChatMessageScreen> createState() => _ChatMessageScreenState();
+}
+
+class _ChatMessageScreenState extends State<ChatMessageScreen> {
+  late ChatCubit _chatCubit;
+
+  @override
+  void initState() {
+    _chatCubit = ChatCubit(
+      currentUserId: FirebaseAuth.instance.currentUser?.uid ?? '',
+      chatRepository: context.read<ChatRepository>(),
+    );
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LoaderOverlay(
       child: BlocProvider(
-        create:
-            (context) => ChatCubit(
-              currentUserId: FirebaseAuth.instance.currentUser?.uid ?? '',
-              chatRepository: context.read<ChatRepository>(),
-            ),
+        create: (context) => _chatCubit,
         child: BlocListener<ChatCubit, ChatState>(
           listener: (context, state) {
             if (state.status == ChatStatus.loading) {
@@ -56,7 +76,9 @@ class ChatMessageScreen extends StatelessWidget {
                         'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
                     avatarSize: 32,
                   ),
-                  CATitleMediumText(text: receiverName.capitalizeEachWord()),
+                  CATitleMediumText(
+                    text: widget.receiverName.capitalizeEachWord(),
+                  ),
                   SizedBox(width: 32),
                 ],
               ),
@@ -66,14 +88,57 @@ class ChatMessageScreen extends StatelessWidget {
                 onPressed: () => context.pop(),
               ),
               trailing: [
-                CAIconButtons(
-                  icon: CAAssets.moreHorizontal(),
-                  onPressed: () {},
+                BlocBuilder<ChatCubit, ChatState>(
+                  bloc: _chatCubit,
+                  builder: (context, state) {
+                    if (state.amIBlocked || state.isUserBlocked) {
+                      return SizedBox(width: 48);
+                    }
+
+                    return PopupMenuButton<String>(
+                      icon: CAAssets.moreHorizontal(),
+                      onSelected: (value) async {
+                        if (value == "block") {
+                          CADialogManager.showDialog(
+                            context: context,
+                            dialog: CADialog(
+                              title:
+                                  S.of(context).chatMessageDialogBlockUserTitle,
+                              content: S
+                                  .of(context)
+                                  .chatMessageDialogBlockUserContent(
+                                    widget.receiverName.capitalizeEachWord(),
+                                  ),
+                              confirmButton: S.of(context).chatMessageBlockBtn,
+                              cancelButton: S.of(context).chatMessageCancelBtn,
+                              onCancel: () => context.pop(),
+                              onConfirm: () {
+                                context.pop();
+                                _chatCubit.blockUser(widget.receiverId);
+                              },
+                            ),
+                          );
+                        }
+                      },
+                      itemBuilder:
+                          (context) => <PopupMenuEntry<String>>[
+                            PopupMenuItem(
+                              value: 'block',
+                              child: CABodyLargeText(
+                                text: S.of(context).chatMessageBlockBtn,
+                              ),
+                            ),
+                          ],
+                    );
+                  },
                 ),
               ],
             ),
             body: SafeArea(
-              child: _View(receiverId: receiverId, receiverName: receiverName),
+              child: _View(
+                receiverId: widget.receiverId,
+                receiverName: widget.receiverName,
+              ),
             ),
           ),
         ),
@@ -116,6 +181,7 @@ class _ViewState extends State<_View> {
   void initState() {
     _chatCubit = context.read<ChatCubit>();
     _chatCubit.enterChat(widget.receiverId);
+    _scrollController.addListener(_onScroll);
 
     super.initState();
   }
@@ -124,138 +190,217 @@ class _ViewState extends State<_View> {
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
+    _chatCubit.leaveChat();
 
     super.dispose();
   }
 
-  bool _isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
+  bool get isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
   }
 
-  String _formatTimestampWithDateCondition(DateTime time) {
-    final now = DateTime.now();
-    final timeStr =
-        "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
-
-    if (_isSameDay(time, now)) {
-      return timeStr;
-    } else {
-      return "$timeStr • ${time.day.toString().padLeft(2, '0')}/${time.month.toString().padLeft(2, '0')}/${time.year}";
-    }
+  void _onScroll() {
+    if (isBottom) _chatCubit.loadMoreMessages();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ChatCubit, ChatState>(
       builder: (context, state) {
-        return Column(
+        return Stack(
+          alignment: Alignment.topCenter,
           children: [
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                reverse: true,
-                itemCount: state.messages.length,
-                itemBuilder: (context, index) {
-                  final message = state.messages[index];
-                  final isMe = message.senderId == _chatCubit.currentUserId;
-                  ChatMessage? nextMessage;
-                  if (index + 1 < state.messages.length) {
-                    nextMessage = state.messages[index + 1];
-                  }
+            Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                    reverse: true,
+                    itemCount: state.messages.length,
+                    itemBuilder: (context, index) {
+                      final message = state.messages[index];
+                      final isMe = message.senderId == _chatCubit.currentUserId;
+                      ChatMessage? nextMessage;
+                      if (index + 1 < state.messages.length) {
+                        nextMessage = state.messages[index + 1];
+                      }
 
-                  bool showTimestamp = false;
+                      bool showTimestamp = false;
 
-                  final currentDate = message.timestamp.toDate();
+                      final currentDate = message.timestamp.toDate();
 
-                  if (nextMessage == null) {
-                    showTimestamp = true;
-                  } else {
-                    final nextDate = nextMessage.timestamp.toDate();
-                    final diff = currentDate.difference(nextDate).inMinutes;
+                      if (nextMessage == null) {
+                        showTimestamp = true;
+                      } else {
+                        final nextDate = nextMessage.timestamp.toDate();
+                        final diff = currentDate.difference(nextDate).inMinutes;
 
-                    // Display if the difference is >= 60 minutes or different day
-                    showTimestamp =
-                        diff >= 5 || !_isSameDay(currentDate, nextDate);
-                  }
+                        // Display if the difference is >= 60 minutes or different day
+                        showTimestamp =
+                            // diff >= 5 || !_isSameDay(currentDate, nextDate);
+                            diff >= 5 || !currentDate.isSameDay(nextDate);
+                      }
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if (showTimestamp) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 4,
-                            horizontal: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: CAPalette.grey[3]!),
-                            color: CAPalette.grey[1],
-                          ),
-                          child: CABodyMediumText(
-                            text: _formatTimestampWithDateCondition(
-                              currentDate,
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (showTimestamp) ...[
+                            SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 4,
+                                horizontal: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: CAPalette.grey[3]!),
+                                color: CAPalette.grey[1],
+                              ),
+                              child: CABodyMediumText(
+                                // text: _formatTimestampWithDateCondition(
+                                //   currentDate,
+                                // ),
+                                text: message.timestamp.formatChatDateTime(),
+                                color: CAPalette.grey[5],
+                              ),
                             ),
-                            color: CAPalette.grey[5],
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                      ] else
-                        SizedBox(height: 10),
-                      MessageBubble(message: message, isMe: isMe),
-                    ],
-                  );
-                },
-              ),
-            ),
-            if (!state.amIBlocked && !state.isUserBlocked)
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    Row(
+                            SizedBox(height: 16),
+                          ] else
+                            SizedBox(height: 10),
+                          MessageBubble(message: message, isMe: isMe),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                if (!state.amIBlocked && !state.isUserBlocked)
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
                       children: [
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: CATextField(
-                            controller: _messageController,
-                            keyboardType: TextInputType.multiline,
-                            hasValidation: false,
-                            onChanged: (value) {
-                              _chatCubit.messageChanged(value);
-                            },
-                            hintText: "Start typing...",
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        BlocSelector<ChatCubit, ChatState, bool>(
-                          selector: (state) {
-                            final isEnabled =
-                                state.message != null && state.message != '';
+                        Row(
+                          children: [
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: CATextField(
+                                controller: _messageController,
+                                keyboardType: TextInputType.multiline,
+                                hasValidation: false,
+                                onChanged: (value) {
+                                  _chatCubit.messageChanged(value);
+                                },
+                                hintText:
+                                    S.of(context).chatMessageTextFieldHint,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            BlocSelector<ChatCubit, ChatState, bool>(
+                              selector: (state) {
+                                final isEnabled =
+                                    state.message != null &&
+                                    state.message != '';
 
-                            return isEnabled;
-                          },
-                          builder: (context, isEnabled) {
-                            return isEnabled
-                                ? IconButton(
-                                  icon: Icon(
-                                    Icons.send,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  onPressed: _handleSendMessage,
-                                )
-                                : CAIconButtons(
-                                  icon: CAAssets.thumpsUp(),
-                                  onPressed: _handleSendThumbUp,
-                                );
-                          },
+                                return isEnabled;
+                              },
+                              builder: (context, isEnabled) {
+                                return isEnabled
+                                    ? IconButton(
+                                      icon: Icon(
+                                        Icons.send,
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
+                                      ),
+                                      onPressed: _handleSendMessage,
+                                    )
+                                    : CAIconButtons(
+                                      icon: CAAssets.thumpsUp(),
+                                      onPressed: _handleSendThumbUp,
+                                    );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                  )
+                else ...[
+                  CADivider(),
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: CATitleMediumText(
+                      text:
+                          state.isUserBlocked
+                              ? S
+                                  .of(context)
+                                  .chatMessageBlockedByMeBannerTitle(
+                                    widget.receiverName.capitalizeEachWord(),
+                                  )
+                              : S
+                                  .of(context)
+                                  .chatMessageBlockedByOtherBannerTitle(
+                                    widget.receiverName.capitalizeEachWord(),
+                                  ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: CABodyMediumText(
+                      text: S
+                          .of(context)
+                          .chatMessageBlockedByOtherBannerDescription(
+                            widget.receiverName.capitalizeEachWord(),
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+
+                  if (state.isUserBlocked) ...[
+                    SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: CAElevatedButton(
+                        text: 'Unblock',
+                        onPressed: () {
+                          CADialogManager.showDialog(
+                            context: context,
+                            dialog: CADialog(
+                              title: S.of(context).chatMessageUnblockBtn,
+                              content: S
+                                  .of(context)
+                                  .chatMessageDialogUnblockUserContent(
+                                    widget.receiverName.capitalizeEachWord(),
+                                  ),
+                              confirmButton:
+                                  S.of(context).chatMessageUnblockBtn,
+                              cancelButton: S.of(context).chatMessageCancelBtn,
+                              onCancel: () => context.pop(),
+                              onConfirm: () {
+                                context.pop();
+                                _chatCubit.unBlockUser(widget.receiverId);
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ],
-                ),
+                ],
+              ],
+            ),
+            if (state.isLoadingMore)
+              Positioned(
+                top: 20,
+                left: 0,
+                right: 0,
+                child: CupertinoActivityIndicator(),
               ),
           ],
         );

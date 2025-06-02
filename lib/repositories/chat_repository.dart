@@ -68,7 +68,24 @@ class ChatRepository extends BaseRepository {
     }
   }
 
-  Stream<List<ChatMessage>> getMessages(
+  // Stream<List<ChatMessage>> getMessages(
+  //   String chatRoomId, {
+  //   DocumentSnapshot? lastDocument,
+  // }) {
+  //   var query = getChatRoomMessages(
+  //     chatRoomId,
+  //   ).orderBy('timestamp', descending: true).limit(20);
+
+  //   if (lastDocument != null) {
+  //     query = query.startAfterDocument(lastDocument);
+  //   }
+  //   return query.snapshots().map(
+  //     (snapshot) =>
+  //         snapshot.docs.map((doc) => ChatMessage.fromFirestore(doc)).toList(),
+  //   );
+  // }
+
+  Stream<PaginatedResult<ChatMessage>> getMessages(
     String chatRoomId, {
     DocumentSnapshot? lastDocument,
   }) {
@@ -79,10 +96,31 @@ class ChatRepository extends BaseRepository {
     if (lastDocument != null) {
       query = query.startAfterDocument(lastDocument);
     }
-    return query.snapshots().map(
-      (snapshot) =>
-          snapshot.docs.map((doc) => ChatMessage.fromFirestore(doc)).toList(),
-    );
+
+    return query.snapshots().map((snapshot) {
+      final messages =
+          snapshot.docs.map((doc) => ChatMessage.fromFirestore(doc)).toList();
+
+      final lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+
+      return PaginatedResult(items: messages, lastDoc: lastDoc);
+    });
+  }
+
+  Future<PaginatedResult<ChatMessage>> getMoreMessages(
+    String chatRoomId, {
+    required DocumentSnapshot lastDocument,
+  }) async {
+    final query = getChatRoomMessages(chatRoomId)
+        .orderBy('timestamp', descending: true)
+        .startAfterDocument(lastDocument)
+        .limit(20);
+    log("comingg");
+    final snapshot = await query.get();
+    final messages =
+        snapshot.docs.map((doc) => ChatMessage.fromFirestore(doc)).toList();
+    final lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+    return PaginatedResult(items: messages, lastDoc: lastDoc);
   }
 
   Future<void> markMessagesAsRead(String chatRoomId, String userId) async {
@@ -227,5 +265,38 @@ class ChatRepository extends BaseRepository {
         .map((snapshot) => snapshot.docs.length);
 
     return snapshot.map((count) => count > 0);
+  }
+
+  Stream<bool> isUserBlocked(String currentUserId, String otherUserId) {
+    return firestore.collection("users").doc(currentUserId).snapshots().map((
+      doc,
+    ) {
+      final userData = UserModel.fromFirestore(doc);
+      return userData.blockedUsers.contains(otherUserId);
+    });
+  }
+
+  Stream<bool> amIBlocked(String currentUserId, String otherUserId) {
+    return firestore.collection("users").doc(otherUserId).snapshots().map((
+      doc,
+    ) {
+      final userData = UserModel.fromFirestore(doc);
+      return userData.blockedUsers.contains(currentUserId);
+    });
+  }
+
+  Future<void> blockUser(String currentUserId, String blockedUserId) async {
+    final userRef = firestore.collection("users").doc(currentUserId);
+    await userRef.update({
+      'blockedUsers': FieldValue.arrayUnion([blockedUserId]),
+      // 'blockedUsers': List<String>.from(data["blockedUsers"] ?? []),
+    });
+  }
+
+  Future<void> unBlockUser(String currentUserId, String blockedUserId) async {
+    final userRef = firestore.collection("users").doc(currentUserId);
+    await userRef.update({
+      'blockedUsers': FieldValue.arrayRemove([blockedUserId]),
+    });
   }
 }

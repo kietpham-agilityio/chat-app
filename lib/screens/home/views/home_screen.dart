@@ -1,5 +1,6 @@
 import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
+import 'package:chat_app/core/extensions/timestamp_extensions.dart';
 import 'package:chat_app/core/router/app_router.dart' show AppPaths;
 import 'package:chat_app/core/themes/themes.dart' show CAPalette;
 import 'package:chat_app/core/widgets/widgets.dart'
@@ -182,48 +183,62 @@ class _ChatListTile extends StatelessWidget {
       }
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CAListTile(
-          leading: CACircleAvatar(
-            url:
-                'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-            avatarSize: 40,
-          ),
-          trailing: StreamBuilder<bool>(
-            stream: context.read<ChatRepository>().getUnreadCount(
-              chatRoom.id,
-              FirebaseAuth.instance.currentUser?.uid ?? '',
-            ),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData || snapshot.data == false) {
-                return const SizedBox();
-              }
+    return StreamBuilder<bool>(
+      stream: context.read<ChatRepository>().getUnreadCount(
+        chatRoom.id,
+        FirebaseAuth.instance.currentUser?.uid ?? '',
+      ),
+      builder: (context, snapshot) {
+        final hasUnread = snapshot.data == true;
 
-              return Container(
-                height: 10,
-                width: 10,
-                decoration: BoxDecoration(
-                  color: context.colorScheme.primary,
-                  shape: BoxShape.circle,
-                ),
-              );
-            },
-          ),
-          title: CATitleMediumText(
-            text: getOtherUsername().capitalizeEachWord(),
-          ),
-          subtitle: CABodyMediumText(
-            text:
-                isMe
-                    ? 'You: ${chatRoom.lastMessage ?? ''}'
-                    : chatRoom.lastMessage ?? '',
-          ),
-          onTap: onTap,
-        ),
-        CADivider(),
-      ],
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CAListTile(
+              leading: const CACircleAvatar(
+                url:
+                    'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
+                avatarSize: 40,
+              ),
+              tileColor: hasUnread ? CAPalette.grey[1] : null,
+              trailing:
+                  hasUnread
+                      ? Container(
+                        height: 10,
+                        width: 10,
+                        decoration: BoxDecoration(
+                          color: context.colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                      )
+                      : const SizedBox(),
+              title: CATitleMediumText(
+                text: getOtherUsername().capitalizeEachWord(),
+              ),
+              subtitle: Row(
+                children: [
+                  Flexible(
+                    child: CABodyMediumText(
+                      text:
+                          isMe
+                              ? 'You: ${chatRoom.lastMessage ?? ''}'
+                              : chatRoom.lastMessage ?? '',
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  CABodyMediumText(
+                    text: chatRoom.lastMessageTime?.timeAgo() ?? '',
+                  ),
+                ],
+              ),
+              onTap: onTap,
+            ),
+            const CADivider(),
+          ],
+        );
+      },
     );
   }
 }

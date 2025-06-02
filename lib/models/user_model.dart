@@ -6,12 +6,14 @@ class UserModel {
     required this.fullName,
     required this.email,
     required this.phoneNumber,
+    this.blockedUsers = const [],
   });
 
   final String uid;
   final String fullName;
   final String email;
   final String phoneNumber;
+  final List<String> blockedUsers;
 
   /// Empty user which represents an unauthenticated user.
   static const empty = UserModel(
@@ -19,11 +21,11 @@ class UserModel {
     fullName: '',
     email: '',
     phoneNumber: '',
+    blockedUsers: [],
   );
 
   UserModel copyWith({
     String? uid,
-    String? username,
     String? fullName,
     String? email,
     String? phoneNumber,
@@ -35,6 +37,7 @@ class UserModel {
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      blockedUsers: blockedUsers ?? this.blockedUsers,
     );
   }
 
@@ -45,10 +48,16 @@ class UserModel {
       fullName: data["fullName"] ?? "",
       email: data["email"] ?? "",
       phoneNumber: data["phoneNumber"] ?? "",
+      blockedUsers: List<String>.from(data["blockedUsers"] ?? []),
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {'email': email, 'fullName': fullName, 'phoneNumber': phoneNumber};
+    return {
+      'email': email,
+      'fullName': fullName,
+      'phoneNumber': phoneNumber,
+      'blockedUsers': blockedUsers,
+    };
   }
 }

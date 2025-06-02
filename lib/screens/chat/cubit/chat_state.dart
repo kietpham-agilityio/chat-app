@@ -16,6 +16,7 @@ class ChatState extends Equatable {
   final String? error;
   final String? receiverId;
   final String? chatRoomId;
+  final DocumentSnapshot? lastDoc;
   final String? message;
 
   const ChatState({
@@ -31,6 +32,7 @@ class ChatState extends Equatable {
     this.error,
     this.receiverId,
     this.chatRoomId,
+    this.lastDoc,
     this.message,
   });
 
@@ -47,6 +49,7 @@ class ChatState extends Equatable {
     bool? isLoadingMore,
     bool? isUserBlocked,
     bool? amIBlocked,
+    DocumentSnapshot? lastDoc,
     String? message,
   }) {
     return ChatState(
@@ -62,6 +65,7 @@ class ChatState extends Equatable {
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       isUserBlocked: isUserBlocked ?? this.isUserBlocked,
       amIBlocked: amIBlocked ?? this.amIBlocked,
+      lastDoc: lastDoc ?? this.lastDoc,
       message: message ?? this.message,
     );
   }
@@ -81,6 +85,7 @@ class ChatState extends Equatable {
       isLoadingMore,
       isUserBlocked,
       amIBlocked,
+      lastDoc,
       message,
     ];
   }

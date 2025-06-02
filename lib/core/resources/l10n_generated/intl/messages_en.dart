@@ -20,8 +20,35 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
+  static String m0(name) => "You\'ve blocked messages from ${name}";
+
+  static String m1(name) =>
+      "You can\'t message ${name} in this chat, and you won\'t receive their messages.";
+
+  static String m2(name) => "You have been blocked by ${name}";
+
+  static String m3(name) => "Are you sure you want to block ${name}";
+
+  static String m4(name) => "Are you sure you want to unblock ${name}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "chatMessageBlockBtn": MessageLookupByLibrary.simpleMessage("Block User"),
+    "chatMessageBlockedByMeBannerTitle": m0,
+    "chatMessageBlockedByOtherBannerDescription": m1,
+    "chatMessageBlockedByOtherBannerTitle": m2,
+    "chatMessageCancelBtn": MessageLookupByLibrary.simpleMessage("Cancel"),
+    "chatMessageDialogBlockUserContent": m3,
+    "chatMessageDialogBlockUserTitle": MessageLookupByLibrary.simpleMessage(
+      "Block User",
+    ),
+    "chatMessageDialogUnblockUserContent": m4,
+    "chatMessageTextFieldHint": MessageLookupByLibrary.simpleMessage(
+      "Start typing...",
+    ),
+    "chatMessageUnblockBtn": MessageLookupByLibrary.simpleMessage(
+      "Unblock User",
+    ),
     "createAccountBtn": MessageLookupByLibrary.simpleMessage(
       "Create an account",
     ),
