@@ -118,7 +118,7 @@ class HomeScreen extends StatelessWidget {
                   return ListView.builder(
                     itemCount: state.chats.length,
                     itemBuilder: (_, index) {
-                      return ChatListTile(
+                      return _ChatListTile(
                         chatRoom: state.chats[index],
                         currentUserId:
                             FirebaseAuth.instance.currentUser?.uid ?? '',
@@ -155,9 +155,8 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class ChatListTile extends StatelessWidget {
-  const ChatListTile({
-    super.key,
+class _ChatListTile extends StatelessWidget {
+  const _ChatListTile({
     required this.chatRoom,
     required this.currentUserId,
     required this.onTap,
