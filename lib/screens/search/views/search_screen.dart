@@ -111,7 +111,14 @@ class SearchScreen extends StatelessWidget {
                                     avatarSize: 48,
                                   ),
                                   onTap: () {
-                                    context.pushNamed(AppPaths.chat.name);
+                                    context.pushNamed(
+                                      AppPaths.chat.name,
+                                      queryParameters: {
+                                        'receiverId': state.users[index].uid,
+                                        'receiverName':
+                                            state.users[index].fullName,
+                                      },
+                                    );
                                   },
                                 ),
                                 CADivider(),
@@ -127,7 +134,15 @@ class SearchScreen extends StatelessWidget {
                                   'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
                               avatarSize: 48,
                             ),
-                            onTap: () {},
+                            onTap: () {
+                              context.pushNamed(
+                                AppPaths.chat.name,
+                                queryParameters: {
+                                  'receiverId': state.users[index].uid,
+                                  'receiverName': state.users[index].fullName,
+                                },
+                              );
+                            },
                           );
                         },
                       );

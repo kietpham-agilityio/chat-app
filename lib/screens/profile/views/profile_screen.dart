@@ -1,7 +1,7 @@
 import 'package:chat_app/core/router/app_router.dart';
 import 'package:chat_app/core/widgets/widgets.dart'
     show CAAppBar, CAAssets, CAElevatedButton, CAIconButtons, CATitleMediumText;
-import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
+import 'package:chat_app/screens/auth/states/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -33,7 +33,7 @@ class ProfileScreen extends StatelessWidget {
             CAElevatedButton(
               text: 'Log Out',
               onPressed: () {
-                context.read<AuthRepository>().signOut();
+                context.read<AuthBloc>().add(const AuthLogoutPressed());
               },
             ),
           ],
