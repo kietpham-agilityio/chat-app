@@ -27,5 +27,55 @@
   "loginForgotPasswordBtn": "Forgot your password?",
   "createAccountTitle": "Create account",
   "createAccountSubTitle": "Create a new account to start chatting",
-  "createAccountBtn": "Create an account"
+  "createAccountBtn": "Create an account",
+  "chatMessageBlockBtn": "Block User",
+  "chatMessageUnblockBtn": "Unblock User",
+  "chatMessageDialogBlockUserTitle": "Block User",
+  "chatMessageDialogBlockUserContent": "Are you sure you want to block {name}",
+  "@chatMessageDialogBlockUserContent": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "David"
+      }
+    }
+  },
+  "chatMessageCancelBtn": "Cancel",
+  "chatMessageBlockedByMeBannerTitle": "You've blocked messages from {name}",
+  "@chatMessageBlockedByMeBannerTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "David"
+      }
+    }
+  },
+  "chatMessageBlockedByOtherBannerTitle": "You have been blocked by {name}",
+  "@chatMessageBlockedByOtherBannerTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "David"
+      }
+    }
+  },
+  "chatMessageBlockedByOtherBannerDescription": "You can't message {name} in this chat, and you won't receive their messages.",
+  "@chatMessageBlockedByOtherBannerDescription": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "David"
+      }
+    }
+  },
+  "chatMessageDialogUnblockUserContent": "Are you sure you want to unblock {name}",
+  "@chatMessageDialogUnblockUserContent": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "David"
+      }
+    }
+  },
+  "chatMessageTextFieldHint": "Start typing..."
 }

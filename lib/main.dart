@@ -1,6 +1,7 @@
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart' show S;
 import 'package:firebase_core/firebase_core.dart' show Firebase;
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/app/app_provider.dart';
 import 'core/router/app_router.dart';
@@ -10,6 +11,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
+
+  await initializeDateFormatting('en');
 
   runApp(const MyApp());
 }

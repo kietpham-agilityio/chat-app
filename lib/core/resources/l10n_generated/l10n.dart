@@ -328,6 +328,106 @@ class S {
       args: [],
     );
   }
+
+  /// `Block User`
+  String get chatMessageBlockBtn {
+    return Intl.message(
+      'Block User',
+      name: 'chatMessageBlockBtn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unblock User`
+  String get chatMessageUnblockBtn {
+    return Intl.message(
+      'Unblock User',
+      name: 'chatMessageUnblockBtn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Block User`
+  String get chatMessageDialogBlockUserTitle {
+    return Intl.message(
+      'Block User',
+      name: 'chatMessageDialogBlockUserTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to block {name}`
+  String chatMessageDialogBlockUserContent(String name) {
+    return Intl.message(
+      'Are you sure you want to block $name',
+      name: 'chatMessageDialogBlockUserContent',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Cancel`
+  String get chatMessageCancelBtn {
+    return Intl.message(
+      'Cancel',
+      name: 'chatMessageCancelBtn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You've blocked messages from {name}`
+  String chatMessageBlockedByMeBannerTitle(String name) {
+    return Intl.message(
+      'You\'ve blocked messages from $name',
+      name: 'chatMessageBlockedByMeBannerTitle',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `You have been blocked by {name}`
+  String chatMessageBlockedByOtherBannerTitle(String name) {
+    return Intl.message(
+      'You have been blocked by $name',
+      name: 'chatMessageBlockedByOtherBannerTitle',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `You can't message {name} in this chat, and you won't receive their messages.`
+  String chatMessageBlockedByOtherBannerDescription(String name) {
+    return Intl.message(
+      'You can\'t message $name in this chat, and you won\'t receive their messages.',
+      name: 'chatMessageBlockedByOtherBannerDescription',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Are you sure you want to unblock {name}`
+  String chatMessageDialogUnblockUserContent(String name) {
+    return Intl.message(
+      'Are you sure you want to unblock $name',
+      name: 'chatMessageDialogUnblockUserContent',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Start typing...`
+  String get chatMessageTextFieldHint {
+    return Intl.message(
+      'Start typing...',
+      name: 'chatMessageTextFieldHint',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -341,6 +341,7 @@ class CABodyMediumText extends StatelessWidget {
     this.textAlign,
     this.fontWeight,
     this.overflow,
+    this.maxLines,
     super.key,
   });
 
@@ -367,6 +368,8 @@ class CABodyMediumText extends StatelessWidget {
   /// If null, the text will use the default overflow behavior from the [TextTheme].
   final TextOverflow? overflow;
 
+  final int? maxLines;
+
   @override
   Widget build(BuildContext context) {
     return CAText(
@@ -378,6 +381,7 @@ class CABodyMediumText extends StatelessWidget {
         overflow: overflow,
         fontSize: context.textTheme.bodyMedium?.fontSize ?? 14,
       ),
+      maxLines: maxLines,
     );
   }
 }
