@@ -9,6 +9,7 @@ class CATextField extends StatefulWidget {
     this.readOnly = false,
     this.autofocus = false,
     this.hasValidation = true,
+    this.enabled = true,
     this.errorMessage,
     this.title,
     this.hintText,
@@ -20,6 +21,7 @@ class CATextField extends StatefulWidget {
     this.onFocusLost,
     this.ontap,
     this.controller,
+    this.initValue,
     super.key,
   });
 
@@ -97,16 +99,26 @@ class CATextField extends StatefulWidget {
 
   final bool hasValidation;
 
+  final bool enabled;
+
+  final String? initValue;
+
   @override
   State<CATextField> createState() => _CATextFieldState();
 }
 
 class _CATextFieldState extends State<CATextField> {
-  late final FocusNode? _focusNode = widget.focusNode;
-  late final TextEditingController? _controller = widget.controller;
+  late final FocusNode? _focusNode;
+  late final TextEditingController? _controller;
 
   @override
   void initState() {
+    _focusNode = widget.focusNode ?? FocusNode();
+    _controller = widget.controller ?? TextEditingController();
+
+    if (widget.initValue != null && widget.controller == null) {
+      _controller?.text = widget.initValue!;
+    }
     _focusNode?.addListener(() {
       if (!_focusNode.hasFocus) {
         widget.onFocusLost?.call();
@@ -135,6 +147,7 @@ class _CATextFieldState extends State<CATextField> {
           controller: _controller,
           obscureText: widget.obscureText,
           readOnly: widget.readOnly,
+          enabled: widget.enabled,
           autofocus: widget.autofocus,
           decoration: InputDecoration(
             hintText: widget.hintText,

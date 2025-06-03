@@ -39,7 +39,7 @@ class CACircleAvatar extends StatelessWidget {
                 errorBuilder: CAAssets.user(
                   width: avatarSize,
                   height: avatarSize,
-                  boxFit: BoxFit.scaleDown,
+                  boxFit: BoxFit.contain,
                 ),
               ),
             ),
