@@ -12,54 +12,14 @@ class InitialEvent extends MyAccountEvent {
     required this.email,
     required this.fullName,
     required this.phoneNumber,
-    this.country,
-    this.city,
-    this.district,
   });
 
   final String email;
   final String fullName;
   final String phoneNumber;
-  final String? country;
-  final String? city;
-  final String? district;
 
   @override
-  List<Object?> get props => [
-    email,
-    fullName,
-    phoneNumber,
-    country,
-    city,
-    district,
-  ];
-}
-
-class CountryChangedEvent extends MyAccountEvent {
-  const CountryChangedEvent(this.value);
-
-  final String value;
-
-  @override
-  List<Object> get props => [value];
-}
-
-class CityChangedEvent extends MyAccountEvent {
-  const CityChangedEvent(this.value);
-
-  final String value;
-
-  @override
-  List<Object> get props => [value];
-}
-
-class DistrictChangedEvent extends MyAccountEvent {
-  const DistrictChangedEvent(this.value);
-
-  final String value;
-
-  @override
-  List<Object> get props => [value];
+  List<Object?> get props => [email, fullName, phoneNumber];
 }
 
 class FullNameChangedEvent extends MyAccountEvent {
@@ -98,24 +58,18 @@ class PhoneNumberValidationEvent extends MyAccountEvent {
   List<Object> get props => [value];
 }
 
-class ClearAddressEvent extends MyAccountEvent {}
+class AvatarChangedEvent extends MyAccountEvent {
+  const AvatarChangedEvent(this.source);
 
-class FetchCountriesEvent extends MyAccountEvent {}
-
-class FetchCitiesEvent extends MyAccountEvent {
-  const FetchCitiesEvent(this.country);
-
-  final String country;
+  final ImageSource source;
 
   @override
-  List<Object> get props => [country];
+  List<Object> get props => [source];
 }
 
-class FetchDistrictsEvent extends MyAccountEvent {
-  const FetchDistrictsEvent(this.city);
-
-  final String city;
+class UpdateUserInfoEvent extends MyAccountEvent {
+  const UpdateUserInfoEvent();
 
   @override
-  List<Object> get props => [city];
+  List<Object> get props => [];
 }

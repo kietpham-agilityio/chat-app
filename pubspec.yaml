@@ -53,8 +53,14 @@ dependencies:
   # Flutter plugin for Firebase Database, a cloud-hosted NoSQL database with realtime data syncing across Android and iOS clients, and offline access.
   firebase_database: ^11.3.6
 
+  # Flutter plugin for Firebase Cloud Storage, a powerful, simple, and cost-effective object storage service for Android and iOS.
+  firebase_storage: ^12.4.6
+
   # Custom event transformers inspired by ember concurrency. Built to be used with the bloc state management package.
   bloc_concurrency: ^0.3.0
+
+  # Flutter plugin for selecting images from the Android and iOS image library, and taking new pictures with the camera.
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

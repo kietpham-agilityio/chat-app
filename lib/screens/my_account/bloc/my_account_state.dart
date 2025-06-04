@@ -1,38 +1,45 @@
 part of 'my_account_bloc.dart';
 
 class MyAccountState extends Equatable {
-  final FullName fullName;
-  final Email email;
-  final PhoneNumber phoneNumber;
-  final bool isValid;
-  final MyAccountStatus status;
-
   const MyAccountState({
     this.fullName = const FullName.pure(),
     this.email = const Email.pure(),
     this.phoneNumber = const PhoneNumber.pure(),
-    this.isValid = false,
+    this.isValidForm = false,
     this.status = MyAccountStatus.initial,
+    this.imageFile,
+    this.avatarUrl,
+    this.errorMessage,
   });
 
-  bool get isEnabledClearButton =>
-      (fullName.value.isNotEmpty && fullName.isValid) ||
-      (email.value.isNotEmpty && email.isValid) ||
-      (phoneNumber.value.isNotEmpty && phoneNumber.isValid);
+  final FullName fullName;
+  final Email email;
+  final PhoneNumber phoneNumber;
+  final bool isValidForm;
+  final MyAccountStatus status;
+  final ImageFile? imageFile;
+  final String? avatarUrl;
+  final String? errorMessage;
 
   MyAccountState copyWith({
     FullName? fullName,
     Email? email,
     PhoneNumber? phoneNumber,
-    bool? isValid,
+    bool? isValidForm,
     MyAccountStatus? status,
+    ImageFile? imageFile,
+    String? errorMessage,
+    String? avatarUrl,
   }) {
     return MyAccountState(
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
-      isValid: isValid ?? this.isValid,
+      isValidForm: isValidForm ?? this.isValidForm,
       status: status ?? this.status,
+      imageFile: imageFile ?? this.imageFile,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 
@@ -41,10 +48,12 @@ class MyAccountState extends Equatable {
     fullName,
     email,
     phoneNumber,
-    isValid,
-    isEnabledClearButton,
+    isValidForm,
     status,
+    imageFile,
+    avatarUrl,
+    errorMessage,
   ];
 }
 
-enum MyAccountStatus { initial, loading, success, failure }
+enum MyAccountStatus { initial, loading, success, failure, profileUpdated }
