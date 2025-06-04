@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 /// Base class for all repositories. This class provides a basic
 /// infrastructure for dealing with Firebase Authentication and Firestore
@@ -17,6 +18,9 @@ abstract class BaseRepository {
 
   /// The Firestore instance.
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  /// The Firebase Storage instance.
+  final firebaseStorage = FirebaseStorage.instance;
 
   // Database realtime
   final realtimeDb = FirebaseDatabase.instance;

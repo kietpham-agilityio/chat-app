@@ -1,4 +1,5 @@
 import 'dart:developer' show log;
+import 'dart:io';
 
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart' show S;
 import 'package:chat_app/models/models.dart' show UserModel;
@@ -150,6 +151,36 @@ class AuthRepository extends BaseRepository {
   Future<void> saveUserData(UserModel user) async {
     try {
       await firestore.collection("users").doc(user.uid).set(user.toMap());
+    } catch (e) {
+      throw const AppException("Failed to save user data");
+    }
+  }
+
+  Future<void> updateUserData({required UserModel user, File? avatar}) async {
+    try {
+      String? avatarUrl;
+      if (avatar != null) {
+        final ref = firebaseStorage.ref().child('avatars/${user.uid}.jpg');
+        final task = await ref.putFile(avatar);
+        final url = await task.ref.getDownloadURL();
+        avatarUrl = url;
+      }
+
+      final newUserData = UserModel(
+        uid: user.uid,
+        fullName: user.fullName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        blockedUsers: user.blockedUsers,
+        avatarUrl: avatarUrl,
+      );
+
+      await firestore
+          .collection("users")
+          .doc(user.uid)
+          .update(newUserData.toMap());
+
+      // saveUserData(newUserData);
     } catch (e) {
       throw const AppException("Failed to save user data");
     }

@@ -12,12 +12,15 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAIconButtons,
         CAListTile,
         CATextField,
-        CATitleMediumText;
+        CATitleMediumText,
+        WzSnackBar;
+import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:chat_app/screens/auth/states/auth_bloc.dart';
 import 'package:chat_app/screens/my_account/bloc/my_account_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 class MyAccountScreen extends StatefulWidget {
@@ -28,6 +31,8 @@ class MyAccountScreen extends StatefulWidget {
 }
 
 class _MyAccountScreenState extends State<MyAccountScreen> {
+  late MyAccountBloc bloc;
+
   final TextEditingController countryController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController districtsController = TextEditingController();
@@ -35,7 +40,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   final FocusNode cityFocusNode = FocusNode();
   final FocusNode districtsFocusNode = FocusNode();
 
-  void _showBottomSheet(BuildContext context) {
+  void _showBottomSheet({
+    required BuildContext context,
+    required MyAccountBloc bloc,
+  }) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -43,7 +51,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) {
+      builder: (_) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -74,10 +82,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
-                      onTap:
-                          () => context.read<AuthBloc>().add(
-                            const AuthLogoutPressed(),
-                          ),
+                      onTap: () {
+                        bloc.add(AvatarChangedEvent(ImageSource.camera));
+                        context.pop();
+                      },
                     ),
                     CAListTile(
                       title: Text('Select from gallery'),
@@ -85,10 +93,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
-                      onTap:
-                          () => context.read<AuthBloc>().add(
-                            const AuthLogoutPressed(),
-                          ),
+                      onTap: () {
+                        bloc.add(AvatarChangedEvent(ImageSource.gallery));
+                        context.pop();
+                      },
                     ),
                   ],
                 ),
@@ -101,12 +109,20 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   }
 
   @override
+  void initState() {
+    bloc = MyAccountBloc(authRepository: context.read<AuthRepository>());
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // return AvatarPickerScreen();
+
     return LoaderOverlay(
       child: BlocProvider(
         create:
             (context) =>
-                MyAccountBloc()..add(
+                bloc..add(
                   InitialEvent(
                     email: context.read<AuthBloc>().state.user?.email ?? '',
                     fullName:
@@ -115,52 +131,87 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         context.read<AuthBloc>().state.user?.phoneNumber ?? '',
                   ),
                 ),
-        child: Scaffold(
-          appBar: CAAppBar(
-            title: CATitleMediumText(text: 'My Account'),
-            leading: CAIconButtons(
-              icon: CAAssets.arrowLeft(),
-              onPressed: () => context.pop(),
+        child: BlocListener<MyAccountBloc, MyAccountState>(
+          listener: (context, state) {
+            if (state.status == MyAccountStatus.loading) {
+              context.loaderOverlay.show();
+            } else {
+              context.loaderOverlay.hide();
+            }
+            if (state.status == MyAccountStatus.profileUpdated) {
+              WzSnackBar.success(context, message: 'Updated successfully');
+              context.loaderOverlay.hide();
+            }
+            if (state.status == MyAccountStatus.failure) {
+              WzSnackBar.error(context, message: state.errorMessage ?? '');
+              context.loaderOverlay.hide();
+            }
+          },
+          child: Scaffold(
+            appBar: CAAppBar(
+              title: CATitleMediumText(text: 'My Account'),
+              leading: CAIconButtons(
+                icon: CAAssets.arrowLeft(),
+                onPressed: () => context.pop(),
+              ),
             ),
-          ),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 22),
-                    Stack(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: CACircleAvatar(
-                            url:
-                                'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-                            avatarSize: 96,
-                          ),
-                        ),
-                        Positioned(
-                          right: -5,
-                          top: -5,
-                          child: CAIconButtons(
-                            backgroundColor: context.colorScheme.primary,
-                            icon: CAAssets.plus(
-                              color: context.colorScheme.onPrimary,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 22),
+                      Stack(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: BlocBuilder<MyAccountBloc, MyAccountState>(
+                              builder: (context, state) {
+                                if (state.imageFile != null) {
+                                  return ClipOval(
+                                    child: Image.file(
+                                      state.imageFile!.value!,
+                                      fit: BoxFit.cover,
+                                      width: 96,
+                                      height: 96,
+                                    ),
+                                  );
+                                }
+
+                                return CACircleAvatar(
+                                  url:
+                                      'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
+                                  avatarSize: 96,
+                                );
+                              },
                             ),
-                            size: 32,
-                            onPressed: () => _showBottomSheet(context),
                           ),
-                        ),
-                      ],
-                    ),
-                    _EmailInput(),
-                    _FullNameInput(),
-                    _PhoneNumberInput(),
-                    SizedBox(height: 20),
-                    _SubmitButton(),
-                  ],
+                          Positioned(
+                            right: -5,
+                            child: CAIconButtons(
+                              backgroundColor: context.colorScheme.primary,
+                              icon: CAAssets.plus(
+                                color: context.colorScheme.onPrimary,
+                              ),
+                              size: 32,
+                              onPressed:
+                                  () => _showBottomSheet(
+                                    context: context,
+                                    bloc: bloc,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      _EmailInput(),
+                      _FullNameInput(),
+                      _PhoneNumberInput(),
+                      SizedBox(height: 20),
+                      _SubmitButton(),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -299,8 +350,18 @@ class _SubmitButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isValid = context.select((MyAccountBloc bloc) => bloc.state.isValid);
-
-    return CAElevatedButton(onPressed: isValid ? () {} : null, text: 'Update');
+    return BlocSelector<MyAccountBloc, MyAccountState, bool>(
+      selector: (MyAccountState state) {
+        return state.isValidForm;
+      },
+      builder: (context, isValid) {
+        return CAElevatedButton(
+          isDisabled: !isValid,
+          onPressed:
+              () => context.read<MyAccountBloc>().add(UpdateUserInfoEvent()),
+          text: 'Update',
+        );
+      },
+    );
   }
 }

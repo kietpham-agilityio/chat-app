@@ -163,7 +163,7 @@ class _CAImageLoader extends StatelessWidget {
               (BuildContext context, ImageProvider<Object> provider) =>
                   Container(
                     decoration: BoxDecoration(
-                      image: DecorationImage(image: provider),
+                      image: DecorationImage(image: provider, fit: boxFit),
                     ),
                   ),
         );

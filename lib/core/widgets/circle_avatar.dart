@@ -1,4 +1,3 @@
-import 'package:chat_app/core/themes/app_palette.dart';
 import 'package:flutter/material.dart';
 
 import 'assets.dart' show CAAssets, CACachedNetworkImage;
@@ -30,17 +29,15 @@ class CACircleAvatar extends StatelessWidget {
         child: CircleAvatar(
           backgroundColor: Colors.transparent,
           child: ClipOval(
-            child: Container(
-              height: avatarSize,
+            child: CACachedNetworkImage(
               width: avatarSize,
-              color: CAPalette.grey[1],
-              child: CACachedNetworkImage(
-                url: url,
-                errorBuilder: CAAssets.user(
-                  width: avatarSize,
-                  height: avatarSize,
-                  boxFit: BoxFit.contain,
-                ),
+              height: avatarSize,
+              url: url,
+              boxFit: BoxFit.cover,
+              errorBuilder: CAAssets.user(
+                width: avatarSize,
+                height: avatarSize,
+                boxFit: BoxFit.cover,
               ),
             ),
           ),

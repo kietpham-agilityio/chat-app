@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:formz/formz.dart';
 
 /// Validation errors [FormzInput].
@@ -107,5 +109,15 @@ class PhoneNumber extends FormzInput<String, ValidationError> {
   ValidationError? validator(String? value) {
     // Check if the value matches the phone number format.
     return _phoneRegExp.hasMatch(value ?? '') ? null : ValidationError.invalid;
+  }
+}
+
+class ImageFile extends FormzInput<File?, ValidationError> {
+  const ImageFile.pure() : super.pure(null);
+  const ImageFile.dirty([super.value]) : super.dirty();
+
+  @override
+  ValidationError? validator(File? value) {
+    return value != null ? null : ValidationError.invalid;
   }
 }
