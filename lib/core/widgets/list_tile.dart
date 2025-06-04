@@ -78,6 +78,7 @@ class CAListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      key: key,
       tileColor: tileColor,
       title: title,
       subtitle: subtitle,

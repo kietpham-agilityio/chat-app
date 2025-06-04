@@ -209,6 +209,14 @@ class CAAssets {
     BoxFit? boxFit,
   })
   user = _CAUserImage.new;
+
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    BoxFit? boxFit,
+  })
+  camera = _CACameraImage.new;
 }
 
 // MARK: Logo
@@ -423,6 +431,28 @@ class _CAUserImage extends StatelessWidget {
     return CAAssetImage(
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icUser.path,
+      boxFit: boxFit,
+      width: width ?? 24,
+      height: height ?? 24,
+      color: color,
+    );
+  }
+}
+
+// MARK: User
+class _CACameraImage extends StatelessWidget {
+  const _CACameraImage({this.color, this.width, this.height, this.boxFit});
+
+  final Color? color;
+  final double? width;
+  final double? height;
+  final BoxFit? boxFit;
+
+  @override
+  Widget build(BuildContext context) {
+    return CAAssetImage(
+      type: ImageLoaderType.assetSVG,
+      path: Assets.icons.icCamera.path,
       boxFit: boxFit,
       width: width ?? 24,
       height: height ?? 24,
