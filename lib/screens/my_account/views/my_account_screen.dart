@@ -167,11 +167,6 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(10.0),
-                            // child: CACircleAvatar(
-                            //   url:
-                            //       'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-                            //   avatarSize: 96,
-                            // ),
                             child: BlocBuilder<MyAccountBloc, MyAccountState>(
                               builder: (context, state) {
                                 if (state.imageFile != null) {
@@ -190,19 +185,6 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                       'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
                                   avatarSize: 96,
                                 );
-                                // _imageFile != null
-                                //     ? ClipOval(
-                                //       child: Image.file(
-                                //         _imageFile!,
-                                //         fit: BoxFit.cover,
-                                //         width: 96,
-                                //         height: 96,
-                                //       ),
-                                //     )
-                                //     : CACircleAvatar(
-                                //       url: _avatarUrl ?? '',
-                                //       avatarSize: 96,
-                                //     );
                               },
                             ),
                           ),
