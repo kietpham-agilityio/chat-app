@@ -1,3 +1,4 @@
+import 'package:chat_app/core/local_database/user_db_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModel {
@@ -53,6 +54,16 @@ class UserModel {
       phoneNumber: data["phoneNumber"] ?? "",
       blockedUsers: List<String>.from(data["blockedUsers"] ?? []),
       avatarUrl: data["avatarUrl"],
+    );
+  }
+
+  factory UserModel.fromDB(UserDBModel map) {
+    return UserModel(
+      uid: map.uid,
+      fullName: map.fullName,
+      email: map.email,
+      phoneNumber: map.phoneNumber,
+      avatarUrl: map.avatarUrl,
     );
   }
 

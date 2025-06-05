@@ -12,14 +12,16 @@ class InitialEvent extends MyAccountEvent {
     required this.email,
     required this.fullName,
     required this.phoneNumber,
+    this.avatarUrl,
   });
 
   final String email;
   final String fullName;
   final String phoneNumber;
+  final String? avatarUrl;
 
   @override
-  List<Object?> get props => [email, fullName, phoneNumber];
+  List<Object?> get props => [email, fullName, phoneNumber, avatarUrl];
 }
 
 class FullNameChangedEvent extends MyAccountEvent {

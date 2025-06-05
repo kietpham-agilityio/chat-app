@@ -45,8 +45,6 @@ class ChatCubit extends Cubit<ChatState> {
     required String content,
     required String receiverId,
   }) async {
-    if (state.chatRoomId == null) return;
-
     try {
       final isExistingChatRoom = await checkExistingChatRoom(receiverId);
       if (!isExistingChatRoom) {

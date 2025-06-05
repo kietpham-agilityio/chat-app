@@ -1,3 +1,4 @@
+import 'package:chat_app/core/local_database/hive_local_db.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart' show S;
 import 'package:firebase_core/firebase_core.dart' show Firebase;
 import 'package:flutter/material.dart';
@@ -13,6 +14,8 @@ Future<void> main() async {
   await Firebase.initializeApp();
 
   await initializeDateFormatting('en');
+
+  await HiveLocalDb.instance.init();
 
   runApp(const MyApp());
 }

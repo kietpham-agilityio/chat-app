@@ -15,7 +15,6 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CATitleMediumText,
         WzSnackBar;
 import 'package:chat_app/repositories/auth_repository.dart';
-import 'package:chat_app/screens/auth/states/auth_bloc.dart';
 import 'package:chat_app/screens/my_account/bloc/my_account_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +23,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 class MyAccountScreen extends StatefulWidget {
-  const MyAccountScreen({super.key});
+  const MyAccountScreen({
+    super.key,
+    required this.email,
+    required this.fullName,
+    required this.phoneNumber,
+    this.avatarUrl,
+  });
+
+  final String email;
+  final String fullName;
+  final String phoneNumber;
+  final String? avatarUrl;
 
   @override
   State<MyAccountScreen> createState() => _MyAccountScreenState();
@@ -124,11 +134,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
             (context) =>
                 bloc..add(
                   InitialEvent(
-                    email: context.read<AuthBloc>().state.user?.email ?? '',
-                    fullName:
-                        context.read<AuthBloc>().state.user?.fullName ?? '',
-                    phoneNumber:
-                        context.read<AuthBloc>().state.user?.phoneNumber ?? '',
+                    email: widget.email,
+                    fullName: widget.fullName,
+                    phoneNumber: widget.phoneNumber,
+                    avatarUrl: widget.avatarUrl,
                   ),
                 ),
         child: BlocListener<MyAccountBloc, MyAccountState>(
@@ -181,8 +190,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 }
 
                                 return CACircleAvatar(
-                                  url:
-                                      'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
+                                  url: state.avatarUrl ?? '',
                                   avatarSize: 96,
                                 );
                               },

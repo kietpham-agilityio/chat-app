@@ -38,6 +38,7 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     final email = Email.pure(event.email);
     final fullName = FullName.pure(event.fullName);
     final phoneNumber = PhoneNumber.pure(event.phoneNumber);
+    final avatarUrl = event.avatarUrl;
 
     emit(
       state.copyWith(
@@ -46,6 +47,7 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
         phoneNumber: phoneNumber,
         isValidForm: false,
         status: MyAccountStatus.success,
+        avatarUrl: avatarUrl,
       ),
     );
   }
@@ -63,7 +65,6 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     FullNameValidationEvent event,
     Emitter<MyAccountState> emit,
   ) {
-    if (state.fullName.value == event.value) return;
     final fullName = FullName.dirty(event.value);
 
     emit(
@@ -94,7 +95,6 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     PhoneNumberValidationEvent event,
     Emitter<MyAccountState> emit,
   ) {
-    if (state.phoneNumber.value == event.value) return;
     final value = event.value;
     final phoneNumber = PhoneNumber.dirty(value);
 

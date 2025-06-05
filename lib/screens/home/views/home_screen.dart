@@ -1,6 +1,7 @@
 import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
 import 'package:chat_app/core/extensions/timestamp_extensions.dart';
+import 'package:chat_app/core/local_database/user_db_model.dart';
 import 'package:chat_app/core/router/app_router.dart' show AppPaths;
 import 'package:chat_app/core/themes/themes.dart' show CAPalette;
 import 'package:chat_app/core/widgets/widgets.dart'
@@ -24,6 +25,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
     show BlocBuilder, BlocProvider, ReadContext;
 import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -39,12 +41,7 @@ class HomeScreen extends StatelessWidget {
       child: Scaffold(
         appBar: CAAppBar(
           title: CATitleMediumText(text: 'Chats'),
-          leading: CACircleAvatar(
-            url:
-                'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-            onTap: () => context.pushNamed(AppPaths.profile.name),
-            avatarSize: 32,
-          ),
+          leading: _Avatar(),
         ),
         body: Column(
           children: [
@@ -156,6 +153,28 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
+class _Avatar extends StatelessWidget {
+  const _Avatar();
+
+  @override
+  Widget build(BuildContext context) {
+    final box = Hive.box<UserDBModel>('userBox');
+    final stream = box.watch();
+    return StreamBuilder<BoxEvent>(
+      stream: stream,
+      builder: (context, snapshot) {
+        final user = Hive.box<UserDBModel>('userBox').get('userBox');
+
+        return CACircleAvatar(
+          url: user?.avatarUrl ?? '',
+          onTap: () => context.pushNamed(AppPaths.profile.name),
+          avatarSize: 32,
+        );
+      },
+    );
+  }
+}
+
 class _ChatListTile extends StatelessWidget {
   const _ChatListTile({
     required this.chatRoom,
@@ -195,10 +214,14 @@ class _ChatListTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             CAListTile(
-              leading: const CACircleAvatar(
-                url:
-                    'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-                avatarSize: 40,
+              leading: BlocBuilder<HomeBloc, HomeState>(
+                builder: (context, state) {
+                  return const CACircleAvatar(
+                    url:
+                        'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
+                    avatarSize: 40,
+                  );
+                },
               ),
               tileColor: hasUnread ? CAPalette.grey[1] : null,
               trailing:
