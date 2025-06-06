@@ -126,8 +126,6 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // return AvatarPickerScreen();
-
     return LoaderOverlay(
       child: BlocProvider(
         create:
@@ -189,9 +187,18 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                   );
                                 }
 
-                                return CACircleAvatar(
-                                  url: state.avatarUrl ?? '',
-                                  avatarSize: 96,
+                                return Hero(
+                                  tag: 'avatar',
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: CACircleAvatar(
+                                      url:
+                                          state.avatarUrl ??
+                                          widget.avatarUrl ??
+                                          '',
+                                      avatarSize: 96,
+                                    ),
+                                  ),
                                 );
                               },
                             ),
@@ -290,7 +297,6 @@ class _FullNameInput extends StatelessWidget {
           focusNode: focusNode,
           controller: fullNameController,
           title: S.of(context).generalFullName,
-          hintText: S.of(context).generalFullNameHint,
           errorMessage:
               state.fullName.displayError != null
                   ? S.of(context).errorInvalidFullName
@@ -333,7 +339,6 @@ class _PhoneNumberInput extends StatelessWidget {
           focusNode: focusNode,
           controller: phoneNumberController,
           title: S.of(context).generalPhoneNumber,
-          hintText: S.of(context).generalPhoneNumberHint,
           keyboardType: TextInputType.number,
           errorMessage:
               state.phoneNumber.displayError != null

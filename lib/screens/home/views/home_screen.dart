@@ -41,6 +41,7 @@ class HomeScreen extends StatelessWidget {
       child: Scaffold(
         appBar: CAAppBar(
           title: CATitleMediumText(text: 'Chats'),
+          // leadingWidth: 32,
           leading: _Avatar(),
         ),
         body: Column(
@@ -165,10 +166,19 @@ class _Avatar extends StatelessWidget {
       builder: (context, snapshot) {
         final user = Hive.box<UserDBModel>('userBox').get('userBox');
 
-        return CACircleAvatar(
-          url: user?.avatarUrl ?? '',
-          onTap: () => context.pushNamed(AppPaths.profile.name),
-          avatarSize: 32,
+        return Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: Hero(
+            tag: 'avatar',
+            child: Material(
+              color: Colors.transparent,
+              child: CACircleAvatar(
+                url: user?.avatarUrl ?? '',
+                onTap: () => context.pushNamed(AppPaths.profile.name),
+                avatarSize: 32,
+              ),
+            ),
+          ),
         );
       },
     );

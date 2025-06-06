@@ -114,10 +114,12 @@ class _Avatar extends StatelessWidget {
       builder: (context, snapshot) {
         final user = hive.get('userBox');
 
-        return CACircleAvatar(
-          url: user?.avatarUrl ?? '',
-          onTap: () => context.pushNamed(AppPaths.profile.name),
-          avatarSize: 96,
+        return Hero(
+          tag: 'avatar',
+          child: Material(
+            color: Colors.transparent,
+            child: CACircleAvatar(url: user?.avatarUrl ?? '', avatarSize: 96),
+          ),
         );
       },
     );

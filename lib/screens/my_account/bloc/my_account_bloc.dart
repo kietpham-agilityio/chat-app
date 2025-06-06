@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:image_picker/image_picker.dart' show ImagePicker, ImageSource;
+import 'package:permission_handler/permission_handler.dart';
 
 part 'my_account_event.dart';
 part 'my_account_state.dart';
@@ -113,6 +114,16 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
   ) async {
     try {
       final picker = ImagePicker();
+
+      if (event.source == ImageSource.camera) {
+        final status = await Permission.camera.status;
+        if (status.isDenied && Platform.isIOS) {
+          await Permission.camera.request();
+        } else if (status.isPermanentlyDenied &&
+            (Platform.isIOS || Platform.isAndroid)) {
+          await openAppSettings();
+        }
+      }
 
       final pickedFile = await picker.pickImage(
         source: event.source,
