@@ -179,6 +179,10 @@ class ChatRepository extends BaseRepository {
       currentUserId: currentUserData['fullName']?.toString() ?? "",
       otherUserId: otherUserData['fullName']?.toString() ?? "",
     };
+    final participantsAvatar = {
+      currentUserId: currentUserData['avatarUrl']?.toString() ?? "",
+      otherUserId: otherUserData['avatarUrl']?.toString() ?? "",
+    };
 
     final newRoom = ChatRoomModel(
       id: roomId,
@@ -188,6 +192,7 @@ class ChatRepository extends BaseRepository {
         currentUserId: Timestamp.now(),
         otherUserId: Timestamp.now(),
       },
+      participantsAvatar: participantsAvatar,
     );
 
     await _chatRooms.doc(roomId).set(newRoom.toMap());

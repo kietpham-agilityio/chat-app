@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:chat_app/core/local_database/hive_local_db.dart';
 import 'package:chat_app/models/models.dart' show UserModel;
 import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
 import 'package:equatable/equatable.dart';
@@ -45,7 +46,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  void _onLogoutPressed(AuthLogoutPressed event, Emitter<AuthState> emit) {
+  void _onLogoutPressed(
+    AuthLogoutPressed event,
+    Emitter<AuthState> emit,
+  ) async {
+    await HiveLocalDb.instance.userBox.clear();
     emit(const AuthState(user: UserModel.empty));
     _authRepository.signOut();
   }

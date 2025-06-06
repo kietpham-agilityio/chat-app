@@ -56,7 +56,19 @@ class AppRouter {
               GoRoute(
                 name: AppPaths.myAccount.name,
                 path: AppPaths.myAccount.path,
-                builder: (_, state) => const MyAccountScreen(),
+                builder: (_, state) {
+                  final avatarUrl = state.uri.queryParameters['avatarUrl'];
+                  final email = state.uri.queryParameters['email'];
+                  final fullName = state.uri.queryParameters['fullName'];
+                  final phoneNumber = state.uri.queryParameters['phoneNumber'];
+
+                  return MyAccountScreen(
+                    avatarUrl: avatarUrl ?? '',
+                    email: email ?? '',
+                    fullName: fullName ?? '',
+                    phoneNumber: phoneNumber ?? '',
+                  );
+                },
               ),
             ],
           ),

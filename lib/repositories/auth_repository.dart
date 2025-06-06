@@ -1,6 +1,8 @@
 import 'dart:developer' show log;
 import 'dart:io';
 
+import 'package:chat_app/core/local_database/hive_local_db.dart';
+import 'package:chat_app/core/local_database/user_db_model.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart' show S;
 import 'package:chat_app/models/models.dart' show UserModel;
 import 'package:chat_app/repositories/base_repository.dart';
@@ -95,7 +97,14 @@ class AuthRepository extends BaseRepository {
       }
 
       log('User id: ${doc.id}');
-      return UserModel.fromFirestore(doc);
+
+      final user = UserModel.fromFirestore(doc);
+
+      await HiveLocalDb.instance.userBox.saveUser(
+        UserDBModel.fromUserModel(user),
+      );
+
+      return user;
     } catch (e) {
       throw const AppException("Failed to get user data");
     }
@@ -179,6 +188,10 @@ class AuthRepository extends BaseRepository {
           .collection("users")
           .doc(user.uid)
           .update(newUserData.toMap());
+
+      await HiveLocalDb.instance.userBox.updateUser(
+        user.copyWith(avatarUrl: avatarUrl),
+      );
 
       // saveUserData(newUserData);
     } catch (e) {

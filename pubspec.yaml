@@ -33,7 +33,7 @@ dependencies:
   intl: 0.19.0
 
   # # Package is a dart library that generates Dart localization code from ARB file. Generated code relies on Intl library.
-  intl_utils: ^2.8.10
+  intl_utils: ^2.8.8
 
   # A unified form representation in Dart which aims to simplify form representation and validation in a generic way.
   formz: ^0.8.0
@@ -62,6 +62,18 @@ dependencies:
   # Flutter plugin for selecting images from the Android and iOS image library, and taking new pictures with the camera.
   image_picker: ^1.1.2
 
+  # Lightweight and blazing fast key-value database written in pure Dart. Strongly encrypted using AES-256.
+  hive: ^2.2.3
+
+  # Extension for Hive. Makes it easier to use Hive in Flutter apps.
+  hive_flutter: ^1.1.0
+
+  # Flutter plugin for getting commonly used locations on host platform file systems, such as the temp and app data directories.
+  path_provider: ^2.1.2
+
+  # Permission plugin for Flutter. This plugin provides a cross-platform (iOS, Android) API to request and check permissions.
+  permission_handler: ^12.0.0+1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -82,6 +94,9 @@ dev_dependencies:
 
   # A testing library which makes it easy to test blocs. Built to be used with the bloc state management package.
   bloc_test: ^10.0.0
+
+  # Extension for Hive. Automatically generates TypeAdapters to store any class.
+  hive_generator: ^2.0.1
 
 flutter:
   uses-material-design: true
