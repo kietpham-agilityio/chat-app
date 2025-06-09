@@ -25,6 +25,7 @@ class ChatCubit extends Cubit<ChatState> {
   StreamSubscription? _messageSubscription;
   StreamSubscription? _blockStatusSubscription;
   StreamSubscription? _amIBlockStatusSubscription;
+  StreamSubscription? _userInfoSubscription;
 
   void messageChanged(String message) => emit(state.copyWith(message: message));
 
@@ -66,6 +67,7 @@ class ChatCubit extends Cubit<ChatState> {
         //subscribe to all updates
         _subscribeToMessages(chatRoom.id);
         _subscribeToBlockStatus(receiverId);
+        _subscribeToUserInfo(receiverId);
       }
       await _chatRepository.sendMessage(
         chatRoomId: state.chatRoomId!,
@@ -81,8 +83,9 @@ class ChatCubit extends Cubit<ChatState> {
 
   Future<void> enterChat(String receiverId) async {
     try {
-      final a = await checkExistingChatRoom(receiverId);
-      if (a) {
+      final isExisting = await checkExistingChatRoom(receiverId);
+
+      if (isExisting) {
         _isInChat = true;
         emit(state.copyWith(status: ChatStatus.loading));
 
@@ -101,6 +104,7 @@ class ChatCubit extends Cubit<ChatState> {
         //subscribe to all updates
         _subscribeToMessages(chatRoom.id);
         _subscribeToBlockStatus(receiverId);
+        _subscribeToUserInfo(receiverId);
       }
     } catch (e) {
       emit(
@@ -151,11 +155,10 @@ class ChatCubit extends Cubit<ChatState> {
       emit(state.copyWith(isLoadingMore: true));
 
       final lastMessage = state.messages.last;
-      final lastDoc =
-          await _chatRepository
-              .getChatRoomMessages(state.chatRoomId!)
-              .doc(lastMessage.id)
-              .get();
+      final lastDoc = await _chatRepository
+          .getChatRoomMessages(state.chatRoomId!)
+          .doc(lastMessage.id)
+          .get();
 
       final moreMessages = await _chatRepository.getMoreMessages(
         state.chatRoomId!,
@@ -213,6 +216,25 @@ class ChatCubit extends Cubit<ChatState> {
         );
   }
 
+  void _subscribeToUserInfo(String receiverId) {
+    _userInfoSubscription?.cancel();
+    _userInfoSubscription = _chatRepository
+        .getUserInfo(receiverId)
+        .listen(
+          (userInfo) {
+            emit(
+              state.copyWith(
+                receiverAvatarUrl: userInfo.avatarUrl,
+                receiverFullName: userInfo.fullName,
+              ),
+            );
+          },
+          onError: (error) {
+            log("error getting user info");
+          },
+        );
+  }
+
   Future<void> blockUser(String userId) async {
     try {
       await _chatRepository.blockUser(currentUserId, userId);
@@ -233,6 +255,7 @@ class ChatCubit extends Cubit<ChatState> {
     _messageSubscription?.cancel();
     _amIBlockStatusSubscription?.cancel();
     _blockStatusSubscription?.cancel();
+    _userInfoSubscription?.cancel();
     _isInChat = false;
   }
 
@@ -241,6 +264,7 @@ class ChatCubit extends Cubit<ChatState> {
     _messageSubscription?.cancel();
     _amIBlockStatusSubscription?.cancel();
     _blockStatusSubscription?.cancel();
+    _userInfoSubscription?.cancel();
     _isInChat = false;
     return super.close();
   }

@@ -2,6 +2,7 @@ import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
 import 'package:chat_app/core/extensions/timestamp_extensions.dart';
 import 'package:chat_app/core/local_database/user_db_model.dart';
+import 'package:chat_app/core/notifications/notifications_service.dart';
 import 'package:chat_app/core/router/app_router.dart' show AppPaths;
 import 'package:chat_app/core/themes/themes.dart' show CAPalette;
 import 'package:chat_app/core/widgets/widgets.dart'
@@ -17,7 +18,8 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CATextField,
         CATitleMediumText;
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
-import 'package:chat_app/repositories/repositories.dart' show ChatRepository;
+import 'package:chat_app/repositories/repositories.dart'
+    show AuthRepository, ChatRepository;
 import 'package:chat_app/screens/home/cubit/home_bloc.dart';
 import 'package:chat_app/screens/search/views/search_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
@@ -33,15 +35,16 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (context) => HomeBloc(chatRepository: context.read<ChatRepository>())
-            ..add(
-              HomeInitializeEvent(FirebaseAuth.instance.currentUser?.uid ?? ''),
-            ),
+      create: (context) {
+        final notificationsService = context.read<NotificationsService>();
+        notificationsService.initialize(context.read<AuthRepository>());
+        return HomeBloc(chatRepository: context.read<ChatRepository>())..add(
+          HomeInitializeEvent(FirebaseAuth.instance.currentUser?.uid ?? ''),
+        );
+      },
       child: Scaffold(
         appBar: CAAppBar(
           title: CATitleMediumText(text: 'Chats'),
-          // leadingWidth: 32,
           leading: _Avatar(),
         ),
         body: Column(
@@ -64,27 +67,20 @@ class HomeScreen extends StatelessWidget {
                         color: CAPalette.grey[4],
                       ),
                     ),
-                    ontap:
-                        () => Navigator.of(context).push(
-                          PageRouteBuilder(
-                            opaque: false,
-                            transitionDuration: const Duration(
-                              milliseconds: 300,
-                            ),
-                            pageBuilder: (_, __, ___) => const SearchScreen(),
-                            transitionsBuilder: (
-                              context,
-                              animation,
-                              secondaryAnimation,
-                              child,
-                            ) {
+                    ontap: () => Navigator.of(context).push(
+                      PageRouteBuilder(
+                        opaque: false,
+                        transitionDuration: const Duration(milliseconds: 300),
+                        pageBuilder: (_, __, ___) => const SearchScreen(),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
                               return FadeTransition(
                                 opacity: animation,
                                 child: child,
                               );
                             },
-                          ),
-                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -212,6 +208,18 @@ class _ChatListTile extends StatelessWidget {
       }
     }
 
+    String getOtherUserAvatar() {
+      try {
+        final otherUserId = chatRoom.participants.firstWhere(
+          (id) => id != currentUserId,
+          orElse: () => 'Unknown User',
+        );
+        return chatRoom.participantsAvatar?[otherUserId] ?? "Unknown User";
+      } catch (e) {
+        return "Unknown User";
+      }
+    }
+
     return StreamBuilder<bool>(
       stream: context.read<ChatRepository>().getUnreadCount(
         chatRoom.id,
@@ -224,27 +232,21 @@ class _ChatListTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             CAListTile(
-              leading: BlocBuilder<HomeBloc, HomeState>(
-                builder: (context, state) {
-                  return const CACircleAvatar(
-                    url:
-                        'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-                    avatarSize: 40,
-                  );
-                },
+              leading: CACircleAvatar(
+                url: getOtherUserAvatar(),
+                avatarSize: 40,
               ),
               tileColor: hasUnread ? CAPalette.grey[1] : null,
-              trailing:
-                  hasUnread
-                      ? Container(
-                        height: 10,
-                        width: 10,
-                        decoration: BoxDecoration(
-                          color: context.colorScheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      )
-                      : const SizedBox(),
+              trailing: hasUnread
+                  ? Container(
+                      height: 10,
+                      width: 10,
+                      decoration: BoxDecoration(
+                        color: context.colorScheme.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    )
+                  : const SizedBox(),
               title: CATitleMediumText(
                 text: getOtherUsername().capitalizeEachWord(),
               ),
@@ -252,10 +254,9 @@ class _ChatListTile extends StatelessWidget {
                 children: [
                   Flexible(
                     child: CABodyMediumText(
-                      text:
-                          isMe
-                              ? 'You: ${chatRoom.lastMessage ?? ''}'
-                              : chatRoom.lastMessage ?? '',
+                      text: isMe
+                          ? 'You: ${chatRoom.lastMessage ?? ''}'
+                          : chatRoom.lastMessage ?? '',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),

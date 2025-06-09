@@ -9,6 +9,7 @@ class UserModel {
     required this.phoneNumber,
     this.blockedUsers = const [],
     this.avatarUrl,
+    this.fcmToken,
   });
 
   final String uid;
@@ -17,6 +18,7 @@ class UserModel {
   final String phoneNumber;
   final List<String> blockedUsers;
   final String? avatarUrl;
+  final String? fcmToken;
 
   /// Empty user which represents an unauthenticated user.
   static const empty = UserModel(
@@ -34,6 +36,7 @@ class UserModel {
     String? phoneNumber,
     List<String>? blockedUsers,
     String? avatarUrl,
+    String? fcmToken,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -42,6 +45,7 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       blockedUsers: blockedUsers ?? this.blockedUsers,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+      fcmToken: fcmToken ?? this.fcmToken,
     );
   }
 
@@ -54,6 +58,7 @@ class UserModel {
       phoneNumber: data["phoneNumber"] ?? "",
       blockedUsers: List<String>.from(data["blockedUsers"] ?? []),
       avatarUrl: data["avatarUrl"],
+      fcmToken: data["fcmToken"],
     );
   }
 
@@ -64,6 +69,7 @@ class UserModel {
       email: map.email,
       phoneNumber: map.phoneNumber,
       avatarUrl: map.avatarUrl,
+      fcmToken: map.fcmToken,
     );
   }
 
@@ -74,6 +80,7 @@ class UserModel {
       'phoneNumber': phoneNumber,
       'blockedUsers': blockedUsers,
       if (avatarUrl != null) 'avatarUrl': avatarUrl,
+      if (fcmToken != null) 'fcmToken': fcmToken,
     };
   }
 }

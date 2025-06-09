@@ -117,11 +117,10 @@ class AuthRepository extends BaseRepository {
   Future<bool> checkEmailExists(String email) async {
     try {
       // Query the Firestore users collection for documents with the specified email
-      final querySnapshot =
-          await firestore
-              .collection("users")
-              .where("email", isEqualTo: email)
-              .get();
+      final querySnapshot = await firestore
+          .collection("users")
+          .where("email", isEqualTo: email)
+          .get();
 
       // Return true if any documents are found, indicating the email exists
       return querySnapshot.docs.isNotEmpty;
@@ -142,11 +141,10 @@ class AuthRepository extends BaseRepository {
       final formattedPhoneNumber = _formatPhoneNumber(phoneNumber);
 
       // Query the Firestore users collection for documents with the specified phone number
-      final querySnapshot =
-          await firestore
-              .collection("users")
-              .where("phoneNumber", isEqualTo: formattedPhoneNumber)
-              .get();
+      final querySnapshot = await firestore
+          .collection("users")
+          .where("phoneNumber", isEqualTo: formattedPhoneNumber)
+          .get();
 
       // Return true if any documents are found, indicating the phone number exists
       return querySnapshot.docs.isNotEmpty;
@@ -181,6 +179,7 @@ class AuthRepository extends BaseRepository {
         email: user.email,
         phoneNumber: user.phoneNumber,
         blockedUsers: user.blockedUsers,
+        fcmToken: user.fcmToken,
         avatarUrl: avatarUrl,
       );
 
@@ -190,10 +189,12 @@ class AuthRepository extends BaseRepository {
           .update(newUserData.toMap());
 
       await HiveLocalDb.instance.userBox.updateUser(
-        user.copyWith(avatarUrl: avatarUrl),
+        fullName: user.fullName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        avatarUrl: avatarUrl,
+        fcmToken: user.fcmToken,
       );
-
-      // saveUserData(newUserData);
     } catch (e) {
       throw const AppException("Failed to save user data");
     }

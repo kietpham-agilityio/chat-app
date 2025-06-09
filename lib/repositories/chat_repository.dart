@@ -23,16 +23,28 @@ class ChatRepository extends BaseRepository {
   }
 
   Stream<List<ChatRoomModel>> getChatRooms(String userId) {
+    // List<ChatRoomModel>? user;
     return _chatRooms
         .where("participants", arrayContains: userId)
         .orderBy('lastMessageTime', descending: true)
         .snapshots()
         .map(
-          (snapshot) =>
-              snapshot.docs
-                  .map((doc) => ChatRoomModel.fromFirestore(doc))
-                  .toList(),
+          (snapshot) => snapshot.docs
+              .map((doc) => ChatRoomModel.fromFirestore(doc))
+              .toList(),
         );
+    // return _chatRooms
+    //     .where("participants", arrayContains: userId)
+    //     .orderBy('lastMessageTime', descending: true)
+    //     .snapshots()
+    //     .map((snapshot) {
+    //       user = snapshot.docs
+    //           .map((doc) => ChatRoomModel.fromFirestore(doc))
+    //           .toList();
+    //       return snapshot.docs
+    //           .map((doc) => ChatRoomModel.fromFirestore(doc))
+    //           .toList();
+    //     });
   }
 
   Future<PaginatedResult<UserModel>> searchUser({
@@ -54,11 +66,10 @@ class ChatRepository extends BaseRepository {
 
       final snapshot = await query.get();
 
-      final users =
-          snapshot.docs
-              .map((doc) => UserModel.fromFirestore(doc))
-              .where((user) => user.uid != currentUser?.uid)
-              .toList();
+      final users = snapshot.docs
+          .map((doc) => UserModel.fromFirestore(doc))
+          .where((user) => user.uid != currentUser?.uid)
+          .toList();
 
       final result = PaginatedResult(items: users, lastDoc: lastDoc);
 
@@ -98,12 +109,20 @@ class ChatRepository extends BaseRepository {
     }
 
     return query.snapshots().map((snapshot) {
-      final messages =
-          snapshot.docs.map((doc) => ChatMessage.fromFirestore(doc)).toList();
+      final messages = snapshot.docs
+          .map((doc) => ChatMessage.fromFirestore(doc))
+          .toList();
 
       final lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
 
       return PaginatedResult(items: messages, lastDoc: lastDoc);
+    });
+  }
+
+  Stream<UserModel> getUserInfo(String userId) {
+    return firestore.collection("users").doc(userId).snapshots().map((doc) {
+      final userData = UserModel.fromFirestore(doc);
+      return userData;
     });
   }
 
@@ -117,8 +136,9 @@ class ChatRepository extends BaseRepository {
         .limit(20);
     log("comingg");
     final snapshot = await query.get();
-    final messages =
-        snapshot.docs.map((doc) => ChatMessage.fromFirestore(doc)).toList();
+    final messages = snapshot.docs
+        .map((doc) => ChatMessage.fromFirestore(doc))
+        .toList();
     final lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
     return PaginatedResult(items: messages, lastDoc: lastDoc);
   }
@@ -129,11 +149,10 @@ class ChatRepository extends BaseRepository {
 
       //get all unread messages where user is receviver
 
-      final unreadMessages =
-          await getChatRoomMessages(chatRoomId)
-              .where("receiverId", isEqualTo: userId)
-              .where('status', isEqualTo: MessageStatus.sent.toString())
-              .get();
+      final unreadMessages = await getChatRoomMessages(chatRoomId)
+          .where("receiverId", isEqualTo: userId)
+          .where('status', isEqualTo: MessageStatus.sent.toString())
+          .get();
       log("found ${unreadMessages.docs.length} unread messages");
 
       for (final doc in unreadMessages.docs) {

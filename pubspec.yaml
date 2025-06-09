@@ -6,7 +6,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.2
+  sdk: ^3.8.0
 
 dependencies:
   flutter:
@@ -30,7 +30,7 @@ dependencies:
   loader_overlay: ^5.0.0
 
   # Contains code to deal with internationalized/localized messages, date and number formatting and parsing, bi-directional text, and other internationalization issues.
-  intl: 0.19.0
+  intl: 0.20.2
 
   # # Package is a dart library that generates Dart localization code from ARB file. Generated code relies on Intl library.
   intl_utils: ^2.8.8
@@ -73,6 +73,12 @@ dependencies:
 
   # Permission plugin for Flutter. This plugin provides a cross-platform (iOS, Android) API to request and check permissions.
   permission_handler: ^12.0.0+1
+
+  # A complete solution to create Local and Push Notifications, customizing buttons, images, sounds, emoticons and applying many different layouts for Flutter apps.
+  awesome_notifications: ^0.10.1
+
+  # Awesome Notifications add-on plugin to send push notifications through Firebase Cloud Messaging, enabling all awesome notifications features.
+  awesome_notifications_fcm: ^0.10.1
 
 dev_dependencies:
   flutter_test:

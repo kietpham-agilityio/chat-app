@@ -41,10 +41,12 @@ class AppRouter {
             builder: (_, state) {
               final receiverName = state.uri.queryParameters['receiverName'];
               final receiverId = state.uri.queryParameters['receiverId'];
+              final avatarUrl = state.uri.queryParameters['receiverAvatarUrl'];
 
               return ChatMessageScreen(
                 receiverId: receiverId ?? '',
                 receiverName: receiverName ?? '',
+                receiverAvatarUrl: avatarUrl ?? '',
               );
             },
           ),
@@ -75,9 +77,8 @@ class AppRouter {
         ],
       ),
     ],
-    errorBuilder:
-        (_, state) =>
-            const Scaffold(body: Center(child: Text('Error: No route found'))),
+    errorBuilder: (_, state) =>
+        const Scaffold(body: Center(child: Text('Error: No route found'))),
     redirect: (_, state) {
       return RouterGuard.authGuard(state);
     },

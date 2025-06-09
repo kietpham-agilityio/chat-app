@@ -28,9 +28,8 @@ class SearchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return LoaderOverlay(
       child: BlocProvider(
-        create:
-            (context) =>
-                SearchCubit(chatRepository: context.read<ChatRepository>()),
+        create: (context) =>
+            SearchCubit(chatRepository: context.read<ChatRepository>()),
         child: BlocListener<SearchCubit, SearchState>(
           listener: (BuildContext context, SearchState state) {
             if (state.status == SearchStatus.loading) {
@@ -106,9 +105,8 @@ class SearchScreen extends StatelessWidget {
                                         .capitalizeEachWord(),
                                   ),
                                   leading: CACircleAvatar(
-                                    url:
-                                        'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-                                    avatarSize: 48,
+                                    url: state.users[index].avatarUrl ?? '',
+                                    avatarSize: 32,
                                   ),
                                   onTap: () {
                                     context.pushNamed(
@@ -117,6 +115,8 @@ class SearchScreen extends StatelessWidget {
                                         'receiverId': state.users[index].uid,
                                         'receiverName':
                                             state.users[index].fullName,
+                                        'receiverAvatarUrl':
+                                            state.users[index].avatarUrl,
                                       },
                                     );
                                   },
@@ -130,9 +130,8 @@ class SearchScreen extends StatelessWidget {
                               state.users[index].fullName.capitalizeEachWord(),
                             ),
                             leading: CACircleAvatar(
-                              url:
-                                  'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-                              avatarSize: 48,
+                              url: state.users[index].avatarUrl ?? '',
+                              avatarSize: 32,
                             ),
                             onTap: () {
                               context.pushNamed(
@@ -140,6 +139,8 @@ class SearchScreen extends StatelessWidget {
                                 queryParameters: {
                                   'receiverId': state.users[index].uid,
                                   'receiverName': state.users[index].fullName,
+                                  'receiverAvatarUrl':
+                                      state.users[index].avatarUrl,
                                 },
                               );
                             },
