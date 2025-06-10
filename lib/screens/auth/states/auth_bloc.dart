@@ -50,8 +50,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthLogoutPressed event,
     Emitter<AuthState> emit,
   ) async {
+    await _authRepository.signOut();
     await HiveLocalDb.instance.userBox.clear();
     emit(const AuthState(user: UserModel.empty));
-    _authRepository.signOut();
   }
 }

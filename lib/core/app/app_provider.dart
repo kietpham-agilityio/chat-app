@@ -1,5 +1,5 @@
 import 'package:chat_app/core/notifications/notifications_service.dart';
-import 'package:chat_app/core/router/app_router.dart' show AppPaths, AppRouter;
+import 'package:chat_app/core/router/app_router.dart';
 import 'package:chat_app/repositories/repositories.dart'
     show AuthRepository, ChatRepository;
 import 'package:chat_app/screens/auth/states/auth_bloc.dart';
@@ -41,13 +41,20 @@ class AppProvider extends StatelessWidget {
         ),
         RepositoryProvider<NotificationsService>(
           lazy: false,
-          create: (context) => NotificationsService()
-            ..configure(
-              onReply: (replyNotifis) {},
+          create: (context) {
+            final service = NotificationsService();
+            service.configure(
               onMessageOpenedApp: (notificationsResponse) {
                 NotificationHandler.navigate(
                   notification: notificationsResponse,
                   onChatDetailsRedirect: (notifsRes) {
+                    // AppRouter.router.pushNamed(
+                    //   AppPaths.chat.name,
+                    //   queryParameters: {
+                    //     'receiverId': notifsRes.accountId,
+                    //     'receiverName': notifsRes.accountName,
+                    //   },
+                    // );
                     AppRouter.router.pushNamed(
                       AppPaths.chat.name,
                       queryParameters: {
@@ -58,7 +65,23 @@ class AppProvider extends StatelessWidget {
                   },
                 );
               },
-            ),
+            );
+
+            // if app is killed and user tap on notification
+            // if (receivedAction != null &&
+            //     receivedAction!.buttonKeyPressed.isEmpty) {
+            //   WidgetsBinding.instance.addPostFrameCallback((_) {
+            //     final data = receivedAction?.payload ?? {};
+
+            //     NotificationHandler.handleTapNavigate(
+            //       data,
+            //       NotificationsService.entity,
+            //     );
+            //   });
+            // }
+
+            return service;
+          },
         ),
       ],
       child: MultiBlocProvider(

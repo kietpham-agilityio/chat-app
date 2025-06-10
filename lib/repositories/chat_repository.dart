@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:developer' show log;
+import 'dart:ui';
 
 import 'package:chat_app/models/chat_message.dart'
     show ChatMessage, MessageStatus, MessageType;
@@ -15,6 +17,22 @@ import 'package:cloud_firestore/cloud_firestore.dart'
         Query,
         Timestamp;
 
+class Debouncer {
+  Debouncer({this.delay = const Duration(milliseconds: 300)});
+
+  final Duration delay;
+  Timer? _timer;
+
+  void run(VoidCallback action) {
+    _timer?.cancel();
+    _timer = Timer(delay, action);
+  }
+
+  void dispose() {
+    _timer?.cancel();
+  }
+}
+
 class ChatRepository extends BaseRepository {
   CollectionReference get _chatRooms => firestore.collection("chatRooms");
 
@@ -23,9 +41,9 @@ class ChatRepository extends BaseRepository {
   }
 
   Stream<List<ChatRoomModel>> getChatRooms(String userId) {
-    // List<ChatRoomModel>? user;
-    return _chatRooms
-        .where("participants", arrayContains: userId)
+    return firestore
+        .collection('chatRooms')
+        .where('participants', arrayContains: userId)
         .orderBy('lastMessageTime', descending: true)
         .snapshots()
         .map(
@@ -33,18 +51,6 @@ class ChatRepository extends BaseRepository {
               .map((doc) => ChatRoomModel.fromFirestore(doc))
               .toList(),
         );
-    // return _chatRooms
-    //     .where("participants", arrayContains: userId)
-    //     .orderBy('lastMessageTime', descending: true)
-    //     .snapshots()
-    //     .map((snapshot) {
-    //       user = snapshot.docs
-    //           .map((doc) => ChatRoomModel.fromFirestore(doc))
-    //           .toList();
-    //       return snapshot.docs
-    //           .map((doc) => ChatRoomModel.fromFirestore(doc))
-    //           .toList();
-    //     });
   }
 
   Future<PaginatedResult<UserModel>> searchUser({
@@ -78,23 +84,6 @@ class ChatRepository extends BaseRepository {
       throw const AppException("Failed to search user");
     }
   }
-
-  // Stream<List<ChatMessage>> getMessages(
-  //   String chatRoomId, {
-  //   DocumentSnapshot? lastDocument,
-  // }) {
-  //   var query = getChatRoomMessages(
-  //     chatRoomId,
-  //   ).orderBy('timestamp', descending: true).limit(20);
-
-  //   if (lastDocument != null) {
-  //     query = query.startAfterDocument(lastDocument);
-  //   }
-  //   return query.snapshots().map(
-  //     (snapshot) =>
-  //         snapshot.docs.map((doc) => ChatMessage.fromFirestore(doc)).toList(),
-  //   );
-  // }
 
   Stream<PaginatedResult<ChatMessage>> getMessages(
     String chatRoomId, {
