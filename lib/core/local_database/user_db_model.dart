@@ -18,14 +18,18 @@ class UserDBModel extends HiveObject {
   String phoneNumber;
 
   @HiveField(4)
-  String avatarUrl;
+  String? avatarUrl;
+
+  @HiveField(5)
+  String? fcmToken;
 
   UserDBModel({
     required this.uid,
     required this.fullName,
     required this.email,
     required this.phoneNumber,
-    required this.avatarUrl,
+    this.avatarUrl,
+    this.fcmToken,
   });
 
   factory UserDBModel.fromUserModel(UserModel userModel) {
@@ -34,7 +38,8 @@ class UserDBModel extends HiveObject {
       fullName: userModel.fullName,
       email: userModel.email,
       phoneNumber: userModel.phoneNumber,
-      avatarUrl: userModel.avatarUrl ?? '',
+      avatarUrl: userModel.avatarUrl,
+      fcmToken: userModel.fcmToken,
     );
   }
 }

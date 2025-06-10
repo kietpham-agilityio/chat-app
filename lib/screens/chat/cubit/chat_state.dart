@@ -18,6 +18,8 @@ class ChatState extends Equatable {
   final String? chatRoomId;
   final DocumentSnapshot? lastDoc;
   final String? message;
+  final String? receiverAvatarUrl;
+  final String? receiverFullName;
 
   const ChatState({
     this.status = ChatStatus.inital,
@@ -34,6 +36,8 @@ class ChatState extends Equatable {
     this.chatRoomId,
     this.lastDoc,
     this.message,
+    this.receiverAvatarUrl,
+    this.receiverFullName,
   });
 
   ChatState copyWith({
@@ -51,6 +55,8 @@ class ChatState extends Equatable {
     bool? amIBlocked,
     DocumentSnapshot? lastDoc,
     String? message,
+    String? receiverAvatarUrl,
+    String? receiverFullName,
   }) {
     return ChatState(
       status: status ?? this.status,
@@ -67,6 +73,8 @@ class ChatState extends Equatable {
       amIBlocked: amIBlocked ?? this.amIBlocked,
       lastDoc: lastDoc ?? this.lastDoc,
       message: message ?? this.message,
+      receiverAvatarUrl: receiverAvatarUrl ?? this.receiverAvatarUrl,
+      receiverFullName: receiverFullName ?? this.receiverFullName,
     );
   }
 
@@ -87,6 +95,8 @@ class ChatState extends Equatable {
       amIBlocked,
       lastDoc,
       message,
+      receiverAvatarUrl,
+      receiverFullName,
     ];
   }
 }

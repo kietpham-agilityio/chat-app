@@ -1,11 +1,16 @@
 import 'package:chat_app/core/local_database/user_db_model.dart';
-import 'package:chat_app/models/models.dart' show UserModel;
 import 'package:hive/hive.dart';
 
 abstract class UserBox {
   Future<void> saveUser(UserDBModel user);
   Future<UserDBModel?> getUser();
-  Future<void> updateUser(UserModel userModel);
+  Future<void> updateUser({
+    String? fullName,
+    String? email,
+    String? phoneNumber,
+    String? avatarUrl,
+    String? fcmToken,
+  });
   Future<void> deleteUser();
   Future<void> clear();
 }
@@ -28,7 +33,13 @@ class UserBoxImpl implements UserBox {
   }
 
   @override
-  Future<void> updateUser(UserModel userModel) async {
+  Future<void> updateUser({
+    String? fullName,
+    String? email,
+    String? phoneNumber,
+    String? avatarUrl,
+    String? fcmToken,
+  }) async {
     final userBox = Hive.box<UserDBModel>('userBox');
 
     if (userBox.isEmpty) return;
@@ -39,23 +50,28 @@ class UserBoxImpl implements UserBox {
 
     bool hasChanged = false;
 
-    if (userModel.fullName != user.fullName) {
-      user.fullName = userModel.fullName;
+    if (fullName != null && fullName != user.fullName) {
+      user.fullName = fullName;
       hasChanged = true;
     }
 
-    if (userModel.email != user.email) {
-      user.email = userModel.email;
+    if (email != null && email != user.email) {
+      user.email = email;
       hasChanged = true;
     }
 
-    if (userModel.phoneNumber != user.phoneNumber) {
-      user.phoneNumber = userModel.phoneNumber;
+    if (phoneNumber != null && phoneNumber != user.phoneNumber) {
+      user.phoneNumber = phoneNumber;
       hasChanged = true;
     }
 
-    if (userModel.avatarUrl != null && userModel.avatarUrl != user.avatarUrl) {
-      user.avatarUrl = userModel.avatarUrl!;
+    if (avatarUrl != null && avatarUrl != user.avatarUrl) {
+      user.avatarUrl = avatarUrl;
+      hasChanged = true;
+    }
+
+    if (fcmToken != null && fcmToken != user.avatarUrl) {
+      user.fcmToken = fcmToken;
       hasChanged = true;
     }
 

@@ -1,3 +1,5 @@
+import 'package:chat_app/core/notifications/notifications_service.dart';
+import 'package:chat_app/core/router/app_router.dart' show AppPaths, AppRouter;
 import 'package:chat_app/repositories/repositories.dart'
     show AuthRepository, ChatRepository;
 import 'package:chat_app/screens/auth/states/auth_bloc.dart';
@@ -37,15 +39,35 @@ class AppProvider extends StatelessWidget {
           lazy: true,
           create: (context) => ChatRepository(),
         ),
+        RepositoryProvider<NotificationsService>(
+          lazy: false,
+          create: (context) => NotificationsService()
+            ..configure(
+              onReply: (replyNotifis) {},
+              onMessageOpenedApp: (notificationsResponse) {
+                NotificationHandler.navigate(
+                  notification: notificationsResponse,
+                  onChatDetailsRedirect: (notifsRes) {
+                    AppRouter.router.pushNamed(
+                      AppPaths.chat.name,
+                      queryParameters: {
+                        'receiverId': notifsRes.accountId,
+                        'receiverName': notifsRes.accountName,
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
             lazy: true,
-            create:
-                (context) =>
-                    AuthBloc(authRepository: context.read<AuthRepository>())
-                      ..add(const AuthCheckAuthentication()),
+            create: (context) =>
+                AuthBloc(authRepository: context.read<AuthRepository>())
+                  ..add(const AuthCheckAuthentication()),
           ),
         ],
         child: child,

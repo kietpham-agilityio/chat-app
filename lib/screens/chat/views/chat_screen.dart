@@ -31,11 +31,13 @@ class ChatMessageScreen extends StatefulWidget {
   const ChatMessageScreen({
     required this.receiverId,
     required this.receiverName,
+    this.receiverAvatarUrl,
     super.key,
   });
 
   final String receiverId;
   final String receiverName;
+  final String? receiverAvatarUrl;
 
   @override
   State<ChatMessageScreen> createState() => _ChatMessageScreenState();
@@ -71,13 +73,29 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CACircleAvatar(
-                    url:
-                        'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-                    avatarSize: 32,
+                  BlocBuilder<ChatCubit, ChatState>(
+                    buildWhen: (previous, current) =>
+                        previous.receiverAvatarUrl != current.receiverAvatarUrl,
+                    builder: (context, state) {
+                      return CACircleAvatar(
+                        url:
+                            state.receiverAvatarUrl ??
+                            widget.receiverAvatarUrl ??
+                            '',
+                        avatarSize: 32,
+                      );
+                    },
                   ),
-                  CATitleMediumText(
-                    text: widget.receiverName.capitalizeEachWord(),
+                  BlocBuilder<ChatCubit, ChatState>(
+                    buildWhen: (previous, current) =>
+                        previous.receiverFullName != current.receiverFullName,
+                    builder: (context, state) {
+                      return CATitleMediumText(
+                        text:
+                            state.receiverFullName?.capitalizeEachWord() ??
+                            widget.receiverName.capitalizeEachWord(),
+                      );
+                    },
                   ),
                   SizedBox(width: 32),
                 ],
@@ -102,8 +120,9 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
                           CADialogManager.showDialog(
                             context: context,
                             dialog: CADialog(
-                              title:
-                                  S.of(context).chatMessageDialogBlockUserTitle,
+                              title: S
+                                  .of(context)
+                                  .chatMessageDialogBlockUserTitle,
                               content: S
                                   .of(context)
                                   .chatMessageDialogBlockUserContent(
@@ -120,15 +139,14 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
                           );
                         }
                       },
-                      itemBuilder:
-                          (context) => <PopupMenuEntry<String>>[
-                            PopupMenuItem(
-                              value: 'block',
-                              child: CABodyLargeText(
-                                text: S.of(context).chatMessageBlockBtn,
-                              ),
-                            ),
-                          ],
+                      itemBuilder: (context) => <PopupMenuEntry<String>>[
+                        PopupMenuItem(
+                          value: 'block',
+                          child: CABodyLargeText(
+                            text: S.of(context).chatMessageBlockBtn,
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),
@@ -293,8 +311,9 @@ class _ViewState extends State<_View> {
                                 onChanged: (value) {
                                   _chatCubit.messageChanged(value);
                                 },
-                                hintText:
-                                    S.of(context).chatMessageTextFieldHint,
+                                hintText: S
+                                    .of(context)
+                                    .chatMessageTextFieldHint,
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -309,19 +328,18 @@ class _ViewState extends State<_View> {
                               builder: (context, isEnabled) {
                                 return isEnabled
                                     ? IconButton(
-                                      icon: Icon(
-                                        Icons.send,
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                      ),
-                                      onPressed: _handleSendMessage,
-                                    )
+                                        icon: Icon(
+                                          Icons.send,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
+                                        ),
+                                        onPressed: _handleSendMessage,
+                                      )
                                     : CAIconButtons(
-                                      icon: CAAssets.thumpsUp(),
-                                      onPressed: _handleSendThumbUp,
-                                    );
+                                        icon: CAAssets.thumpsUp(),
+                                        onPressed: _handleSendThumbUp,
+                                      );
                               },
                             ),
                           ],
@@ -335,18 +353,17 @@ class _ViewState extends State<_View> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: CATitleMediumText(
-                      text:
-                          state.isUserBlocked
-                              ? S
-                                  .of(context)
-                                  .chatMessageBlockedByMeBannerTitle(
-                                    widget.receiverName.capitalizeEachWord(),
-                                  )
-                              : S
-                                  .of(context)
-                                  .chatMessageBlockedByOtherBannerTitle(
-                                    widget.receiverName.capitalizeEachWord(),
-                                  ),
+                      text: state.isUserBlocked
+                          ? S
+                                .of(context)
+                                .chatMessageBlockedByMeBannerTitle(
+                                  widget.receiverName.capitalizeEachWord(),
+                                )
+                          : S
+                                .of(context)
+                                .chatMessageBlockedByOtherBannerTitle(
+                                  widget.receiverName.capitalizeEachWord(),
+                                ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -378,8 +395,9 @@ class _ViewState extends State<_View> {
                                   .chatMessageDialogUnblockUserContent(
                                     widget.receiverName.capitalizeEachWord(),
                                   ),
-                              confirmButton:
-                                  S.of(context).chatMessageUnblockBtn,
+                              confirmButton: S
+                                  .of(context)
+                                  .chatMessageUnblockBtn,
                               cancelButton: S.of(context).chatMessageCancelBtn,
                               onCancel: () => context.pop(),
                               onConfirm: () {
@@ -434,10 +452,9 @@ class MessageBubble extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color:
-                  isMe
-                      ? Theme.of(context).colorScheme.primary
-                      : CAPalette.grey[1],
+              color: isMe
+                  ? Theme.of(context).colorScheme.primary
+                  : CAPalette.grey[1],
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(8),
                 topRight: const Radius.circular(8),
