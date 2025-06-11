@@ -233,6 +233,71 @@ class _ViewState extends State<_View> {
           children: [
             Column(
               children: [
+                // Expanded(
+                //   child: ListView.builder(
+                //     controller: _scrollController,
+                //     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                //     reverse: true,
+                //     itemCount: state.messages.length,
+                //     itemBuilder: (context, index) {
+                //       final message = state.messages[index];
+                //       final isMe = message.senderId == _chatCubit.currentUserId;
+                //       ChatMessage? nextMessage;
+                //       if (index + 1 < state.messages.length) {
+                //         nextMessage = state.messages[index + 1];
+                //       }
+
+                //       bool showTimestamp = false;
+
+                //       final currentDate = message.timestamp.toDate();
+
+                //       if (nextMessage == null) {
+                //         showTimestamp = true;
+                //       } else {
+                //         final nextDate = nextMessage.timestamp.toDate();
+                //         final diff = currentDate.difference(nextDate).inMinutes;
+
+                //         // Display if the difference is >= 5 minutes or different day
+                //         showTimestamp =
+                //             diff >= 5 || !currentDate.isSameDay(nextDate);
+                //       }
+
+                //       return Column(
+                //         crossAxisAlignment: CrossAxisAlignment.center,
+                //         children: [
+                //           if (showTimestamp) ...[
+                //             SizedBox(height: 16),
+                //             Container(
+                //               padding: const EdgeInsets.symmetric(
+                //                 vertical: 4,
+                //                 horizontal: 8,
+                //               ),
+                //               decoration: BoxDecoration(
+                //                 borderRadius: BorderRadius.circular(16),
+                //                 border: Border.all(color: CAPalette.grey[3]!),
+                //                 color: CAPalette.grey[1],
+                //               ),
+                //               child: CABodyMediumText(
+                //                 // text: _formatTimestampWithDateCondition(
+                //                 //   currentDate,
+                //                 // ),
+                //                 text: message.timestamp.formatChatDateTime(),
+                //                 color: CAPalette.grey[5],
+                //               ),
+                //             ),
+                //             SizedBox(height: 16),
+                //           ] else
+                //             SizedBox(height: 10),
+                //           MessageBubble(
+                //             message: message,
+                //             isMe: isMe,
+                //             receiverAvatarUrl: state.receiverAvatarUrl,
+                //           ),
+                //         ],
+                //       );
+                //     },
+                //   ),
+                // ),
                 Expanded(
                   child: ListView.builder(
                     controller: _scrollController,
@@ -435,6 +500,71 @@ class _ViewState extends State<_View> {
     );
   }
 }
+
+// class MessageBubble extends StatelessWidget {
+//   const MessageBubble({
+//     required this.message,
+//     required this.isMe,
+//     // required this.isLastBeforeTimestamp,
+//     this.receiverAvatarUrl,
+//     super.key,
+//   });
+
+//   final ChatMessage message;
+//   final bool isMe;
+//   // final bool isLastBeforeTimestamp;
+//   final String? receiverAvatarUrl;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Align(
+//       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+//       child: Row(
+//         mainAxisSize: MainAxisSize.min,
+//         crossAxisAlignment: CrossAxisAlignment.end,
+//         children: [
+//           // if (!isMe && isLastBeforeTimestamp) ...[
+//           if (!isMe) ...[
+//             CACircleAvatar(url: receiverAvatarUrl ?? '', avatarSize: 32),
+//             SizedBox(width: 8),
+//           ],
+//           Container(
+//             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+//             decoration: BoxDecoration(
+//               color: isMe
+//                   ? Theme.of(context).colorScheme.primary
+//                   : CAPalette.grey[1],
+//               borderRadius: BorderRadius.only(
+//                 topLeft: const Radius.circular(8),
+//                 topRight: const Radius.circular(8),
+//                 bottomLeft: Radius.circular(isMe ? 8 : 4),
+//                 bottomRight: Radius.circular(isMe ? 4 : 8),
+//               ),
+//             ),
+//             child: ConstrainedBox(
+//               constraints: BoxConstraints(
+//                 maxWidth: MediaQuery.of(context).size.width * 0.7,
+//               ),
+//               child: CABodyLargeText(
+//                 text: message.content,
+//                 color: isMe ? CAPalette.genericWhite : CAPalette.grey[5],
+//                 overflow: TextOverflow.visible,
+//               ),
+//             ),
+//           ),
+//           if (isMe) ...[
+//             SizedBox(width: 8),
+//             CACircleAvatar(
+//               url:
+//                   'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
+//               avatarSize: 24,
+//             ),
+//           ],
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class MessageBubble extends StatelessWidget {
   const MessageBubble({
