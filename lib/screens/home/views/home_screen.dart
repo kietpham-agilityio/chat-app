@@ -16,7 +16,8 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAHeadlineMediumText,
         CAListTile,
         CATextField,
-        CATitleMediumText;
+        CATitleMediumText,
+        WzSnackBar;
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
 import 'package:chat_app/repositories/repositories.dart'
     show AuthRepository, ChatRepository;
@@ -50,6 +51,10 @@ class HomeScreen extends StatelessWidget {
               context.loaderOverlay.show();
             } else {
               context.loaderOverlay.hide();
+            }
+
+            if (state.status == HomeStatus.failure) {
+              WzSnackBar.error(context, message: state.errorMessage ?? '');
             }
           },
           child: Scaffold(
@@ -244,7 +249,7 @@ class _ChatListTile extends StatelessWidget {
     }
 
     return StreamBuilder<bool>(
-      stream: context.read<ChatRepository>().getUnreadCount(
+      stream: context.read<ChatRepository>().checkUnread(
         chatRoom.id,
         FirebaseAuth.instance.currentUser?.uid ?? '',
       ),

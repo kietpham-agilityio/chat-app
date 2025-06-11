@@ -176,7 +176,12 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
         ),
       );
     } catch (e) {
-      emit(state.copyWith(errorMessage: "Failed to update user info"));
+      emit(
+        state.copyWith(
+          errorMessage: "Failed to update user info",
+          status: MyAccountStatus.failure,
+        ),
+      );
     }
   }
 }

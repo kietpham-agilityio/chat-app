@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' show log;
 import 'dart:io';
 
@@ -43,12 +44,12 @@ class AuthRepository extends BaseRepository {
 
       if (results[0]) {
         throw const AppException(
-          "An account with the same email already exists",
+          'An account with the same email already exists',
         );
       }
       if (results[1]) {
         throw const AppException(
-          "An account with the same phone already exists",
+          'An account with the same phone already exists',
         );
       }
 
@@ -90,10 +91,10 @@ class AuthRepository extends BaseRepository {
 
   Future<UserModel> getUserData(String uid) async {
     try {
-      final doc = await firestore.collection("users").doc(uid).get();
+      final doc = await firestore.collection('users').doc(uid).get();
 
       if (!doc.exists) {
-        throw const AppException("User data not found");
+        throw const AppException('User data not found');
       }
 
       log('User id: ${doc.id}');
@@ -106,7 +107,7 @@ class AuthRepository extends BaseRepository {
 
       return user;
     } catch (e) {
-      throw const AppException("Failed to get user data");
+      throw const AppException('Failed to get user data');
     }
   }
 
@@ -118,15 +119,15 @@ class AuthRepository extends BaseRepository {
     try {
       // Query the Firestore users collection for documents with the specified email
       final querySnapshot = await firestore
-          .collection("users")
-          .where("email", isEqualTo: email)
+          .collection('users')
+          .where('email', isEqualTo: email)
           .get();
 
       // Return true if any documents are found, indicating the email exists
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
       // Log the error and return false if an exception occurs
-      log("Error checking email: $e");
+      log('Error checking email: $e');
       return false;
     }
   }
@@ -142,24 +143,28 @@ class AuthRepository extends BaseRepository {
 
       // Query the Firestore users collection for documents with the specified phone number
       final querySnapshot = await firestore
-          .collection("users")
-          .where("phoneNumber", isEqualTo: formattedPhoneNumber)
+          .collection('users')
+          .where('phoneNumber', isEqualTo: formattedPhoneNumber)
           .get();
 
       // Return true if any documents are found, indicating the phone number exists
       return querySnapshot.docs.isNotEmpty;
     } catch (e) {
       // Log the error and return false if an exception occurs
-      log("Error checking phone: $e");
+      log('Error checking phone: $e');
       return false;
     }
   }
 
   Future<void> saveUserData(UserModel user) async {
     try {
-      await firestore.collection("users").doc(user.uid).set(user.toMap());
+      await firestore
+          .collection('users')
+          .doc(user.uid)
+          .set(user.toMap())
+          .timeout(const Duration(seconds: 5));
     } catch (e) {
-      throw const AppException("Failed to save user data");
+      throw const AppException('Failed to save user data');
     }
   }
 
@@ -169,11 +174,15 @@ class AuthRepository extends BaseRepository {
       if (avatar != null) {
         try {
           final ref = firebaseStorage.ref().child('avatars/${user.uid}.jpg');
-          final task = await ref.putFile(avatar);
-          final url = await task.ref.getDownloadURL();
+          final task = await ref
+              .putFile(avatar)
+              .timeout(const Duration(seconds: 5));
+          final url = await task.ref.getDownloadURL().timeout(
+            const Duration(seconds: 5),
+          );
           avatarUrl = url;
         } catch (e) {
-          throw const AppException("Failed to upload avatar");
+          throw const AppException('Failed to upload avatar');
         }
       }
 
@@ -188,9 +197,10 @@ class AuthRepository extends BaseRepository {
       );
 
       await firestore
-          .collection("users")
+          .collection('users')
           .doc(user.uid)
-          .update(newUserData.toMap());
+          .update(newUserData.toMap())
+          .timeout(const Duration(seconds: 5));
 
       await HiveLocalDb.instance.userBox.updateUser(
         fullName: user.fullName,
@@ -199,8 +209,27 @@ class AuthRepository extends BaseRepository {
         avatarUrl: avatarUrl,
         fcmToken: user.fcmToken,
       );
+
+      // handle update user info in chatRooms(Client Side)
+      final roomsSnapshot = await firestore
+          .collection('chatRooms')
+          .where('participants', arrayContains: user.uid)
+          .get()
+          .timeout(const Duration(seconds: 5));
+
+      for (final doc in roomsSnapshot.docs) {
+        final chatRoomRef = firestore.collection('chatRooms').doc(doc.id);
+
+        await chatRoomRef
+            .update({
+              'participantsName.${user.uid}': user.fullName.toLowerCase(),
+              if (avatarUrl != null)
+                'participantsAvatar.${user.uid}': avatarUrl,
+            })
+            .timeout(const Duration(seconds: 5));
+      }
     } catch (e) {
-      throw const AppException("Failed to save user data");
+      throw const AppException('Failed to save user data');
     }
   }
 
@@ -211,7 +240,9 @@ class AuthRepository extends BaseRepository {
   Future<void> signOut() async {
     final user = await getUserData(FirebaseAuth.instance.currentUser!.uid);
 
-    await updateUserData(user: user.copyWith(fcmToken: ''));
+    await updateUserData(
+      user: user.copyWith(fcmToken: ''),
+    ).timeout(const Duration(seconds: 5));
 
     await auth.signOut();
   }
@@ -221,17 +252,18 @@ class AuthRepository extends BaseRepository {
     required String password,
   }) async {
     try {
-      final userCredential = await auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await auth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .timeout(const Duration(seconds: 5));
 
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
         throw const LogInWithEmailAndPasswordFailure();
       }
 
-      final userData = await getUserData(firebaseUser.uid);
+      final userData = await getUserData(
+        firebaseUser.uid,
+      ).timeout(const Duration(seconds: 5));
       return userData;
     } on FirebaseAuthException catch (e) {
       throw LogInWithEmailAndPasswordFailure.fromCode(e.code);

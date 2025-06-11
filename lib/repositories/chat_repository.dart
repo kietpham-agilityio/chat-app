@@ -70,7 +70,7 @@ class ChatRepository extends BaseRepository {
         query = query.startAfterDocument(lastDoc);
       }
 
-      final snapshot = await query.get();
+      final snapshot = await query.get().timeout(const Duration(seconds: 5));
 
       final users = snapshot.docs
           .map((doc) => UserModel.fromFirestore(doc))
@@ -124,7 +124,7 @@ class ChatRepository extends BaseRepository {
         .startAfterDocument(lastDocument)
         .limit(20);
     log("comingg");
-    final snapshot = await query.get();
+    final snapshot = await query.get().timeout(const Duration(seconds: 5));
     final messages = snapshot.docs
         .map((doc) => ChatMessage.fromFirestore(doc))
         .toList();
@@ -141,7 +141,8 @@ class ChatRepository extends BaseRepository {
       final unreadMessages = await getChatRoomMessages(chatRoomId)
           .where("receiverId", isEqualTo: userId)
           .where('status', isEqualTo: MessageStatus.sent.toString())
-          .get();
+          .get()
+          .timeout(const Duration(seconds: 5));
       log("found ${unreadMessages.docs.length} unread messages");
 
       for (final doc in unreadMessages.docs) {
@@ -171,7 +172,10 @@ class ChatRepository extends BaseRepository {
     final users = [currentUserId, otherUserId]..sort();
     final roomId = users.join("_");
 
-    final roomDoc = await _chatRooms.doc(roomId).get();
+    final roomDoc = await _chatRooms
+        .doc(roomId)
+        .get()
+        .timeout(const Duration(seconds: 5));
 
     if (roomDoc.exists) {
       return ChatRoomModel.fromFirestore(roomDoc);
@@ -203,7 +207,10 @@ class ChatRepository extends BaseRepository {
       participantsAvatar: participantsAvatar,
     );
 
-    await _chatRooms.doc(roomId).set(newRoom.toMap());
+    await _chatRooms
+        .doc(roomId)
+        .set(newRoom.toMap())
+        .timeout(const Duration(seconds: 5));
     return newRoom;
   }
 
@@ -248,29 +255,24 @@ class ChatRepository extends BaseRepository {
     await batch.commit();
   }
 
-  Future<bool> checkChatRoomExists(String docId) async {
-    final docRef = FirebaseFirestore.instance
-        .collection('chatRooms')
-        .doc(docId);
-
-    final docSnapshot = await docRef.get();
-    return docSnapshot.exists;
-  }
-
   Future<bool> findExistingChatRoom(List<String> docIds) async {
-    final collection = FirebaseFirestore.instance.collection('chatRooms');
+    try {
+      final collection = FirebaseFirestore.instance.collection('chatRooms');
 
-    for (final id in docIds) {
-      final docSnapshot = await collection.doc(id).get();
-      if (docSnapshot.exists) {
-        return true;
+      for (final id in docIds) {
+        final docSnapshot = await collection.doc(id).get();
+        if (docSnapshot.exists) {
+          return true;
+        }
       }
-    }
 
-    return false;
+      return false;
+    } catch (e) {
+      throw AppException('Failed to find chat room existence');
+    }
   }
 
-  Stream<bool> getUnreadCount(String chatRoomId, String userId) {
+  Stream<bool> checkUnread(String chatRoomId, String userId) {
     final snapshot = getChatRoomMessages(chatRoomId)
         .where("receiverId", isEqualTo: userId)
         .where('status', isEqualTo: MessageStatus.sent.toString())
@@ -299,17 +301,24 @@ class ChatRepository extends BaseRepository {
   }
 
   Future<void> blockUser(String currentUserId, String blockedUserId) async {
-    final userRef = firestore.collection("users").doc(currentUserId);
-    await userRef.update({
-      'blockedUsers': FieldValue.arrayUnion([blockedUserId]),
-      // 'blockedUsers': List<String>.from(data["blockedUsers"] ?? []),
-    });
+    try {
+      final userRef = firestore.collection("users").doc(currentUserId);
+      await userRef.update({
+        'blockedUsers': FieldValue.arrayUnion([blockedUserId]),
+      });
+    } catch (e) {
+      throw AppException('Failed to block user');
+    }
   }
 
   Future<void> unBlockUser(String currentUserId, String blockedUserId) async {
-    final userRef = firestore.collection("users").doc(currentUserId);
-    await userRef.update({
-      'blockedUsers': FieldValue.arrayRemove([blockedUserId]),
-    });
+    try {
+      final userRef = firestore.collection("users").doc(currentUserId);
+      await userRef.update({
+        'blockedUsers': FieldValue.arrayRemove([blockedUserId]),
+      });
+    } catch (e) {
+      throw AppException('Failed to unblock user');
+    }
   }
 }

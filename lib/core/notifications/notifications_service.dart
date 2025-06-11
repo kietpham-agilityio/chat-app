@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
+import 'package:chat_app/core/local_database/hive_local_db.dart';
 import 'package:chat_app/core/notifications/notifications_controller.dart';
 import 'package:chat_app/core/notifications/notifications_model.dart'
     show
@@ -14,6 +15,7 @@ import 'package:chat_app/core/notifications/notifications_model.dart'
         NotificationType;
 import 'package:chat_app/core/notifications/notifications_setup.dart';
 import 'package:chat_app/repositories/auth_repository.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class NotificationsService {
@@ -74,18 +76,26 @@ class NotificationsService {
       String? token = await awesomeFCM.requestFirebaseAppToken();
       log('Token: $token');
 
-      final user = await authRepository.getUserData(
-        FirebaseAuth.instance.currentUser!.uid,
-      );
+      await HiveLocalDb.instance.userBox.getUser().then((user) async {
+        if (user != null && user.fcmToken != token) {
+          final userUid = FirebaseAuth.instance.currentUser?.uid;
+          final chatRoomRef = FirebaseFirestore.instance
+              .collection('users')
+              .doc(userUid);
 
-      await authRepository.updateUserData(user: user.copyWith(fcmToken: token));
+          await chatRoomRef.update({'fcmToken': token});
+          await HiveLocalDb.instance.userBox.updateUser(
+            fcmToken: user.fcmToken,
+          );
+        }
+      });
     }
   }
 
   // when receiving FCM token
   @pragma('vm:entry-point')
   static Future<void> myFcmTokenHandle(String token) async {
-    log('FCM Token: $token');
+    log('FCM Token Handle: $token');
   }
 
   // when receiving FCM silent data
@@ -97,7 +107,7 @@ class NotificationsService {
   // when receiving native token
   @pragma('vm:entry-point')
   static Future<void> myNativeTokenHandle(String token) async {
-    log('Native Token: $token');
+    log('Native Token Handle: $token');
   }
 }
 
