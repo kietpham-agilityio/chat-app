@@ -53,6 +53,24 @@ class ChatRepository extends BaseRepository {
         );
   }
 
+  // StreamSubscription<List<ChatRoomModel>> getChatRooms(
+  //   String userId,
+  //   void Function(List<ChatRoomModel>) onData, {
+  //   Function? onError,
+  // }) {
+  //   return firestore
+  //       .collection('chatRooms')
+  //       .where('participants', arrayContains: userId)
+  //       .orderBy('lastMessageTime', descending: true)
+  //       .snapshots()
+  //       .map(
+  //         (snapshot) => snapshot.docs
+  //             .map((doc) => ChatRoomModel.fromFirestore(doc))
+  //             .toList(),
+  //       )
+  //       .listen(onData, onError: onError);
+  // }
+
   Future<PaginatedResult<UserModel>> searchUser({
     required String searchText,
     DocumentSnapshot? lastDoc,

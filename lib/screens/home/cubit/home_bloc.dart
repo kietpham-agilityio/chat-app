@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
 import 'package:chat_app/repositories/repositories.dart' show ChatRepository;
 import 'package:equatable/equatable.dart' show Equatable;
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+// import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
@@ -14,6 +18,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   final ChatRepository _chatRepository;
+  StreamSubscription<List<ChatRoomModel>>? _chatRoomsSubscription;
 
   Future<void> _initialize(
     HomeInitializeEvent event,
@@ -30,5 +35,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         emit(state.copyWith(status: HomeStatus.failure, errorMessage: ''));
       },
     );
+  }
+
+  @override
+  Future<void> close() async {
+    await _chatRoomsSubscription?.cancel();
+    return super.close();
   }
 }

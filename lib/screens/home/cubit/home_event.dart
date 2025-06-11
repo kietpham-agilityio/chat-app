@@ -10,3 +10,10 @@ class HomeInitializeEvent extends HomeEvent {
   @override
   List<Object?> get props => [currentUserId];
 }
+
+class HomeCloseAllStreamEvent extends HomeEvent {
+  HomeCloseAllStreamEvent();
+
+  @override
+  List<Object?> get props => [];
+}

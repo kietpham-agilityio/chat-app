@@ -39,7 +39,10 @@ class UserDBModel extends HiveObject {
       email: userModel.email,
       phoneNumber: userModel.phoneNumber,
       avatarUrl: userModel.avatarUrl,
-      fcmToken: userModel.fcmToken,
     );
+  }
+
+  factory UserDBModel.empty() {
+    return UserDBModel(uid: '', fullName: '', email: '', phoneNumber: '');
   }
 }

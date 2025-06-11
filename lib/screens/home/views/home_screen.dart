@@ -17,7 +17,8 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAListTile,
         CATextField,
         CATitleMediumText,
-        WzSnackBar;
+        WzSnackBar,
+        CAIconButtons;
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
 import 'package:chat_app/repositories/repositories.dart'
     show AuthRepository, ChatRepository;
@@ -31,14 +32,19 @@ import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return LoaderOverlay(
       child: BlocProvider(
-        create: (context) {
+        create: (_) {
           final notificationsService = context.read<NotificationsService>();
           notificationsService.initialize(context.read<AuthRepository>());
           return HomeBloc(chatRepository: context.read<ChatRepository>())..add(
@@ -53,7 +59,8 @@ class HomeScreen extends StatelessWidget {
               context.loaderOverlay.hide();
             }
 
-            if (state.status == HomeStatus.failure) {
+            if (state.status == HomeStatus.failure &&
+                state.errorMessage != '') {
               WzSnackBar.error(context, message: state.errorMessage ?? '');
             }
           },
@@ -61,6 +68,18 @@ class HomeScreen extends StatelessWidget {
             appBar: CAAppBar(
               title: CATitleMediumText(text: 'Chats'),
               leading: _Avatar(),
+              trailing: [
+                BlocBuilder<HomeBloc, HomeState>(
+                  builder: (context, state) {
+                    return CAIconButtons(
+                      icon: CAAssets.search(),
+                      onPressed: () {
+                        context.read<HomeBloc>().add(HomeCloseAllStreamEvent());
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
             body: Column(
               children: [

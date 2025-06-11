@@ -3,10 +3,10 @@ import 'dart:developer' show log;
 import 'dart:io';
 
 import 'package:chat_app/core/local_database/hive_local_db.dart';
-import 'package:chat_app/core/local_database/user_db_model.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart' show S;
 import 'package:chat_app/models/models.dart' show UserModel;
 import 'package:chat_app/repositories/base_repository.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuthException, User, FirebaseAuth;
 
@@ -101,8 +101,12 @@ class AuthRepository extends BaseRepository {
 
       final user = UserModel.fromFirestore(doc);
 
-      await HiveLocalDb.instance.userBox.saveUser(
-        UserDBModel.fromUserModel(user),
+      await HiveLocalDb.instance.userBox.updateUser(
+        fullName: user.fullName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        avatarUrl: user.avatarUrl,
+        // UserDBModel.fromUserModel(user.copyWith(fcmToken: [])),
       );
 
       return user;
@@ -207,7 +211,6 @@ class AuthRepository extends BaseRepository {
         email: user.email,
         phoneNumber: user.phoneNumber,
         avatarUrl: avatarUrl,
-        fcmToken: user.fcmToken,
       );
 
       // handle update user info in chatRooms(Client Side)
@@ -238,13 +241,43 @@ class AuthRepository extends BaseRepository {
   }
 
   Future<void> signOut() async {
-    final user = await getUserData(FirebaseAuth.instance.currentUser!.uid);
+    try {
+      final userDB = await HiveLocalDb.instance.userBox.getUser();
 
-    await updateUserData(
-      user: user.copyWith(fcmToken: ''),
-    ).timeout(const Duration(seconds: 5));
+      final fcmToken = userDB?.fcmToken;
 
-    await auth.signOut();
+      await removeFcmToken(fcmToken ?? '').timeout(const Duration(seconds: 5));
+
+      await auth.signOut().timeout(const Duration(seconds: 5));
+    } catch (_) {
+      throw const AppException('Failed to sign out');
+    }
+  }
+
+  Future<void> addFcmToken(String token) async {
+    try {
+      await firestore
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({
+            'fcmToken': FieldValue.arrayUnion([token]),
+          });
+    } catch (_) {
+      throw const AppException('Failed to add fcm token');
+    }
+  }
+
+  Future<void> removeFcmToken(String token) async {
+    try {
+      await firestore
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({
+            'fcmToken': FieldValue.arrayRemove([token]),
+          });
+    } catch (_) {
+      throw const AppException('Failed to remove fcm token');
+    }
   }
 
   Future<UserModel> signInWithEmailAndPassword({

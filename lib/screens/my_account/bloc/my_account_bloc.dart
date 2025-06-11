@@ -161,7 +161,7 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     try {
       final user = UserModel(
         uid: FirebaseAuth.instance.currentUser?.uid ?? '',
-        fullName: state.fullName.value,
+        fullName: state.fullName.value.toLowerCase(),
         email: state.email.value,
         phoneNumber: state.phoneNumber.value,
       );
