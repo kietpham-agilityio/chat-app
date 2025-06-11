@@ -48,13 +48,6 @@ class AppProvider extends StatelessWidget {
                 NotificationHandler.navigate(
                   notification: notificationsResponse,
                   onChatDetailsRedirect: (notifsRes) {
-                    // AppRouter.router.pushNamed(
-                    //   AppPaths.chat.name,
-                    //   queryParameters: {
-                    //     'receiverId': notifsRes.accountId,
-                    //     'receiverName': notifsRes.accountName,
-                    //   },
-                    // );
                     AppRouter.router.pushNamed(
                       AppPaths.chat.name,
                       queryParameters: {
@@ -66,19 +59,6 @@ class AppProvider extends StatelessWidget {
                 );
               },
             );
-
-            // if app is killed and user tap on notification
-            // if (receivedAction != null &&
-            //     receivedAction!.buttonKeyPressed.isEmpty) {
-            //   WidgetsBinding.instance.addPostFrameCallback((_) {
-            //     final data = receivedAction?.payload ?? {};
-
-            //     NotificationHandler.handleTapNavigate(
-            //       data,
-            //       NotificationsService.entity,
-            //     );
-            //   });
-            // }
 
             return service;
           },
