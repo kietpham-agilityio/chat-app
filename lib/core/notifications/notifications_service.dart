@@ -1,15 +1,17 @@
 import 'dart:async';
 import 'dart:developer' show log;
+import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
+import 'package:chat_app/core/notifications/notifications_controller.dart';
 import 'package:chat_app/core/notifications/notifications_model.dart'
     show
         NotificationEntity,
         NotificationResponseData,
-        NotificationType,
         NotificationsResponseEntity,
-        ReplyNotification;
+        ReplyNotification,
+        NotificationType;
 import 'package:chat_app/core/notifications/notifications_setup.dart';
 import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,10 +28,7 @@ class NotificationsService {
     await _setupFCM();
     await getToken(authRepository);
     await awesomeNotifications.setListeners(
-      onActionReceivedMethod: onActionReceivedMethod,
-      onNotificationCreatedMethod: onNotificationCreatedMethod,
-      onNotificationDisplayedMethod: onNotificationDisplayedMethod,
-      onDismissActionReceivedMethod: onDismissActionReceivedMethod,
+      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
     );
   }
 
@@ -42,18 +41,15 @@ class NotificationsService {
         playSound: true,
         importance: NotificationImportance.High,
         defaultPrivacy: NotificationPrivacy.Private,
+        soundSource: 'resource://raw/notifications',
       ),
     ]);
   }
 
   NotificationsService configure({
     FutureOr<void> Function(NotificationsResponseEntity)? onMessageOpenedApp,
-    FutureOr<void> Function(ReplyNotification)? onReply,
   }) {
-    entity.setHandlers(
-      onMessageOpenedApp: onMessageOpenedApp,
-      onReply: onReply,
-    );
+    entity.setHandlers(onMessageOpenedApp: onMessageOpenedApp);
     return this;
   }
 
@@ -74,14 +70,16 @@ class NotificationsService {
   }
 
   Future<void> getToken(AuthRepository authRepository) async {
-    String? token = await awesomeFCM.requestFirebaseAppToken();
-    log('Token: $token');
+    if (Platform.isAndroid) {
+      String? token = await awesomeFCM.requestFirebaseAppToken();
+      log('Token: $token');
 
-    final user = await authRepository.getUserData(
-      FirebaseAuth.instance.currentUser!.uid,
-    );
+      final user = await authRepository.getUserData(
+        FirebaseAuth.instance.currentUser!.uid,
+      );
 
-    await authRepository.updateUserData(user: user.copyWith(fcmToken: token));
+      await authRepository.updateUserData(user: user.copyWith(fcmToken: token));
+    }
   }
 
   // when receiving FCM token
@@ -100,52 +98,6 @@ class NotificationsService {
   @pragma('vm:entry-point')
   static Future<void> myNativeTokenHandle(String token) async {
     log('Native Token: $token');
-  }
-
-  Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-    log('Received Action: ${receivedAction.toMap()}');
-
-    switch (receivedAction.buttonKeyPressed) {
-      case 'NAVIGATE':
-        final data = receivedAction.payload ?? {};
-        NotificationHandler.handleTapNavigate(data, entity);
-        log('Navigate: ${data['type']}');
-        break;
-      case 'REPLY':
-        final replyText = receivedAction.buttonKeyInput;
-        log('Reply: $replyText');
-        break;
-      case 'LIKE':
-        log('Ontap Like action button');
-        break;
-      default:
-        final data = receivedAction.payload ?? {};
-        NotificationHandler.handleTapNavigate(data, entity);
-        log('Ontap notification: ${data['type']}');
-    }
-  }
-
-  @pragma('vm:entry-point')
-  static Future<void> onNotificationCreatedMethod(
-    ReceivedNotification receivedNotification,
-  ) async {
-    log('onNotificationCreatedMethod created: ${receivedNotification.toMap()}');
-  }
-
-  @pragma('vm:entry-point')
-  static Future<void> onNotificationDisplayedMethod(
-    ReceivedNotification receivedNotification,
-  ) async {
-    log(
-      'onNotificationDisplayedMethod created: ${receivedNotification.toMap()}',
-    );
-  }
-
-  @pragma('vm:entry-point')
-  static Future<void> onDismissActionReceivedMethod(
-    ReceivedAction receivedAction,
-  ) async {
-    log('Notification received: ${receivedAction.toMap()}');
   }
 }
 

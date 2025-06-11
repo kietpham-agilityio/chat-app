@@ -243,24 +243,31 @@ class _ViewState extends State<_View> {
                       final message = state.messages[index];
                       final isMe = message.senderId == _chatCubit.currentUserId;
                       ChatMessage? nextMessage;
+                      ChatMessage? previousMessage;
                       if (index + 1 < state.messages.length) {
                         nextMessage = state.messages[index + 1];
                       }
+                      if (index > 0) {
+                        previousMessage = state.messages[index - 1];
+                      }
 
                       bool showTimestamp = false;
+                      bool isLastBeforeTimestamp = false;
 
                       final currentDate = message.timestamp.toDate();
 
                       if (nextMessage == null) {
                         showTimestamp = true;
                       } else {
-                        final nextDate = nextMessage.timestamp.toDate();
-                        final diff = currentDate.difference(nextDate).inMinutes;
-
-                        // Display if the difference is >= 60 minutes or different day
+                        final nextTime = nextMessage.timestamp.toDate();
+                        final diff = currentDate.difference(nextTime).inMinutes;
                         showTimestamp =
-                            // diff >= 5 || !_isSameDay(currentDate, nextDate);
-                            diff >= 5 || !currentDate.isSameDay(nextDate);
+                            diff >= 5 || !currentDate.isSameDay(nextTime);
+                      }
+
+                      if (index == 0 ||
+                          previousMessage?.senderId != message.senderId) {
+                        isLastBeforeTimestamp = true;
                       }
 
                       return Column(
@@ -279,9 +286,6 @@ class _ViewState extends State<_View> {
                                 color: CAPalette.grey[1],
                               ),
                               child: CABodyMediumText(
-                                // text: _formatTimestampWithDateCondition(
-                                //   currentDate,
-                                // ),
                                 text: message.timestamp.formatChatDateTime(),
                                 color: CAPalette.grey[5],
                               ),
@@ -289,7 +293,12 @@ class _ViewState extends State<_View> {
                             SizedBox(height: 16),
                           ] else
                             SizedBox(height: 10),
-                          MessageBubble(message: message, isMe: isMe),
+                          MessageBubble(
+                            message: message,
+                            isMe: isMe,
+                            receiverAvatarUrl: state.receiverAvatarUrl,
+                            isLastBeforeTimestamp: isLastBeforeTimestamp,
+                          ),
                         ],
                       );
                     },
@@ -428,10 +437,18 @@ class _ViewState extends State<_View> {
 }
 
 class MessageBubble extends StatelessWidget {
-  const MessageBubble({required this.message, required this.isMe, super.key});
+  const MessageBubble({
+    required this.message,
+    required this.isMe,
+    this.receiverAvatarUrl,
+    required this.isLastBeforeTimestamp,
+    super.key,
+  });
 
   final ChatMessage message;
   final bool isMe;
+  final String? receiverAvatarUrl;
+  final bool isLastBeforeTimestamp;
 
   @override
   Widget build(BuildContext context) {
@@ -441,13 +458,11 @@ class MessageBubble extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (!isMe) ...[
-            CACircleAvatar(
-              url:
-                  'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-              avatarSize: 32,
-            ),
+          if (!isMe && isLastBeforeTimestamp) ...[
+            CACircleAvatar(url: receiverAvatarUrl ?? '', avatarSize: 32),
             SizedBox(width: 8),
+          ] else ...[
+            SizedBox(height: 32, width: 40),
           ],
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -473,13 +488,15 @@ class MessageBubble extends StatelessWidget {
               ),
             ),
           ),
-          if (isMe) ...[
+          if (isMe && isLastBeforeTimestamp) ...[
             SizedBox(width: 8),
             CACircleAvatar(
               url:
                   'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
               avatarSize: 24,
             ),
+          ] else ...[
+            SizedBox(height: 24, width: 32),
           ],
         ],
       ),

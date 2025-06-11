@@ -1,5 +1,5 @@
 import 'package:chat_app/core/notifications/notifications_service.dart';
-import 'package:chat_app/core/router/app_router.dart' show AppPaths, AppRouter;
+import 'package:chat_app/core/router/app_router.dart';
 import 'package:chat_app/repositories/repositories.dart'
     show AuthRepository, ChatRepository;
 import 'package:chat_app/screens/auth/states/auth_bloc.dart';
@@ -41,9 +41,9 @@ class AppProvider extends StatelessWidget {
         ),
         RepositoryProvider<NotificationsService>(
           lazy: false,
-          create: (context) => NotificationsService()
-            ..configure(
-              onReply: (replyNotifis) {},
+          create: (context) {
+            final service = NotificationsService();
+            service.configure(
               onMessageOpenedApp: (notificationsResponse) {
                 NotificationHandler.navigate(
                   notification: notificationsResponse,
@@ -58,7 +58,10 @@ class AppProvider extends StatelessWidget {
                   },
                 );
               },
-            ),
+            );
+
+            return service;
+          },
         ),
       ],
       child: MultiBlocProvider(

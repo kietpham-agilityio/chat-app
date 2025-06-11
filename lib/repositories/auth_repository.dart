@@ -7,7 +7,7 @@ import 'package:chat_app/core/resources/l10n_generated/l10n.dart' show S;
 import 'package:chat_app/models/models.dart' show UserModel;
 import 'package:chat_app/repositories/base_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuthException, User;
+    show FirebaseAuthException, User, FirebaseAuth;
 
 class AuthRepository extends BaseRepository {
   Stream<User?> get authStateChanges => auth.authStateChanges();
@@ -167,10 +167,14 @@ class AuthRepository extends BaseRepository {
     try {
       String? avatarUrl;
       if (avatar != null) {
-        final ref = firebaseStorage.ref().child('avatars/${user.uid}.jpg');
-        final task = await ref.putFile(avatar);
-        final url = await task.ref.getDownloadURL();
-        avatarUrl = url;
+        try {
+          final ref = firebaseStorage.ref().child('avatars/${user.uid}.jpg');
+          final task = await ref.putFile(avatar);
+          final url = await task.ref.getDownloadURL();
+          avatarUrl = url;
+        } catch (e) {
+          throw const AppException("Failed to upload avatar");
+        }
       }
 
       final newUserData = UserModel(
@@ -205,6 +209,10 @@ class AuthRepository extends BaseRepository {
   }
 
   Future<void> signOut() async {
+    final user = await getUserData(FirebaseAuth.instance.currentUser!.uid);
+
+    await updateUserData(user: user.copyWith(fcmToken: ''));
+
     await auth.signOut();
   }
 

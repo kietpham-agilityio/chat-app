@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 
-class ChatRoomModel {
+class ChatRoomModel extends Equatable {
   ChatRoomModel({
     required this.id,
     required this.participants,
@@ -50,6 +51,33 @@ class ChatRoomModel {
     );
   }
 
+  ChatRoomModel copyWith({
+    List<String>? participants,
+    String? lastMessage,
+    String? lastMessageSenderId,
+    Timestamp? lastMessageTime,
+    Map<String, Timestamp>? lastReadTime,
+    Map<String, String>? participantsName,
+    Map<String, String>? participantsAvatar,
+    bool? isTyping,
+    String? typingUserId,
+    bool? isCallActive,
+  }) {
+    return ChatRoomModel(
+      id: id,
+      participants: participants ?? this.participants,
+      lastMessage: lastMessage ?? this.lastMessage,
+      lastMessageSenderId: lastMessageSenderId ?? this.lastMessageSenderId,
+      lastMessageTime: lastMessageTime ?? this.lastMessageTime,
+      lastReadTime: lastReadTime ?? this.lastReadTime,
+      participantsName: participantsName ?? this.participantsName,
+      participantsAvatar: participantsAvatar ?? this.participantsAvatar,
+      isTyping: isTyping ?? this.isTyping,
+      typingUserId: typingUserId ?? this.typingUserId,
+      isCallActive: isCallActive ?? this.isCallActive,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'participants': participants,
@@ -64,4 +92,19 @@ class ChatRoomModel {
       'isCallActive': isCallActive,
     };
   }
+
+  @override
+  List<Object?> get props => [
+    id,
+    participants,
+    lastMessage,
+    lastMessageSenderId,
+    lastMessageTime,
+    lastReadTime,
+    participantsName,
+    participantsAvatar,
+    isTyping,
+    typingUserId,
+    isCallActive,
+  ];
 }

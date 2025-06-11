@@ -56,6 +56,12 @@ class ChatCubit extends Cubit<ChatState> {
           currentUserId,
           receiverId,
         );
+
+        //subscribe to all updates
+        _subscribeToMessages(chatRoom.id);
+        _subscribeToBlockStatus(receiverId);
+        _subscribeToUserInfo(receiverId);
+
         emit(
           state.copyWith(
             chatRoomId: chatRoom.id,
@@ -63,11 +69,6 @@ class ChatCubit extends Cubit<ChatState> {
             status: ChatStatus.loaded,
           ),
         );
-
-        //subscribe to all updates
-        _subscribeToMessages(chatRoom.id);
-        _subscribeToBlockStatus(receiverId);
-        _subscribeToUserInfo(receiverId);
       }
       await _chatRepository.sendMessage(
         chatRoomId: state.chatRoomId!,
@@ -93,6 +94,12 @@ class ChatCubit extends Cubit<ChatState> {
           currentUserId,
           receiverId,
         );
+
+        //subscribe to all updates
+        _subscribeToMessages(chatRoom.id);
+        _subscribeToBlockStatus(receiverId);
+        _subscribeToUserInfo(receiverId);
+
         emit(
           state.copyWith(
             chatRoomId: chatRoom.id,
@@ -100,11 +107,6 @@ class ChatCubit extends Cubit<ChatState> {
             status: ChatStatus.loaded,
           ),
         );
-
-        //subscribe to all updates
-        _subscribeToMessages(chatRoom.id);
-        _subscribeToBlockStatus(receiverId);
-        _subscribeToUserInfo(receiverId);
       }
     } catch (e) {
       emit(
