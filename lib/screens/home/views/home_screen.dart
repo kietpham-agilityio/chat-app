@@ -17,12 +17,11 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAListTile,
         CATextField,
         CATitleMediumText,
-        WzSnackBar,
-        CAIconButtons;
+        WzSnackBar;
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
 import 'package:chat_app/repositories/repositories.dart'
     show AuthRepository, ChatRepository;
-import 'package:chat_app/screens/home/cubit/home_bloc.dart';
+import 'package:chat_app/screens/home/cubit/home_cubit.dart';
 import 'package:chat_app/screens/search/views/search_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:flutter/material.dart';
@@ -40,6 +39,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late final HomeCubit _cubit;
+
+  @override
+  void initState() {
+    _cubit = HomeCubit(chatRepository: context.read<ChatRepository>());
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _cubit.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return LoaderOverlay(
@@ -47,11 +60,11 @@ class _HomeScreenState extends State<HomeScreen> {
         create: (_) {
           final notificationsService = context.read<NotificationsService>();
           notificationsService.initialize(context.read<AuthRepository>());
-          return HomeBloc(chatRepository: context.read<ChatRepository>())..add(
-            HomeInitializeEvent(FirebaseAuth.instance.currentUser?.uid ?? ''),
-          );
+
+          return _cubit
+            ..initialize(FirebaseAuth.instance.currentUser?.uid ?? '');
         },
-        child: BlocListener<HomeBloc, HomeState>(
+        child: BlocListener<HomeCubit, HomeState>(
           listener: (context, state) {
             if (state.status == HomeStatus.loading) {
               context.loaderOverlay.show();
@@ -68,18 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
             appBar: CAAppBar(
               title: CATitleMediumText(text: 'Chats'),
               leading: _Avatar(),
-              trailing: [
-                BlocBuilder<HomeBloc, HomeState>(
-                  builder: (context, state) {
-                    return CAIconButtons(
-                      icon: CAAssets.search(),
-                      onPressed: () {
-                        context.read<HomeBloc>().add(HomeCloseAllStreamEvent());
-                      },
-                    );
-                  },
-                ),
-              ],
             ),
             body: Column(
               children: [
@@ -127,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 Expanded(
-                  child: BlocBuilder<HomeBloc, HomeState>(
+                  child: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, state) {
                       if (state.status == HomeStatus.success &&
                           state.chats.isEmpty) {

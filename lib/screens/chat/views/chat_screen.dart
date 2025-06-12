@@ -51,7 +51,7 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
     _chatCubit = ChatCubit(
       currentUserId: FirebaseAuth.instance.currentUser?.uid ?? '',
       chatRepository: context.read<ChatRepository>(),
-    );
+    )..getMyAvatarUrl();
     super.initState();
   }
 
@@ -243,12 +243,13 @@ class _ViewState extends State<_View> {
                       final message = state.messages[index];
                       final isMe = message.senderId == _chatCubit.currentUserId;
                       ChatMessage? nextMessage;
-                      ChatMessage? previousMessage;
+                      ChatMessage? prevMessage;
+
                       if (index + 1 < state.messages.length) {
                         nextMessage = state.messages[index + 1];
                       }
-                      if (index > 0) {
-                        previousMessage = state.messages[index - 1];
+                      if (index - 1 >= 0) {
+                        prevMessage = state.messages[index - 1];
                       }
 
                       bool showTimestamp = false;
@@ -256,6 +257,7 @@ class _ViewState extends State<_View> {
 
                       final currentDate = message.timestamp.toDate();
 
+                      // Xác định showTimestamp
                       if (nextMessage == null) {
                         showTimestamp = true;
                       } else {
@@ -265,9 +267,21 @@ class _ViewState extends State<_View> {
                             diff >= 5 || !currentDate.isSameDay(nextTime);
                       }
 
-                      if (index == 0 ||
-                          previousMessage?.senderId != message.senderId) {
-                        isLastBeforeTimestamp = true;
+                      // Xác định isLastBeforeTimestamp
+                      if (index == 0) {
+                        isLastBeforeTimestamp = true; // Item đầu tiên
+                      } else if (prevMessage != null) {
+                        final prevDate = prevMessage.timestamp.toDate();
+                        final prevDiff = prevDate
+                            .difference(currentDate)
+                            .inMinutes;
+                        final prevShowTimestamp =
+                            prevDiff >= 5 || !prevDate.isSameDay(currentDate);
+                        isLastBeforeTimestamp =
+                            prevShowTimestamp ||
+                            prevMessage.senderId !=
+                                message
+                                    .senderId; // Thêm điều kiện senderId khác nhau
                       }
 
                       return Column(
@@ -298,6 +312,7 @@ class _ViewState extends State<_View> {
                             isMe: isMe,
                             receiverAvatarUrl: state.receiverAvatarUrl,
                             isLastBeforeTimestamp: isLastBeforeTimestamp,
+                            myAvatar: state.myAvatarUrl,
                           ),
                         ],
                       );
@@ -505,14 +520,16 @@ class MessageBubble extends StatelessWidget {
   const MessageBubble({
     required this.message,
     required this.isMe,
-    this.receiverAvatarUrl,
     required this.isLastBeforeTimestamp,
+    this.receiverAvatarUrl,
+    this.myAvatar,
     super.key,
   });
 
   final ChatMessage message;
   final bool isMe;
   final String? receiverAvatarUrl;
+  final String? myAvatar;
   final bool isLastBeforeTimestamp;
 
   @override
@@ -555,11 +572,7 @@ class MessageBubble extends StatelessWidget {
           ),
           if (isMe && isLastBeforeTimestamp) ...[
             SizedBox(width: 8),
-            CACircleAvatar(
-              url:
-                  'https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png',
-              avatarSize: 24,
-            ),
+            CACircleAvatar(url: myAvatar ?? '', avatarSize: 24),
           ] else ...[
             SizedBox(height: 24, width: 32),
           ],

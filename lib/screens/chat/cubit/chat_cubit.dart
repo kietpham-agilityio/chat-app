@@ -1,6 +1,7 @@
 import 'dart:async' show StreamSubscription;
 import 'dart:developer' show log;
 
+import 'package:chat_app/core/local_database/hive_local_db.dart';
 import 'package:chat_app/models/chat_message.dart' show ChatMessage;
 import 'package:chat_app/repositories/repositories.dart' show ChatRepository;
 import 'package:cloud_firestore/cloud_firestore.dart'
@@ -28,6 +29,11 @@ class ChatCubit extends Cubit<ChatState> {
   StreamSubscription? _userInfoSubscription;
 
   void messageChanged(String message) => emit(state.copyWith(message: message));
+
+  Future<void> getMyAvatarUrl() async {
+    final userDB = await HiveLocalDb.instance.userBox.getUser();
+    emit(state.copyWith(myAvatarUrl: userDB?.avatarUrl));
+  }
 
   Future<bool> checkExistingChatRoom(String receiverId) async {
     try {

@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 
 enum MessageType { text, image, video }
 
 enum MessageStatus { sent, read }
 
-class ChatMessage {
+class ChatMessage extends Equatable {
   final String id;
   final String chatRoomId;
   final String senderId;
@@ -15,7 +16,7 @@ class ChatMessage {
   final Timestamp timestamp;
   final List<String> readBy;
 
-  ChatMessage({
+  const ChatMessage({
     required this.id,
     required this.chatRoomId,
     required this.senderId,
@@ -84,4 +85,17 @@ class ChatMessage {
       readBy: readBy ?? this.readBy,
     );
   }
+
+  @override
+  List<Object?> get props => [
+    id,
+    chatRoomId,
+    senderId,
+    receiverId,
+    content,
+    type,
+    status,
+    timestamp,
+    readBy,
+  ];
 }

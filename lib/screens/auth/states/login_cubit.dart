@@ -58,13 +58,6 @@ class LoginCubit extends Cubit<LoginState> {
           errorMessage: e.message,
         ),
       );
-    } catch (e) {
-      emit(
-        state.copyWith(
-          status: FormzSubmissionStatus.failure,
-          errorMessage: 'An unknown error occurred',
-        ),
-      );
     }
   }
 }

@@ -1,4 +1,4 @@
-part of 'home_bloc.dart';
+part of 'home_cubit.dart';
 
 enum HomeStatus { initial, loading, success, failure }
 
