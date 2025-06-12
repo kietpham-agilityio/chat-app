@@ -106,7 +106,6 @@ class AuthRepository extends BaseRepository {
         email: user.email,
         phoneNumber: user.phoneNumber,
         avatarUrl: user.avatarUrl,
-        // UserDBModel.fromUserModel(user.copyWith(fcmToken: [])),
       );
 
       return user;
