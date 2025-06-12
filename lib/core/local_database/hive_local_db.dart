@@ -20,6 +20,9 @@ class HiveLocalDb {
     final userBox = await Hive.openBox<UserDBModel>('userBox');
 
     _userBox = UserBoxImpl(userBox);
+    if (userBox.values.isEmpty) {
+      _userBox.createEmptyUser();
+    }
   }
 
   UserBox get userBox => _userBox;

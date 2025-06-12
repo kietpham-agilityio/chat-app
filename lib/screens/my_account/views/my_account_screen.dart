@@ -128,16 +128,15 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   Widget build(BuildContext context) {
     return LoaderOverlay(
       child: BlocProvider(
-        create:
-            (context) =>
-                bloc..add(
-                  InitialEvent(
-                    email: widget.email,
-                    fullName: widget.fullName,
-                    phoneNumber: widget.phoneNumber,
-                    avatarUrl: widget.avatarUrl,
-                  ),
-                ),
+        create: (context) => bloc
+          ..add(
+            InitialEvent(
+              email: widget.email,
+              fullName: widget.fullName,
+              phoneNumber: widget.phoneNumber,
+              avatarUrl: widget.avatarUrl,
+            ),
+          ),
         child: BlocListener<MyAccountBloc, MyAccountState>(
           listener: (context, state) {
             if (state.status == MyAccountStatus.loading) {
@@ -149,7 +148,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
               WzSnackBar.success(context, message: 'Updated successfully');
               context.loaderOverlay.hide();
             }
-            if (state.status == MyAccountStatus.failure) {
+            if (state.status == MyAccountStatus.failure &&
+                state.errorMessage != '') {
               WzSnackBar.error(context, message: state.errorMessage ?? '');
               context.loaderOverlay.hide();
             }
@@ -211,11 +211,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 color: context.colorScheme.onPrimary,
                               ),
                               size: 32,
-                              onPressed:
-                                  () => _showBottomSheet(
-                                    context: context,
-                                    bloc: bloc,
-                                  ),
+                              onPressed: () => _showBottomSheet(
+                                context: context,
+                                bloc: bloc,
+                              ),
                             ),
                           ),
                         ],
@@ -263,10 +262,9 @@ class _EmailInput extends StatelessWidget {
           focusNode: focusNode,
           keyboardType: TextInputType.emailAddress,
           title: S.of(context).generalEmailAddress,
-          errorMessage:
-              state.email.displayError != null
-                  ? S.of(context).errorInvalidEmail
-                  : null,
+          errorMessage: state.email.displayError != null
+              ? S.of(context).errorInvalidEmail
+              : null,
         );
       },
     );
@@ -297,18 +295,14 @@ class _FullNameInput extends StatelessWidget {
           focusNode: focusNode,
           controller: fullNameController,
           title: S.of(context).generalFullName,
-          errorMessage:
-              state.fullName.displayError != null
-                  ? S.of(context).errorInvalidFullName
-                  : null,
-          onChanged:
-              (value) => context.read<MyAccountBloc>().add(
-                FullNameChangedEvent(value),
-              ),
-          onFocusLost:
-              () => context.read<MyAccountBloc>().add(
-                FullNameValidationEvent(state.fullName.value),
-              ),
+          errorMessage: state.fullName.displayError != null
+              ? S.of(context).errorInvalidFullName
+              : null,
+          onChanged: (value) =>
+              context.read<MyAccountBloc>().add(FullNameChangedEvent(value)),
+          onFocusLost: () => context.read<MyAccountBloc>().add(
+            FullNameValidationEvent(state.fullName.value),
+          ),
         );
       },
     );
@@ -340,18 +334,14 @@ class _PhoneNumberInput extends StatelessWidget {
           controller: phoneNumberController,
           title: S.of(context).generalPhoneNumber,
           keyboardType: TextInputType.number,
-          errorMessage:
-              state.phoneNumber.displayError != null
-                  ? S.of(context).errorInvalidPhoneNumber
-                  : null,
-          onChanged:
-              (value) => context.read<MyAccountBloc>().add(
-                PhoneNumberChangedEvent(value),
-              ),
-          onFocusLost:
-              () => context.read<MyAccountBloc>().add(
-                PhoneNumberValidationEvent(state.phoneNumber.value),
-              ),
+          errorMessage: state.phoneNumber.displayError != null
+              ? S.of(context).errorInvalidPhoneNumber
+              : null,
+          onChanged: (value) =>
+              context.read<MyAccountBloc>().add(PhoneNumberChangedEvent(value)),
+          onFocusLost: () => context.read<MyAccountBloc>().add(
+            PhoneNumberValidationEvent(state.phoneNumber.value),
+          ),
         );
       },
     );
@@ -370,8 +360,8 @@ class _SubmitButton extends StatelessWidget {
       builder: (context, isValid) {
         return CAElevatedButton(
           isDisabled: !isValid,
-          onPressed:
-              () => context.read<MyAccountBloc>().add(UpdateUserInfoEvent()),
+          onPressed: () =>
+              context.read<MyAccountBloc>().add(UpdateUserInfoEvent()),
           text: 'Update',
         );
       },

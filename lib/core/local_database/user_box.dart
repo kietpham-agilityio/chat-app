@@ -2,7 +2,7 @@ import 'package:chat_app/core/local_database/user_db_model.dart';
 import 'package:hive/hive.dart';
 
 abstract class UserBox {
-  Future<void> saveUser(UserDBModel user);
+  Future<void> createEmptyUser();
   Future<UserDBModel?> getUser();
   Future<void> updateUser({
     String? fullName,
@@ -23,13 +23,14 @@ class UserBoxImpl implements UserBox {
   static const _userKey = 'userBox';
 
   @override
-  Future<void> saveUser(UserDBModel user) async {
-    await box.put(_userKey, user);
+  Future<void> createEmptyUser() async {
+    await box.put(_userKey, UserDBModel.empty());
   }
 
   @override
   Future<UserDBModel?> getUser() async {
-    return box.get(_userKey);
+    final a = box.get(_userKey);
+    return a;
   }
 
   @override
@@ -70,7 +71,7 @@ class UserBoxImpl implements UserBox {
       hasChanged = true;
     }
 
-    if (fcmToken != null && fcmToken != user.avatarUrl) {
+    if (fcmToken != null && fcmToken != user.fcmToken) {
       user.fcmToken = fcmToken;
       hasChanged = true;
     }
@@ -82,7 +83,13 @@ class UserBoxImpl implements UserBox {
 
   @override
   Future<void> deleteUser() async {
-    await box.delete(_userKey);
+    await updateUser(
+      fullName: '',
+      email: '',
+      phoneNumber: '',
+      avatarUrl: '',
+      fcmToken: '',
+    );
   }
 
   @override

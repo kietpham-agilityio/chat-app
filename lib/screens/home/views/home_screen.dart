@@ -21,7 +21,7 @@ import 'package:chat_app/core/widgets/widgets.dart'
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
 import 'package:chat_app/repositories/repositories.dart'
     show AuthRepository, ChatRepository;
-import 'package:chat_app/screens/home/cubit/home_bloc.dart';
+import 'package:chat_app/screens/home/cubit/home_cubit.dart';
 import 'package:chat_app/screens/search/views/search_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:flutter/material.dart';
@@ -31,21 +31,40 @@ import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late final HomeCubit _cubit;
+
+  @override
+  void initState() {
+    _cubit = HomeCubit(chatRepository: context.read<ChatRepository>());
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _cubit.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return LoaderOverlay(
       child: BlocProvider(
-        create: (context) {
+        create: (_) {
           final notificationsService = context.read<NotificationsService>();
           notificationsService.initialize(context.read<AuthRepository>());
-          return HomeBloc(chatRepository: context.read<ChatRepository>())..add(
-            HomeInitializeEvent(FirebaseAuth.instance.currentUser?.uid ?? ''),
-          );
+
+          return _cubit
+            ..initialize(FirebaseAuth.instance.currentUser?.uid ?? '');
         },
-        child: BlocListener<HomeBloc, HomeState>(
+        child: BlocListener<HomeCubit, HomeState>(
           listener: (context, state) {
             if (state.status == HomeStatus.loading) {
               context.loaderOverlay.show();
@@ -53,7 +72,8 @@ class HomeScreen extends StatelessWidget {
               context.loaderOverlay.hide();
             }
 
-            if (state.status == HomeStatus.failure) {
+            if (state.status == HomeStatus.failure &&
+                state.errorMessage != '') {
               WzSnackBar.error(context, message: state.errorMessage ?? '');
             }
           },
@@ -108,7 +128,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: BlocBuilder<HomeBloc, HomeState>(
+                  child: BlocBuilder<HomeCubit, HomeState>(
                     builder: (context, state) {
                       if (state.status == HomeStatus.success &&
                           state.chats.isEmpty) {

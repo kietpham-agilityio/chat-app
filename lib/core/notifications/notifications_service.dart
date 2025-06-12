@@ -15,8 +15,6 @@ import 'package:chat_app/core/notifications/notifications_model.dart'
         NotificationType;
 import 'package:chat_app/core/notifications/notifications_setup.dart';
 import 'package:chat_app/repositories/auth_repository.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class NotificationsService {
   static NotificationEntity entity = NotificationEntity.initialize();
@@ -76,19 +74,12 @@ class NotificationsService {
       String? token = await awesomeFCM.requestFirebaseAppToken();
       log('Token: $token');
 
-      await HiveLocalDb.instance.userBox.getUser().then((user) async {
-        if (user != null && user.fcmToken != token) {
-          final userUid = FirebaseAuth.instance.currentUser?.uid;
-          final chatRoomRef = FirebaseFirestore.instance
-              .collection('users')
-              .doc(userUid);
+      final userDB = await HiveLocalDb.instance.userBox.getUser();
 
-          await chatRoomRef.update({'fcmToken': token});
-          await HiveLocalDb.instance.userBox.updateUser(
-            fcmToken: user.fcmToken,
-          );
-        }
-      });
+      if (userDB?.fcmToken != token) {
+        await authRepository.addFcmToken(token);
+        await HiveLocalDb.instance.userBox.updateUser(fcmToken: token);
+      }
     }
   }
 

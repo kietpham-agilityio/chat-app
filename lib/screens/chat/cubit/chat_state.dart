@@ -20,6 +20,7 @@ class ChatState extends Equatable {
   final String? message;
   final String? receiverAvatarUrl;
   final String? receiverFullName;
+  final String? myAvatarUrl;
 
   const ChatState({
     this.status = ChatStatus.inital,
@@ -38,6 +39,7 @@ class ChatState extends Equatable {
     this.message,
     this.receiverAvatarUrl,
     this.receiverFullName,
+    this.myAvatarUrl,
   });
 
   ChatState copyWith({
@@ -57,6 +59,7 @@ class ChatState extends Equatable {
     String? message,
     String? receiverAvatarUrl,
     String? receiverFullName,
+    String? myAvatarUrl,
   }) {
     return ChatState(
       status: status ?? this.status,
@@ -75,6 +78,7 @@ class ChatState extends Equatable {
       message: message ?? this.message,
       receiverAvatarUrl: receiverAvatarUrl ?? this.receiverAvatarUrl,
       receiverFullName: receiverFullName ?? this.receiverFullName,
+      myAvatarUrl: myAvatarUrl ?? this.myAvatarUrl,
     );
   }
 
@@ -97,6 +101,7 @@ class ChatState extends Equatable {
       message,
       receiverAvatarUrl,
       receiverFullName,
+      myAvatarUrl,
     ];
   }
 }
