@@ -1,0 +1,73 @@
+name: Flutter CI/CD Android
+
+on:
+  push:
+    branches:
+      - prod
+      - dev
+  pull_request:
+    branches:
+      - prod
+      - dev
+
+jobs:
+  build:
+    name: Build & Upload to Firebase
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Decode google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES }}" | base64 -d > android/app/google-services.json
+
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.3"
+
+      - name: Set build name, number, and release notes
+        run: |
+          BRANCH_NAME="${{ github.ref_name || github.head_ref }}"
+          TARGET_BRANCH="${{ github.base_ref }}"
+
+          # use target branch if it's a pull request, otherwise use the branch name
+          if [[ -n "$TARGET_BRANCH" ]]; then
+            SELECTED_BRANCH="$TARGET_BRANCH"
+          else
+            SELECTED_BRANCH="$BRANCH_NAME"
+          fi
+
+          echo "⚙️ Selected branch: $SELECTED_BRANCH"
+
+          if [[ "$SELECTED_BRANCH" == "prod" ]]; then
+            echo "Using PROD version name"
+            echo "BUILD_NAME=${{ secrets.BUILD_NAME_PROD }}" >> $GITHUB_ENV
+            echo "RELEASE_NOTES=Prod" >> $GITHUB_ENV
+          else
+            echo "Using DEV version name"
+            echo "BUILD_NAME=${{ secrets.BUILD_NAME_DEV }}" >> $GITHUB_ENV
+            echo "RELEASE_NOTES=Dev" >> $GITHUB_ENV
+          fi
+
+          echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: |
+          flutter build apk --release --build-name=${{ env.BUILD_NAME }} --build-number=${{ env.BUILD_NUMBER }}
+
+      - name: Upload to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: testers-group
+          file: build/app/outputs/flutter-apk/app-release.apk
+          releaseNotes: ${{ env.RELEASE_NOTES }}
