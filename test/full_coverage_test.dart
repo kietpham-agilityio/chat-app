@@ -31,7 +31,6 @@ import 'package:chat_app/main.dart';
 import 'package:chat_app/models/models.dart';
 import 'package:chat_app/models/user_model.dart';
 import 'package:chat_app/repositories/auth_repository.dart';
-import 'package:chat_app/repositories/base_repository.dart';
 import 'package:chat_app/repositories/repositories.dart';
 import 'package:chat_app/screens/auth/states/auth_bloc.dart';
 import 'package:chat_app/screens/auth/states/login_cubit.dart';

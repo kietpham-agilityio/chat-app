@@ -56,8 +56,9 @@ class ProfileScreen extends StatelessWidget {
             CAListTile(
               title: Text('Log Out'),
               leading: CAAssets.logOut(),
-              onTap:
-                  () => context.read<AuthBloc>().add(const AuthLogoutPressed()),
+
+              onTap: () =>
+                  context.read<AuthBloc>().add(const AuthLogoutPressed()),
             ),
           ],
         ),

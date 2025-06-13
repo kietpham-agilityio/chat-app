@@ -1,9 +1,8 @@
 import 'package:chat_app/core/utils/validations.dart' show Email, Password;
-import 'package:chat_app/repositories/repositories.dart'
-    show AuthRepository, LogInWithEmailAndPasswordFailure;
+import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:formz/formz.dart' show Formz, FormzSubmissionStatus;
+import 'package:formz/formz.dart' show Formz;
 
 part 'login_state.dart';
 
@@ -14,22 +13,17 @@ class LoginCubit extends Cubit<LoginState> {
 
   void emailChanged(String email) {
     final newEmail = Email.pure(email);
-    emit(
-      state.copyWith(email: newEmail, status: FormzSubmissionStatus.success),
-    );
+    emit(state.copyWith(email: newEmail, status: LoginStatus.success));
   }
 
   void emailValidation(String email) => emit(
-    state.copyWith(
-      email: Email.dirty(email),
-      status: FormzSubmissionStatus.success,
-    ),
+    state.copyWith(email: Email.dirty(email), status: LoginStatus.success),
   );
 
   void passwordChanged(String password) => emit(
     state.copyWith(
       password: Password.dirty(password),
-      status: FormzSubmissionStatus.success,
+      status: LoginStatus.success,
     ),
   );
 
@@ -37,27 +31,26 @@ class LoginCubit extends Cubit<LoginState> {
     emit(
       state.copyWith(
         isObscured: !state.isObscured,
-        status: FormzSubmissionStatus.success,
+        status: LoginStatus.success,
       ),
     );
   }
 
   Future<void> logInWithCredentials() async {
     if (!state.isValid) return;
-    emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
-    try {
-      await _authRepository.signInWithEmailAndPassword(
-        email: state.email.value,
-        password: state.password.value,
-      );
-      emit(state.copyWith(status: FormzSubmissionStatus.success));
-    } on LogInWithEmailAndPasswordFailure catch (e) {
-      emit(
-        state.copyWith(
-          status: FormzSubmissionStatus.failure,
-          errorMessage: e.message,
-        ),
-      );
-    }
+
+    emit(state.copyWith(status: LoginStatus.inProgress));
+
+    final res = await _authRepository.signInWithEmailAndPassword(
+      email: state.email.value,
+      password: state.password.value,
+    );
+
+    return res.fold(
+      (l) => emit(
+        state.copyWith(status: LoginStatus.failure, errorMessage: l.message),
+      ),
+      (r) => emit(state.copyWith(status: LoginStatus.success)),
+    );
   }
 }

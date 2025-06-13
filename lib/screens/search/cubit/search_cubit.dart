@@ -14,16 +14,14 @@ class SearchCubit extends Cubit<SearchState> {
 
   Future<void> searchUser(String username) async {
     emit(state.copyWith(status: SearchStatus.loading));
-    try {
-      final users = await _authRepository.searchUser(searchText: username);
-      emit(state.copyWith(users: users.items, status: SearchStatus.success));
-    } catch (e) {
-      emit(
-        state.copyWith(
-          errorMessage: e.toString(),
-          status: SearchStatus.failure,
-        ),
-      );
-    }
+
+    final res = await _authRepository.searchUser(searchText: username);
+
+    res.fold(
+      (l) => emit(
+        state.copyWith(errorMessage: l.message, status: SearchStatus.failure),
+      ),
+      (r) => emit(state.copyWith(users: r.items, status: SearchStatus.success)),
+    );
   }
 }

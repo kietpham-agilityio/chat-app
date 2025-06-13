@@ -35,17 +35,31 @@ class ChatCubit extends Cubit<ChatState> {
     emit(state.copyWith(myAvatarUrl: userDB?.avatarUrl));
   }
 
+  // Future<bool> checkExistingChatRoom(String receiverId) async {
+  //   try {
+  //     final docIds = [
+  //       '${currentUserId}_$receiverId',
+  //       '${receiverId}_$currentUserId',
+  //     ];
+  //     return _chatRepository.findExistingChatRoom(docIds);
+  //   } catch (e) {
+  //     log(e.toString());
+  //     return false;
+  //   }
+  // }
+
   Future<bool> checkExistingChatRoom(String receiverId) async {
-    try {
-      final docIds = [
-        '${currentUserId}_$receiverId',
-        '${receiverId}_$currentUserId',
-      ];
-      return _chatRepository.findExistingChatRoom(docIds);
-    } catch (e) {
-      log(e.toString());
+    final docIds = [
+      '${currentUserId}_$receiverId',
+      '${receiverId}_$currentUserId',
+    ];
+
+    final result = await _chatRepository.findExistingChatRoom(docIds);
+
+    return result.fold((failure) {
+      log('Error checking existing chat room: ${failure.message}');
       return false;
-    }
+    }, (exists) => exists);
   }
 
   Future<void> sendMessage({
@@ -58,24 +72,34 @@ class ChatCubit extends Cubit<ChatState> {
         _isInChat = true;
         emit(state.copyWith(status: ChatStatus.loading));
 
-        final chatRoom = await _chatRepository.getOrCreateChatRoom(
+        final result = await _chatRepository.getOrCreateChatRoom(
           currentUserId,
           receiverId,
         );
 
-        //subscribe to all updates
-        _subscribeToMessages(chatRoom.id);
-        _subscribeToBlockStatus(receiverId);
-        _subscribeToUserInfo(receiverId);
+        result.fold(
+          (failure) {
+            emit(
+              state.copyWith(error: failure.message, status: ChatStatus.error),
+            );
+            return;
+          },
+          (chatRoom) {
+            _subscribeToMessages(chatRoom.id);
+            _subscribeToBlockStatus(receiverId);
+            _subscribeToUserInfo(receiverId);
 
-        emit(
-          state.copyWith(
-            chatRoomId: chatRoom.id,
-            receiverId: receiverId,
-            status: ChatStatus.loaded,
-          ),
+            emit(
+              state.copyWith(
+                chatRoomId: chatRoom.id,
+                receiverId: receiverId,
+                status: ChatStatus.loaded,
+              ),
+            );
+          },
         );
       }
+
       await _chatRepository.sendMessage(
         chatRoomId: state.chatRoomId!,
         senderId: currentUserId,
@@ -83,7 +107,7 @@ class ChatCubit extends Cubit<ChatState> {
         content: content,
       );
     } catch (e) {
-      log(e.toString());
+      log("Failed to send message: $e");
       emit(state.copyWith(error: "Failed to send message"));
     }
   }
@@ -96,22 +120,32 @@ class ChatCubit extends Cubit<ChatState> {
         _isInChat = true;
         emit(state.copyWith(status: ChatStatus.loading));
 
-        final chatRoom = await _chatRepository.getOrCreateChatRoom(
+        final result = await _chatRepository.getOrCreateChatRoom(
           currentUserId,
           receiverId,
         );
 
-        //subscribe to all updates
-        _subscribeToMessages(chatRoom.id);
-        _subscribeToBlockStatus(receiverId);
-        _subscribeToUserInfo(receiverId);
+        result.fold(
+          (failure) {
+            emit(
+              state.copyWith(error: failure.message, status: ChatStatus.error),
+            );
+            return;
+          },
+          (chatRoom) {
+            //subscribe to all updates
+            _subscribeToMessages(chatRoom.id);
+            _subscribeToBlockStatus(receiverId);
+            _subscribeToUserInfo(receiverId);
 
-        emit(
-          state.copyWith(
-            chatRoomId: chatRoom.id,
-            receiverId: receiverId,
-            status: ChatStatus.loaded,
-          ),
+            emit(
+              state.copyWith(
+                chatRoomId: chatRoom.id,
+                receiverId: receiverId,
+                status: ChatStatus.loaded,
+              ),
+            );
+          },
         );
       }
     } catch (e) {
@@ -124,32 +158,97 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  // void _subscribeToMessages(String chatRoomId) {
+  //   _messageSubscription?.cancel();
+  //   _messageSubscription = _chatRepository
+  //       .getMessages(chatRoomId)
+  //       .listen(
+  //         (messages) {
+  //           if (_isInChat) {
+  //             _markMessagesAsRead(chatRoomId);
+  //           }
+  //           emit(
+  //             state.copyWith(
+  //               messages: messages.items,
+  //               lastDoc: messages.lastDoc,
+  //             ),
+  //           );
+  //         },
+  //         onError: (error) {
+  //           emit(
+  //             state.copyWith(
+  //               error: "Failed to load messages",
+  //               status: ChatStatus.error,
+  //             ),
+  //           );
+  //         },
+  //       );
+  // }
+
   void _subscribeToMessages(String chatRoomId) {
     _messageSubscription?.cancel();
-    _messageSubscription = _chatRepository
-        .getMessages(chatRoomId)
-        .listen(
-          (messages) {
-            if (_isInChat) {
-              _markMessagesAsRead(chatRoomId);
-            }
-            emit(
-              state.copyWith(
-                messages: messages.items,
-                lastDoc: messages.lastDoc,
-              ),
-            );
-          },
-          onError: (error) {
-            emit(
-              state.copyWith(
-                error: "Failed to load messages",
-                status: ChatStatus.error,
-              ),
-            );
-          },
-        );
+    _messageSubscription = _chatRepository.getMessages(chatRoomId).listen((
+      either,
+    ) {
+      either.fold(
+        (failure) {
+          emit(
+            state.copyWith(error: failure.message, status: ChatStatus.error),
+          );
+        },
+        (result) {
+          if (_isInChat) {
+            _markMessagesAsRead(chatRoomId);
+          }
+          emit(state.copyWith(messages: result.items, lastDoc: result.lastDoc));
+        },
+      );
+    });
   }
+
+  // Future<void> loadMoreMessages() async {
+  //   if (state.status != ChatStatus.loaded ||
+  //       state.messages.isEmpty ||
+  //       !state.hasMoreMessages ||
+  //       state.isLoadingMore) {
+  //     return;
+  //   }
+
+  //   try {
+  //     emit(state.copyWith(isLoadingMore: true));
+
+  //     final lastMessage = state.messages.last;
+  //     final lastDoc = await _chatRepository
+  //         .getChatRoomMessages(state.chatRoomId!)
+  //         .doc(lastMessage.id)
+  //         .get();
+
+  //     final moreMessages = await _chatRepository.getMoreMessages(
+  //       state.chatRoomId!,
+  //       lastDocument: lastDoc,
+  //     );
+
+  //     if (moreMessages.items.isEmpty) {
+  //       emit(state.copyWith(hasMoreMessages: false, isLoadingMore: false));
+  //       return;
+  //     }
+
+  //     emit(
+  //       state.copyWith(
+  //         messages: [...state.messages, ...moreMessages.items],
+  //         hasMoreMessages: moreMessages.items.length >= 20,
+  //         isLoadingMore: false,
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     emit(
+  //       state.copyWith(
+  //         error: "Failed to load more messages",
+  //         isLoadingMore: false,
+  //       ),
+  //     );
+  //   }
+  // }
 
   Future<void> loadMoreMessages() async {
     if (state.status != ChatStatus.loaded ||
@@ -159,31 +258,44 @@ class ChatCubit extends Cubit<ChatState> {
       return;
     }
 
-    try {
-      emit(state.copyWith(isLoadingMore: true));
+    emit(state.copyWith(isLoadingMore: true));
 
+    try {
       final lastMessage = state.messages.last;
       final lastDoc = await _chatRepository
           .getChatRoomMessages(state.chatRoomId!)
           .doc(lastMessage.id)
           .get();
 
-      final moreMessages = await _chatRepository.getMoreMessages(
+      final result = await _chatRepository.getMoreMessages(
         state.chatRoomId!,
         lastDocument: lastDoc,
       );
 
-      if (moreMessages.items.isEmpty) {
-        emit(state.copyWith(hasMoreMessages: false, isLoadingMore: false));
-        return;
-      }
+      result.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              error: failure.message,
+              isLoadingMore: false,
+              status: ChatStatus.error,
+            ),
+          );
+        },
+        (moreMessages) {
+          if (moreMessages.items.isEmpty) {
+            emit(state.copyWith(hasMoreMessages: false, isLoadingMore: false));
+            return;
+          }
 
-      emit(
-        state.copyWith(
-          messages: [...state.messages, ...moreMessages.items],
-          hasMoreMessages: moreMessages.items.length >= 20,
-          isLoadingMore: false,
-        ),
+          emit(
+            state.copyWith(
+              messages: [...state.messages, ...moreMessages.items],
+              hasMoreMessages: moreMessages.items.length >= 20,
+              isLoadingMore: false,
+            ),
+          );
+        },
       );
     } catch (e) {
       emit(
@@ -208,55 +320,121 @@ class ChatCubit extends Cubit<ChatState> {
     _blockStatusSubscription = _chatRepository
         .isUserBlocked(currentUserId, otherUserId)
         .listen(
-          (isBlocked) {
-            emit(state.copyWith(isUserBlocked: isBlocked));
+          (eitherIsBlocked) {
+            eitherIsBlocked.fold(
+              (failure) {
+                emit(state.copyWith(error: failure.message));
+              },
+              (isBlocked) {
+                emit(state.copyWith(isUserBlocked: isBlocked));
 
-            _amIBlockStatusSubscription?.cancel();
-            _amIBlockStatusSubscription = _chatRepository
-                .amIBlocked(currentUserId, otherUserId)
-                .listen((amIBlocked) {
-                  emit(state.copyWith(amIBlocked: amIBlocked));
-                });
+                _amIBlockStatusSubscription?.cancel();
+                _amIBlockStatusSubscription = _chatRepository
+                    .amIBlocked(currentUserId, otherUserId)
+                    .listen(
+                      (eitherAmIBlocked) {
+                        eitherAmIBlocked.fold(
+                          (failure) {
+                            emit(
+                              state.copyWith(
+                                error: failure.message,
+                                status: ChatStatus.error,
+                              ),
+                            );
+                          },
+                          (amIBlocked) {
+                            emit(state.copyWith(amIBlocked: amIBlocked));
+                          },
+                        );
+                      },
+                      onError: (_) {
+                        emit(
+                          state.copyWith(
+                            error: 'Failed getting amIBlocked status',
+                            status: ChatStatus.error,
+                          ),
+                        );
+                      },
+                    );
+              },
+            );
           },
-          onError: (error) {
-            log("error getting online status");
-          },
-        );
-  }
-
-  void _subscribeToUserInfo(String receiverId) {
-    _userInfoSubscription?.cancel();
-    _userInfoSubscription = _chatRepository
-        .getUserInfo(receiverId)
-        .listen(
-          (userInfo) {
+          onError: (_) {
             emit(
               state.copyWith(
-                receiverAvatarUrl: userInfo.avatarUrl,
-                receiverFullName: userInfo.fullName,
+                error: 'Failed getting isUserBlocked status',
+                status: ChatStatus.error,
               ),
             );
           },
-          onError: (error) {
-            log("error getting user info");
-          },
         );
   }
 
+  // void _subscribeToUserInfo(String receiverId) {
+  //   _userInfoSubscription?.cancel();
+  //   _userInfoSubscription = _chatRepository
+  //       .getUserInfo(receiverId)
+  //       .listen(
+  //         (userInfo) {
+  //           emit(
+  //             state.copyWith(
+  //               receiverAvatarUrl: userInfo.avatarUrl,
+  //               receiverFullName: userInfo.fullName,
+  //             ),
+  //           );
+  //         },
+  //         onError: (error) {
+  //           log("error getting user info");
+  //         },
+  //       );
+  // }
+
+  void _subscribeToUserInfo(String receiverId) {
+    _userInfoSubscription?.cancel();
+    _userInfoSubscription = _chatRepository.getUserInfo(receiverId).listen((
+      either,
+    ) {
+      either.fold(
+        (failure) {
+          log("error getting user info: ${failure.message}");
+          emit(
+            state.copyWith(error: failure.message, status: ChatStatus.error),
+          );
+        },
+        (userInfo) {
+          emit(
+            state.copyWith(
+              receiverAvatarUrl: userInfo.avatarUrl,
+              receiverFullName: userInfo.fullName,
+            ),
+          );
+        },
+      );
+    });
+  }
+
   Future<void> blockUser(String userId) async {
-    try {
-      await _chatRepository.blockUser(currentUserId, userId);
-    } catch (e) {
-      emit(state.copyWith(error: 'failed to block user $e'));
-    }
+    final result = await _chatRepository.blockUser(currentUserId, userId);
+    result.fold(
+      (failure) {
+        emit(state.copyWith(error: failure.message, status: ChatStatus.error));
+      },
+      (_) {
+        emit(state.copyWith(isUserBlocked: true));
+      },
+    );
   }
 
   Future<void> unBlockUser(String userId) async {
-    try {
-      await _chatRepository.unBlockUser(currentUserId, userId);
-    } catch (e) {
-      emit(state.copyWith(error: 'failed to unblock user $e'));
-    }
+    final result = await _chatRepository.unBlockUser(currentUserId, userId);
+    result.fold(
+      (failure) {
+        emit(state.copyWith(error: failure.message, status: ChatStatus.error));
+      },
+      (_) {
+        emit(state.copyWith(isUserBlocked: false));
+      },
+    );
   }
 
   Future<void> leaveChat() async {

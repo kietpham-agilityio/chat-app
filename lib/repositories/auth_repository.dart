@@ -3,56 +3,33 @@ import 'dart:developer' show log;
 import 'dart:io';
 
 import 'package:chat_app/core/local_database/hive_local_db.dart';
-import 'package:chat_app/core/resources/l10n_generated/l10n.dart' show S;
+import 'package:chat_app/core/utils/failure.dart';
 import 'package:chat_app/models/models.dart' show UserModel;
-import 'package:chat_app/repositories/base_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuthException, User, FirebaseAuth;
+import 'package:firebase_auth/firebase_auth.dart' show User, FirebaseAuth;
+import 'package:firebase_storage/firebase_storage.dart' show FirebaseStorage;
+import 'package:fpdart/fpdart.dart';
 
-class AuthRepository extends BaseRepository {
+class AuthRepository {
+  const AuthRepository({
+    required this.auth,
+    required this.firestore,
+    required this.firebaseStorage,
+  });
+
+  final FirebaseAuth auth;
+  final FirebaseFirestore firestore;
+  final FirebaseStorage firebaseStorage;
+
   Stream<User?> get authStateChanges => auth.authStateChanges();
 
-  /// Signs up a new user with the given full name, email, phone number,
-  /// and password.
-  ///
-  /// The phone number should be in the format `+1234567890`.
-  ///
-  /// If the email or phone number already exists, an [AppException] is
-  /// thrown.
-  ///
-  /// If the user is successfully created, the user's data is saved to
-  /// Firestore and the [UserModel] is returned.
-  ///
-  /// If there is an error, a [SignUpWithEmailAndPasswordFailure] is
-  /// thrown.
-  Future<UserModel> signUp({
+  Future<Either<Failure, UserModel>> signUp({
     required String fullName,
     required String email,
     required String phoneNumber,
     required String password,
   }) async {
     try {
-      // Format the phone number to `+1234567890` format
-      final formattedPhoneNumber = _formatPhoneNumber(phoneNumber);
-
-      // Check if the email or phone number already exists
-      final results = await Future.wait([
-        checkEmailExists(email),
-        checkPhoneExists(formattedPhoneNumber),
-      ]);
-
-      if (results[0]) {
-        throw const AppException(
-          'An account with the same email already exists',
-        );
-      }
-      if (results[1]) {
-        throw const AppException(
-          'An account with the same phone already exists',
-        );
-      }
-
       // Create a new user with the given credentials
       final userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
@@ -62,7 +39,7 @@ class AuthRepository extends BaseRepository {
       // Get the user that was just created
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        throw const SignUpWithEmailAndPasswordFailure();
+        return left(Failure('User not found!'));
       }
 
       // Create a new [UserModel] from the created user
@@ -70,31 +47,26 @@ class AuthRepository extends BaseRepository {
         uid: firebaseUser.uid,
         fullName: fullName,
         email: email,
-        phoneNumber: formattedPhoneNumber,
+        phoneNumber: phoneNumber,
       );
 
       // Save the user's data to Firestore
-      await saveUserData(user);
+      saveUserData(user);
 
       // Return the created user
-      return user;
-    } on FirebaseAuthException catch (e) {
-      // If there is an error, throw a [SignUpWithEmailAndPasswordFailure]
-      throw SignUpWithEmailAndPasswordFailure.fromCode(e.code);
-    } catch (e) {
-      // If there is an error that is not a [FirebaseAuthException], throw
-      // a generic [SignUpWithEmailAndPasswordFailure]
-      if (e is AppException) rethrow;
-      throw const SignUpWithEmailAndPasswordFailure();
+      return right(user);
+    } catch (_) {
+      return left(Failure('Failed to sign up!'));
     }
   }
 
-  Future<UserModel> getUserData(String uid) async {
+  Future<Either<Failure, UserModel>> getUserData(String uid) async {
     try {
       final doc = await firestore.collection('users').doc(uid).get();
 
       if (!doc.exists) {
-        throw const AppException('User data not found');
+        // throw const AppException('User data not found');
+        return left(Failure('User data not found!'));
       }
 
       log('User id: ${doc.id}');
@@ -108,85 +80,40 @@ class AuthRepository extends BaseRepository {
         avatarUrl: user.avatarUrl,
       );
 
-      return user;
-    } catch (e) {
-      throw const AppException('Failed to get user data');
+      return right(user);
+    } catch (_) {
+      return left(Failure('Failed to get user data!'));
     }
   }
 
-  /// Checks if an email already exists in the users collection.
-  ///
-  /// Returns `true` if the email exists, otherwise `false`.
-  /// Logs any exceptions that occur during the process.
-  Future<bool> checkEmailExists(String email) async {
-    try {
-      // Query the Firestore users collection for documents with the specified email
-      final querySnapshot = await firestore
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .get();
-
-      // Return true if any documents are found, indicating the email exists
-      return querySnapshot.docs.isNotEmpty;
-    } catch (e) {
-      // Log the error and return false if an exception occurs
-      log('Error checking email: $e');
-      return false;
-    }
-  }
-
-  /// Checks if a phone number already exists in the users collection.
-  ///
-  /// Returns `true` if the phone number exists, otherwise `false`.
-  /// Logs any exceptions that occur during the process.
-  Future<bool> checkPhoneExists(String phoneNumber) async {
-    try {
-      // Format the input phone number to remove any whitespace characters
-      final formattedPhoneNumber = _formatPhoneNumber(phoneNumber);
-
-      // Query the Firestore users collection for documents with the specified phone number
-      final querySnapshot = await firestore
-          .collection('users')
-          .where('phoneNumber', isEqualTo: formattedPhoneNumber)
-          .get();
-
-      // Return true if any documents are found, indicating the phone number exists
-      return querySnapshot.docs.isNotEmpty;
-    } catch (e) {
-      // Log the error and return false if an exception occurs
-      log('Error checking phone: $e');
-      return false;
-    }
-  }
-
-  Future<void> saveUserData(UserModel user) async {
+  Future<Either<Failure, Unit>> saveUserData(UserModel user) async {
     try {
       await firestore
           .collection('users')
           .doc(user.uid)
           .set(user.toMap())
           .timeout(const Duration(seconds: 5));
-    } catch (e) {
-      throw const AppException('Failed to save user data');
+      return right(unit);
+    } catch (_) {
+      return left(Failure('Failed to get user data!'));
     }
   }
 
-  Future<void> updateUserData({required UserModel user, File? avatar}) async {
+  Future<Either<Failure, Unit>> updateUserData({
+    required UserModel user,
+    File? avatar,
+  }) async {
     try {
       String? avatarUrl;
       if (avatar != null) {
-        try {
-          final ref = firebaseStorage.ref().child('avatars/${user.uid}.jpg');
-          final task = await ref
-              .putFile(avatar)
-              .timeout(const Duration(seconds: 5));
-          final url = await task.ref.getDownloadURL().timeout(
-            const Duration(seconds: 5),
-          );
-          avatarUrl = url;
-        } catch (e) {
-          throw const AppException('Failed to upload avatar');
-        }
+        final ref = firebaseStorage.ref().child('avatars/${user.uid}.jpg');
+        final task = await ref
+            .putFile(avatar)
+            .timeout(const Duration(seconds: 5));
+        final url = await task.ref.getDownloadURL().timeout(
+          const Duration(seconds: 5),
+        );
+        avatarUrl = url;
       }
 
       final newUserData = UserModel(
@@ -230,16 +157,14 @@ class AuthRepository extends BaseRepository {
             })
             .timeout(const Duration(seconds: 5));
       }
-    } catch (e) {
-      throw const AppException('Failed to save user data');
+
+      return right(unit);
+    } catch (_) {
+      return left(Failure('Failed to update user data!'));
     }
   }
 
-  String _formatPhoneNumber(String number) {
-    return number.replaceAll(RegExp(r'\s+'), '');
-  }
-
-  Future<void> signOut() async {
+  Future<Either<Failure, Unit>> signOut() async {
     try {
       final userDB = await HiveLocalDb.instance.userBox.getUser();
 
@@ -248,12 +173,14 @@ class AuthRepository extends BaseRepository {
       await removeFcmToken(fcmToken ?? '').timeout(const Duration(seconds: 5));
 
       await auth.signOut().timeout(const Duration(seconds: 5));
+
+      return right(unit);
     } catch (_) {
-      throw const AppException('Failed to sign out');
+      return left(Failure('Failed to sign out!'));
     }
   }
 
-  Future<void> addFcmToken(String token) async {
+  Future<Either<Failure, Unit>> addFcmToken(String token) async {
     try {
       await firestore
           .collection('users')
@@ -261,12 +188,13 @@ class AuthRepository extends BaseRepository {
           .update({
             'fcmToken': FieldValue.arrayUnion([token]),
           });
+      return right(unit);
     } catch (_) {
-      throw const AppException('Failed to add fcm token');
+      return left(Failure('Failed to add fcm token!'));
     }
   }
 
-  Future<void> removeFcmToken(String token) async {
+  Future<Either<Failure, Unit>> removeFcmToken(String token) async {
     try {
       await firestore
           .collection('users')
@@ -274,12 +202,13 @@ class AuthRepository extends BaseRepository {
           .update({
             'fcmToken': FieldValue.arrayRemove([token]),
           });
+      return right(unit);
     } catch (_) {
-      throw const AppException('Failed to remove fcm token');
+      return left(Failure('Failed to remove fcm token!'));
     }
   }
 
-  Future<UserModel> signInWithEmailAndPassword({
+  Future<Either<Failure, UserModel>> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
@@ -290,98 +219,16 @@ class AuthRepository extends BaseRepository {
 
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        throw const LogInWithEmailAndPasswordFailure();
+        return left(Failure('User not found!'));
       }
 
       final userData = await getUserData(
         firebaseUser.uid,
       ).timeout(const Duration(seconds: 5));
+
       return userData;
-    } on FirebaseAuthException catch (e) {
-      throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
     } catch (_) {
-      throw const LogInWithEmailAndPasswordFailure();
-    }
-  }
-}
-
-// Custom exception for general app-level errors
-class AppException implements Exception {
-  final String message;
-  const AppException(this.message);
-
-  @override
-  String toString() => message;
-}
-
-/// Thrown if signing up with email and password fails.
-///
-/// Contains a human-readable message describing the error.
-///
-/// See [SignUpWithEmailAndPasswordFailure.fromCode] for creating an instance
-/// from a [FirebaseAuthException.code].
-class SignUpWithEmailAndPasswordFailure implements Exception {
-  /// Creates a new [SignUpWithEmailAndPasswordFailure].
-  ///
-  /// If [message] is not provided, it defaults to
-  /// 'An unknown exception occurred. Please try again.'.
-  const SignUpWithEmailAndPasswordFailure([
-    this.message = 'An unknown exception occurred. Please try again.',
-  ]);
-
-  /// A human-readable message describing the error.
-  final String message;
-
-  /// Creates a new [SignUpWithEmailAndPasswordFailure] from a
-  /// [FirebaseAuthException.code].
-  factory SignUpWithEmailAndPasswordFailure.fromCode(String code) {
-    switch (code) {
-      case 'user-disabled':
-        return SignUpWithEmailAndPasswordFailure(S.current.errorUserDisabled);
-      case 'email-already-in-use':
-        return SignUpWithEmailAndPasswordFailure(
-          S.current.errorEmailAlreadyInUse,
-        );
-      case 'operation-not-allowed':
-        return SignUpWithEmailAndPasswordFailure(
-          S.current.errorOperationNotAllowed,
-        );
-      default:
-        return SignUpWithEmailAndPasswordFailure(S.current.errorUnknown);
-    }
-  }
-}
-
-/// Thrown during the login process if a failure occurs.
-///
-/// Contains a human-readable message describing the error.
-///
-/// See [LogInWithEmailAndPasswordFailure.fromCode] for creating an instance
-/// from a [FirebaseAuthException.code].
-class LogInWithEmailAndPasswordFailure implements Exception {
-  /// Creates a new [LogInWithEmailAndPasswordFailure].
-  ///
-  /// If [message] is not provided, it defaults to
-  /// 'An unknown exception occurred. Please try again.'.
-  const LogInWithEmailAndPasswordFailure([
-    this.message = 'An unknown exception occurred. Please try again.',
-  ]);
-
-  /// A human-readable message describing the error.
-  final String message;
-
-  /// Creates a new [LogInWithEmailAndPasswordFailure] from a
-  /// [FirebaseAuthException.code].
-  factory LogInWithEmailAndPasswordFailure.fromCode(String code) {
-    switch (code) {
-      case 'user-disabled':
-        return LogInWithEmailAndPasswordFailure(S.current.errorUserDisabled);
-      case 'user-not-found':
-        return LogInWithEmailAndPasswordFailure(S.current.errorUserNotFound);
-      case 'wrong-password':
-        return LogInWithEmailAndPasswordFailure(S.current.errorWrongPassword);
-      default:
-        return LogInWithEmailAndPasswordFailure(S.current.errorUnknown);
+      return left(Failure('Failed to sign in!'));
     }
   }
 }

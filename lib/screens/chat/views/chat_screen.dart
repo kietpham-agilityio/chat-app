@@ -257,7 +257,6 @@ class _ViewState extends State<_View> {
 
                       final currentDate = message.timestamp.toDate();
 
-                      // Xác định showTimestamp
                       if (nextMessage == null) {
                         showTimestamp = true;
                       } else {
@@ -267,9 +266,8 @@ class _ViewState extends State<_View> {
                             diff >= 5 || !currentDate.isSameDay(nextTime);
                       }
 
-                      // Xác định isLastBeforeTimestamp
                       if (index == 0) {
-                        isLastBeforeTimestamp = true; // Item đầu tiên
+                        isLastBeforeTimestamp = true;
                       } else if (prevMessage != null) {
                         final prevDate = prevMessage.timestamp.toDate();
                         final prevDiff = prevDate
@@ -279,9 +277,7 @@ class _ViewState extends State<_View> {
                             prevDiff >= 5 || !prevDate.isSameDay(currentDate);
                         isLastBeforeTimestamp =
                             prevShowTimestamp ||
-                            prevMessage.senderId !=
-                                message
-                                    .senderId; // Thêm điều kiện senderId khác nhau
+                            prevMessage.senderId != message.senderId;
                       }
 
                       return Column(

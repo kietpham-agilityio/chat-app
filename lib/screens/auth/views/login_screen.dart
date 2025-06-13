@@ -8,7 +8,6 @@ import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
 import 'package:chat_app/screens/auth/states/login_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
@@ -25,14 +24,14 @@ class LoginScreen extends StatelessWidget {
           create: (_) => LoginCubit(context.read<AuthRepository>()),
           child: BlocListener<LoginCubit, LoginState>(
             listener: (context, state) {
-              if (state.status.isFailure) {
+              if (state.status == LoginStatus.failure) {
                 WzSnackBar.error(
                   context,
                   message: state.errorMessage ?? S.of(context).errorUnknown,
                 );
               }
 
-              if (state.status.isInProgress) {
+              if (state.status == LoginStatus.inProgress) {
                 context.loaderOverlay.show();
               } else {
                 context.loaderOverlay.hide();
