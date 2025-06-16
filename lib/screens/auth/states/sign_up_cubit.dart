@@ -1,7 +1,6 @@
 import 'package:chat_app/core/utils/validations.dart'
     show ConfirmedPassword, Email, FullName, Password, PhoneNumber;
-import 'package:chat_app/repositories/repositories.dart'
-    show AuthRepository, SignUpWithEmailAndPasswordFailure;
+import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
@@ -65,16 +64,15 @@ class SignUpCubit extends Cubit<SignUpState> {
   void passwordValidation(String password) => emit(
     state.copyWith(
       password: Password.dirty(password),
-      confirmedPassword:
-          state.confirmedPassword.isPure
-              ? ConfirmedPassword.pure(
-                password: password,
-                value: state.confirmedPassword.value,
-              )
-              : ConfirmedPassword.dirty(
-                password: password,
-                value: state.confirmedPassword.value,
-              ),
+      confirmedPassword: state.confirmedPassword.isPure
+          ? ConfirmedPassword.pure(
+              password: password,
+              value: state.confirmedPassword.value,
+            )
+          : ConfirmedPassword.dirty(
+              password: password,
+              value: state.confirmedPassword.value,
+            ),
       status: FormzSubmissionStatus.success,
     ),
   );
@@ -112,28 +110,22 @@ class SignUpCubit extends Cubit<SignUpState> {
   Future<void> signUpFormSubmitted() async {
     if (!state.isValid) return;
     emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
-    try {
-      await _authRepository.signUp(
-        fullName: state.fullName.value,
-        email: state.email.value,
-        phoneNumber: state.phoneNumber.value,
-        password: state.password.value,
-      );
-      emit(state.copyWith(status: FormzSubmissionStatus.success));
-    } on SignUpWithEmailAndPasswordFailure catch (e) {
-      emit(
+
+    final res = await _authRepository.signUp(
+      fullName: state.fullName.value,
+      email: state.email.value,
+      phoneNumber: state.phoneNumber.value,
+      password: state.password.value,
+    );
+
+    res.fold(
+      (l) => emit(
         state.copyWith(
           status: FormzSubmissionStatus.failure,
-          errorMessage: e.message,
+          errorMessage: l.message,
         ),
-      );
-    } catch (_) {
-      emit(
-        state.copyWith(
-          status: FormzSubmissionStatus.failure,
-          errorMessage: 'An unknown error occurred',
-        ),
-      );
-    }
+      ),
+      (r) => emit(state.copyWith(status: FormzSubmissionStatus.success)),
+    );
   }
 }

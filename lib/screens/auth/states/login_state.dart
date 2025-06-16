@@ -1,24 +1,26 @@
 part of 'login_cubit.dart';
 
+enum LoginStatus { initial, inProgress, success, failure }
+
 final class LoginState extends Equatable {
   const LoginState({
     this.email = const Email.pure(),
     this.password = const Password.pure(),
-    this.status = FormzSubmissionStatus.initial,
+    this.status = LoginStatus.initial,
     this.isObscured = true,
     this.errorMessage,
   });
 
   final Email email;
   final Password password;
-  final FormzSubmissionStatus status;
+  final LoginStatus status;
   final String? errorMessage;
   final bool isObscured;
 
   LoginState copyWith({
     Email? email,
     Password? password,
-    FormzSubmissionStatus? status,
+    LoginStatus? status,
     bool? isObscured,
     String? errorMessage,
   }) {

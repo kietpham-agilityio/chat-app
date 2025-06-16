@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:developer' show log;
-import 'dart:ui';
 
+import 'package:chat_app/core/utils/failure.dart';
 import 'package:chat_app/models/chat_message.dart'
     show ChatMessage, MessageStatus, MessageType;
 import 'package:chat_app/models/models.dart'
     show ChatRoomModel, PaginatedResult, UserModel;
-import 'package:chat_app/repositories/repositories.dart'
-    show AppException, BaseRepository;
 import 'package:cloud_firestore/cloud_firestore.dart'
     show
         CollectionReference,
@@ -16,44 +14,40 @@ import 'package:cloud_firestore/cloud_firestore.dart'
         FirebaseFirestore,
         Query,
         Timestamp;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fpdart/fpdart.dart';
 
-class Debouncer {
-  Debouncer({this.delay = const Duration(milliseconds: 300)});
+class ChatRepository {
+  const ChatRepository({required this.firestore, required this.auth});
 
-  final Duration delay;
-  Timer? _timer;
+  final FirebaseFirestore firestore;
+  final FirebaseAuth auth;
 
-  void run(VoidCallback action) {
-    _timer?.cancel();
-    _timer = Timer(delay, action);
-  }
-
-  void dispose() {
-    _timer?.cancel();
-  }
-}
-
-class ChatRepository extends BaseRepository {
   CollectionReference get _chatRooms => firestore.collection("chatRooms");
 
   CollectionReference getChatRoomMessages(String chatRoomId) {
     return _chatRooms.doc(chatRoomId).collection("messages");
   }
 
-  Stream<List<ChatRoomModel>> getChatRooms(String userId) {
+  Stream<Either<Failure, List<ChatRoomModel>>> getChatRooms(String userId) {
     return firestore
         .collection('chatRooms')
         .where('participants', arrayContains: userId)
         .orderBy('lastMessageTime', descending: true)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
+        .map((snapshot) {
+          final chatRooms = snapshot.docs
               .map((doc) => ChatRoomModel.fromFirestore(doc))
-              .toList(),
-        );
+              .toList();
+
+          return right<Failure, List<ChatRoomModel>>(chatRooms);
+        })
+        .handleError((error, stackTrace) {
+          return left(Failure('Failed to get chat rooms!'));
+        });
   }
 
-  Future<PaginatedResult<UserModel>> searchUser({
+  Future<Either<Failure, PaginatedResult<UserModel>>> searchUser({
     required String searchText,
     DocumentSnapshot? lastDoc,
     int limit = 20,
@@ -74,18 +68,18 @@ class ChatRepository extends BaseRepository {
 
       final users = snapshot.docs
           .map((doc) => UserModel.fromFirestore(doc))
-          .where((user) => user.uid != currentUser?.uid)
+          .where((user) => user.uid != auth.currentUser?.uid)
           .toList();
 
       final result = PaginatedResult(items: users, lastDoc: lastDoc);
 
-      return result;
-    } catch (e) {
-      throw const AppException("Failed to search user");
+      return right(result);
+    } catch (_) {
+      return left(Failure('Failed to search user!'));
     }
   }
 
-  Stream<PaginatedResult<ChatMessage>> getMessages(
+  Stream<Either<Failure, PaginatedResult<ChatMessage>>> getMessages(
     String chatRoomId, {
     DocumentSnapshot? lastDocument,
   }) {
@@ -97,46 +91,70 @@ class ChatRepository extends BaseRepository {
       query = query.startAfterDocument(lastDocument);
     }
 
-    return query.snapshots().map((snapshot) {
+    return query
+        .snapshots()
+        .map((snapshot) {
+          final messages = snapshot.docs
+              .map((doc) => ChatMessage.fromFirestore(doc))
+              .toList();
+
+          final lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+
+          return right<Failure, PaginatedResult<ChatMessage>>(
+            PaginatedResult(items: messages, lastDoc: lastDoc),
+          );
+        })
+        .handleError((error, stackTrace) {
+          return left(Failure('Failed to get messages'));
+        });
+  }
+
+  Stream<Either<Failure, UserModel>> getUserInfo(String userId) {
+    return firestore
+        .collection("users")
+        .doc(userId)
+        .snapshots()
+        .map((doc) {
+          final userData = UserModel.fromFirestore(doc);
+          return right<Failure, UserModel>(userData);
+        })
+        .handleError((error, stackTrace) {
+          return left(Failure('Failed to load user info'));
+        });
+  }
+
+  Future<Either<Failure, PaginatedResult<ChatMessage>>> getMoreMessages(
+    String chatRoomId, {
+    required DocumentSnapshot lastDocument,
+  }) async {
+    try {
+      final query = getChatRoomMessages(chatRoomId)
+          .orderBy('timestamp', descending: true)
+          .startAfterDocument(lastDocument)
+          .limit(20);
+
+      log("comingg");
+
+      final snapshot = await query.get().timeout(const Duration(seconds: 5));
+
       final messages = snapshot.docs
           .map((doc) => ChatMessage.fromFirestore(doc))
           .toList();
 
       final lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
 
-      return PaginatedResult(items: messages, lastDoc: lastDoc);
-    });
+      return right(PaginatedResult(items: messages, lastDoc: lastDoc));
+    } catch (_) {
+      return left(Failure('Failed to load more messages'));
+    }
   }
 
-  Stream<UserModel> getUserInfo(String userId) {
-    return firestore.collection("users").doc(userId).snapshots().map((doc) {
-      final userData = UserModel.fromFirestore(doc);
-      return userData;
-    });
-  }
-
-  Future<PaginatedResult<ChatMessage>> getMoreMessages(
-    String chatRoomId, {
-    required DocumentSnapshot lastDocument,
-  }) async {
-    final query = getChatRoomMessages(chatRoomId)
-        .orderBy('timestamp', descending: true)
-        .startAfterDocument(lastDocument)
-        .limit(20);
-    log("comingg");
-    final snapshot = await query.get().timeout(const Duration(seconds: 5));
-    final messages = snapshot.docs
-        .map((doc) => ChatMessage.fromFirestore(doc))
-        .toList();
-    final lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
-    return PaginatedResult(items: messages, lastDoc: lastDoc);
-  }
-
-  Future<void> markMessagesAsRead(String chatRoomId, String userId) async {
+  Future<Either<Failure, Unit>> markMessagesAsRead(
+    String chatRoomId,
+    String userId,
+  ) async {
     try {
       final batch = firestore.batch();
-
-      //get all unread messages where user is receviver
 
       final unreadMessages = await getChatRoomMessages(chatRoomId)
           .where("receiverId", isEqualTo: userId)
@@ -150,68 +168,85 @@ class ChatRepository extends BaseRepository {
           'readBy': FieldValue.arrayUnion([userId]),
           'status': MessageStatus.read.toString(),
         });
-
-        await batch.commit();
-
-        log("Marked messaegs as read for user $userId");
       }
+
+      await batch.commit();
+      log("Marked messages as read for user $userId");
+
+      return right(unit);
     } catch (e) {
       log("Error marking messages as read: $e");
+      return left(Failure("Failed to mark messages as read"));
     }
   }
 
-  Future<ChatRoomModel> getOrCreateChatRoom(
+  Future<Either<Failure, ChatRoomModel>> getOrCreateChatRoom(
     String currentUserId,
     String otherUserId,
   ) async {
-    // Prevent creating a chat room with yourself
-    if (currentUserId == otherUserId) {
-      throw Exception("Cannot create a chat room with yourself");
+    try {
+      if (currentUserId == otherUserId) {
+        return left(Failure("Cannot create a chat room with yourself"));
+      }
+
+      final users = [currentUserId, otherUserId]..sort();
+      final roomId = users.join("_");
+
+      final roomDoc = await _chatRooms
+          .doc(roomId)
+          .get()
+          .timeout(const Duration(seconds: 5));
+
+      if (roomDoc.exists) {
+        return right(ChatRoomModel.fromFirestore(roomDoc));
+      }
+
+      final currentUserSnapshot = await firestore
+          .collection("users")
+          .doc(currentUserId)
+          .get();
+      final otherUserSnapshot = await firestore
+          .collection("users")
+          .doc(otherUserId)
+          .get();
+
+      if (!currentUserSnapshot.exists || !otherUserSnapshot.exists) {
+        return left(Failure("One or both users not found"));
+      }
+
+      final currentUserData = currentUserSnapshot.data()!;
+      final otherUserData = otherUserSnapshot.data()!;
+
+      final participantsName = {
+        currentUserId: currentUserData['fullName']?.toString() ?? "",
+        otherUserId: otherUserData['fullName']?.toString() ?? "",
+      };
+
+      final participantsAvatar = {
+        currentUserId: currentUserData['avatarUrl']?.toString() ?? "",
+        otherUserId: otherUserData['avatarUrl']?.toString() ?? "",
+      };
+
+      final newRoom = ChatRoomModel(
+        id: roomId,
+        participants: users,
+        participantsName: participantsName,
+        lastReadTime: {
+          currentUserId: Timestamp.now(),
+          otherUserId: Timestamp.now(),
+        },
+        participantsAvatar: participantsAvatar,
+      );
+
+      await _chatRooms
+          .doc(roomId)
+          .set(newRoom.toMap())
+          .timeout(const Duration(seconds: 5));
+
+      return right(newRoom);
+    } catch (e) {
+      return left(Failure("Failed to get or create chat room: $e"));
     }
-
-    final users = [currentUserId, otherUserId]..sort();
-    final roomId = users.join("_");
-
-    final roomDoc = await _chatRooms
-        .doc(roomId)
-        .get()
-        .timeout(const Duration(seconds: 5));
-
-    if (roomDoc.exists) {
-      return ChatRoomModel.fromFirestore(roomDoc);
-    }
-
-    final currentUserData =
-        (await firestore.collection("users").doc(currentUserId).get()).data()
-            as Map<String, dynamic>;
-    final otherUserData =
-        (await firestore.collection("users").doc(otherUserId).get()).data()
-            as Map<String, dynamic>;
-    final participantsName = {
-      currentUserId: currentUserData['fullName']?.toString() ?? "",
-      otherUserId: otherUserData['fullName']?.toString() ?? "",
-    };
-    final participantsAvatar = {
-      currentUserId: currentUserData['avatarUrl']?.toString() ?? "",
-      otherUserId: otherUserData['avatarUrl']?.toString() ?? "",
-    };
-
-    final newRoom = ChatRoomModel(
-      id: roomId,
-      participants: users,
-      participantsName: participantsName,
-      lastReadTime: {
-        currentUserId: Timestamp.now(),
-        otherUserId: Timestamp.now(),
-      },
-      participantsAvatar: participantsAvatar,
-    );
-
-    await _chatRooms
-        .doc(roomId)
-        .set(newRoom.toMap())
-        .timeout(const Duration(seconds: 5));
-    return newRoom;
   }
 
   Future<void> sendMessage({
@@ -255,20 +290,22 @@ class ChatRepository extends BaseRepository {
     await batch.commit();
   }
 
-  Future<bool> findExistingChatRoom(List<String> docIds) async {
+  Future<Either<Failure, bool>> findExistingChatRoom(
+    List<String> docIds,
+  ) async {
     try {
       final collection = FirebaseFirestore.instance.collection('chatRooms');
 
       for (final id in docIds) {
         final docSnapshot = await collection.doc(id).get();
         if (docSnapshot.exists) {
-          return true;
+          return right(true);
         }
       }
 
-      return false;
+      return right(false);
     } catch (e) {
-      throw AppException('Failed to find chat room existence');
+      return left(Failure('Failed to find chat room existence'));
     }
   }
 
@@ -282,43 +319,108 @@ class ChatRepository extends BaseRepository {
     return snapshot.map((count) => count > 0);
   }
 
-  Stream<bool> isUserBlocked(String currentUserId, String otherUserId) {
-    return firestore.collection("users").doc(currentUserId).snapshots().map((
-      doc,
-    ) {
-      final userData = UserModel.fromFirestore(doc);
-      return userData.blockedUsers.contains(otherUserId);
-    });
-  }
+  Stream<Either<Failure, bool>> isUserBlocked(
+    String currentUserId,
+    String otherUserId,
+  ) {
+    final controller = StreamController<Either<Failure, bool>>();
 
-  Stream<bool> amIBlocked(String currentUserId, String otherUserId) {
-    return firestore.collection("users").doc(otherUserId).snapshots().map((
-      doc,
-    ) {
-      final userData = UserModel.fromFirestore(doc);
-      return userData.blockedUsers.contains(currentUserId);
-    });
-  }
-
-  Future<void> blockUser(String currentUserId, String blockedUserId) async {
     try {
-      final userRef = firestore.collection("users").doc(currentUserId);
-      await userRef.update({
-        'blockedUsers': FieldValue.arrayUnion([blockedUserId]),
-      });
+      firestore
+          .collection("users")
+          .doc(currentUserId)
+          .snapshots()
+          .timeout(const Duration(seconds: 5))
+          .listen(
+            (doc) {
+              try {
+                final userData = UserModel.fromFirestore(doc);
+                final isBlocked = userData.blockedUsers.contains(otherUserId);
+                controller.add(right(isBlocked));
+              } catch (e) {
+                controller.add(left(Failure('Failed to parse user data')));
+              }
+            },
+            onError: (error) {
+              controller.add(
+                left(Failure('Failed to check if user is blocked')),
+              );
+            },
+          );
     } catch (e) {
-      throw AppException('Failed to block user');
+      controller.add(left(Failure('Unexpected error checking block status')));
+    }
+
+    return controller.stream;
+  }
+
+  // Stream<bool> amIBlocked(String currentUserId, String otherUserId) {
+  //   return firestore.collection("users").doc(otherUserId).snapshots().map((
+  //     doc,
+  //   ) {
+  //     final userData = UserModel.fromFirestore(doc);
+  //     return userData.blockedUsers.contains(currentUserId);
+  //   });
+  // }
+
+  Stream<Either<Failure, bool>> amIBlocked(
+    String currentUserId,
+    String otherUserId,
+  ) {
+    try {
+      return firestore
+          .collection("users")
+          .doc(otherUserId)
+          .snapshots()
+          .timeout(const Duration(seconds: 5))
+          .map((doc) {
+            final userData = UserModel.fromFirestore(doc);
+            final isBlocked = userData.blockedUsers.contains(currentUserId);
+            return right<Failure, bool>(isBlocked);
+          })
+          .handleError((error) {
+            return left<Failure, bool>(
+              Failure('Failed to check if user is blocked'),
+            );
+          });
+    } catch (e) {
+      return Stream.value(
+        left(Failure('Unexpected error checking block status')),
+      );
     }
   }
 
-  Future<void> unBlockUser(String currentUserId, String blockedUserId) async {
+  Future<Either<Failure, Unit>> blockUser(
+    String currentUserId,
+    String blockedUserId,
+  ) async {
     try {
       final userRef = firestore.collection("users").doc(currentUserId);
-      await userRef.update({
-        'blockedUsers': FieldValue.arrayRemove([blockedUserId]),
-      });
+      await userRef
+          .update({
+            'blockedUsers': FieldValue.arrayUnion([blockedUserId]),
+          })
+          .timeout(const Duration(seconds: 5));
+      return right(unit);
     } catch (e) {
-      throw AppException('Failed to unblock user');
+      return left(Failure('Failed to block user'));
+    }
+  }
+
+  Future<Either<Failure, Unit>> unBlockUser(
+    String currentUserId,
+    String blockedUserId,
+  ) async {
+    try {
+      final userRef = firestore.collection("users").doc(currentUserId);
+      await userRef
+          .update({
+            'blockedUsers': FieldValue.arrayRemove([blockedUserId]),
+          })
+          .timeout(const Duration(seconds: 5));
+      return right(unit);
+    } catch (e) {
+      return left(Failure('Failed to unblock user'));
     }
   }
 }

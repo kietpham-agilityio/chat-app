@@ -36,7 +36,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (user != null) {
           if (state.user == UserModel.empty) {
             final userData = await _authRepository.getUserData(user.uid);
-            emit(AuthState(user: userData));
+
+            userData.fold(
+              (l) => emit(const AuthState(user: UserModel.empty)),
+              (r) => emit(AuthState(user: r)),
+            );
           }
         } else {
           emit(const AuthState(user: UserModel.empty));

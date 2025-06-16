@@ -80,6 +80,9 @@ dependencies:
   # Awesome Notifications add-on plugin to send push notifications through Firebase Cloud Messaging, enabling all awesome notifications features.
   awesome_notifications_fcm: ^0.10.1
 
+  # Functional programming in Dart and Flutter. All the main functional programming types and patterns fully documented, tested, and with examples.
+  fpdart: ^1.1.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

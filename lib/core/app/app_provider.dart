@@ -5,6 +5,7 @@ import 'package:chat_app/repositories/repositories.dart'
 import 'package:chat_app/screens/auth/states/auth_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseFirestore;
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
+import 'package:firebase_storage/firebase_storage.dart' show FirebaseStorage;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
     show
@@ -23,21 +24,20 @@ class AppProvider extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider<FirebaseFirestore>(
-          lazy: false,
-          create: (context) => FirebaseFirestore.instance,
-        ),
-        RepositoryProvider<FirebaseAuth>(
-          lazy: false,
-          create: (context) => FirebaseAuth.instance,
-        ),
         RepositoryProvider<AuthRepository>(
           lazy: false,
-          create: (context) => AuthRepository(),
+          create: (context) => AuthRepository(
+            auth: FirebaseAuth.instance,
+            firestore: FirebaseFirestore.instance,
+            firebaseStorage: FirebaseStorage.instance,
+          ),
         ),
         RepositoryProvider<ChatRepository>(
           lazy: true,
-          create: (context) => ChatRepository(),
+          create: (context) => ChatRepository(
+            auth: FirebaseAuth.instance,
+            firestore: FirebaseFirestore.instance,
+          ),
         ),
         RepositoryProvider<NotificationsService>(
           lazy: false,
