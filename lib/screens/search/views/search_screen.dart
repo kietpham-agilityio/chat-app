@@ -102,7 +102,7 @@ class SearchScreen extends StatelessWidget {
                                 CAListTile(
                                   title: Text(
                                     state.users[index].fullName
-                                        .capitalizeEachWord(),
+                                        .capitalizeWords(),
                                   ),
                                   leading: CACircleAvatar(
                                     url: state.users[index].avatarUrl ?? '',
@@ -127,7 +127,7 @@ class SearchScreen extends StatelessWidget {
                           }
                           return CAListTile(
                             title: Text(
-                              state.users[index].fullName.capitalizeEachWord(),
+                              state.users[index].fullName.capitalizeWords(),
                             ),
                             leading: CACircleAvatar(
                               url: state.users[index].avatarUrl ?? '',

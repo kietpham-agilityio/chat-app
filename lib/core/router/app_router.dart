@@ -12,9 +12,8 @@ import 'package:go_router/go_router.dart';
 
 class AppRouter {
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
-  static final authNotifier = AuthNotifier();
 
-  static final router = GoRouter(
+  static GoRouter router(AuthNotifier authNotifier) => GoRouter(
     debugLogDiagnostics: kDebugMode,
     initialLocation: AppPaths.home.path,
     navigatorKey: rootNavigatorKey,

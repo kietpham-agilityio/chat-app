@@ -17,7 +17,7 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAListTile,
         CATextField,
         CATitleMediumText,
-        WzSnackBar;
+        CASnackBar;
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
 import 'package:chat_app/repositories/repositories.dart'
     show AuthRepository, ChatRepository;
@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             if (state.status == HomeStatus.failure &&
                 state.errorMessage != '') {
-              WzSnackBar.error(context, message: state.errorMessage ?? '');
+              CASnackBar.error(context, message: state.errorMessage ?? '');
             }
           },
           child: Scaffold(
@@ -296,7 +296,7 @@ class _ChatListTile extends StatelessWidget {
                     )
                   : const SizedBox(),
               title: CATitleMediumText(
-                text: getOtherUsername().capitalizeEachWord(),
+                text: getOtherUsername().capitalizeWords(),
               ),
               subtitle: Row(
                 children: [

@@ -6,14 +6,14 @@ import 'package:flutter/material.dart';
 ///
 /// Contains static methods for displaying snack bars with [error] and
 /// [success] styles.
-class WzSnackBar {
+class CASnackBar {
   /// Displays a snack bar with the error style.
   ///
   /// The [message] parameter is the text to be displayed in the snack bar.
   static void error(BuildContext context, {required String message}) {
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(WzSnackBarContentError(context, message: message));
+    ).showSnackBar(CASnackBarContentError(context, message: message));
   }
 
   /// Displays a snack bar with the success style.
@@ -22,7 +22,7 @@ class WzSnackBar {
   static void success(BuildContext context, {required String message}) {
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(WzSnackBarContentSuccess(context, message: message));
+    ).showSnackBar(CASnackBarContentSuccess(context, message: message));
   }
 }
 
@@ -30,13 +30,13 @@ class WzSnackBar {
 ///
 /// This widget provides a predefined style for error messages with an icon,
 /// text, and background color.
-class WzSnackBarContentError extends SnackBar {
-  /// Constructs a [WzSnackBarContentError].
+class CASnackBarContentError extends SnackBar {
+  /// Constructs a [CASnackBarContentError].
   ///
   /// The [context] is used to find the [ScaffoldMessenger] and display the
   /// snack bar. The [message] is the text to be displayed in the snack bar.
   /// Defaults to an empty string if not provided.
-  WzSnackBarContentError(BuildContext context, {String message = '', super.key})
+  CASnackBarContentError(BuildContext context, {String message = '', super.key})
     : super(
         padding: EdgeInsets.zero,
         behavior: SnackBarBehavior.floating,
@@ -57,13 +57,13 @@ class WzSnackBarContentError extends SnackBar {
 ///
 /// This widget provides a predefined style for success messages with a check
 /// icon, text, and background color.
-class WzSnackBarContentSuccess extends SnackBar {
-  /// Constructs a [WzSnackBarContentSuccess].
+class CASnackBarContentSuccess extends SnackBar {
+  /// Constructs a [CASnackBarContentSuccess].
   ///
   /// The [context] is used to find the [ScaffoldMessenger] and display the
   /// snack bar. The [message] is the text to be displayed in the snack bar.
   /// Defaults to an empty string if not provided.
-  WzSnackBarContentSuccess(
+  CASnackBarContentSuccess(
     BuildContext context, {
     String message = '',
     super.key,

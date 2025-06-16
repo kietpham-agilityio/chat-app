@@ -29,7 +29,7 @@ class SignUpScreen extends StatelessWidget {
           child: BlocListener<SignUpCubit, SignUpState>(
             listener: (context, state) {
               if (state.status.isFailure) {
-                WzSnackBar.error(
+                CASnackBar.error(
                   context,
                   message: state.errorMessage ?? S.of(context).errorUnknown,
                 );

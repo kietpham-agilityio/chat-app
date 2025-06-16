@@ -1,4 +1,3 @@
-import 'package:chat_app/core/extensions/datetime_extensions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
@@ -25,10 +24,5 @@ extension TimestampExtension on Timestamp {
       final years = (diff.inDays / 365).floor();
       return '${years}y';
     }
-  }
-
-  String formatChatDateTime({String locale = 'en'}) {
-    final dateTime = toDate();
-    return dateTime.formatChatDateTime(locale: locale);
   }
 }

@@ -3,12 +3,12 @@ name: Flutter CI/CD Android
 on:
   push:
     branches:
-      - prod
-      - dev
+      - build-prod
+      - build-dev
   pull_request:
     branches:
-      - prod
-      - dev
+      - build-prod
+      - build-dev
 
 jobs:
   build:

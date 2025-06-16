@@ -36,7 +36,7 @@ class NotificationController {
           receiverId: receiverId,
           content: replyText,
           timestamp: Timestamp.now(),
-          readBy: [senderId],
+          readByUserIds: [senderId],
         );
 
         //add message to sub collection

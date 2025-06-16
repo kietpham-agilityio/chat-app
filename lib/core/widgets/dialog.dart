@@ -10,8 +10,8 @@ class CADialog extends StatelessWidget {
   const CADialog({
     required this.title,
     this.content,
-    this.confirmButton,
-    this.cancelButton,
+    this.confirmButtonTitle,
+    this.cancelButtonTitle,
     this.onConfirm,
     this.onCancel,
     this.textAlignContent,
@@ -20,8 +20,8 @@ class CADialog extends StatelessWidget {
 
   final String title;
   final String? content;
-  final String? confirmButton;
-  final String? cancelButton;
+  final String? confirmButtonTitle;
+  final String? cancelButtonTitle;
   final VoidCallback? onConfirm;
   final VoidCallback? onCancel;
   final TextAlign? textAlignContent;
@@ -44,18 +44,18 @@ class CADialog extends StatelessWidget {
           textAlign: textAlignContent ?? TextAlign.center,
         ),
         actions: <Widget>[
-          if (confirmButton != null)
+          if (confirmButtonTitle != null)
             CAElevatedButton(
               onPressed: onConfirm,
-              text: confirmButton ?? '',
+              text: confirmButtonTitle ?? '',
               minHeight: 40,
             ),
           SizedBox(height: 2),
-          if (cancelButton != null)
+          if (cancelButtonTitle != null)
             CAElevatedButton(
               minHeight: 40,
               onPressed: onCancel ?? () => Navigator.pop(context),
-              text: cancelButton!,
+              text: cancelButtonTitle!,
               backgroundColor: CAPalette.grey[2],
               foregroundColor: CAPalette.grey[5],
             ),
@@ -76,11 +76,12 @@ class CADialogManager {
       transitionDuration: const Duration(milliseconds: 200),
       pageBuilder: (_, __, ___) => const SizedBox.shrink(),
       transitionBuilder: (context, animation, _, __) {
+        final opacity = animation.value;
+        final blur = 8.0 * opacity;
+
         return AnimatedBuilder(
           animation: animation,
           builder: (context, child) {
-            final opacity = animation.value;
-            final blur = 8.0 * opacity;
             return Stack(
               children: [
                 Opacity(

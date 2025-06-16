@@ -274,7 +274,7 @@ class ChatRepository {
       content: content,
       type: type,
       timestamp: Timestamp.now(),
-      readBy: [senderId],
+      readByUserIds: [senderId],
     );
 
     //add message to sub collection
