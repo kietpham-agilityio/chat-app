@@ -79,7 +79,7 @@ class _PasswordInput extends StatelessWidget {
               !state.isObscured
                   ? Icons.visibility_outlined
                   : Icons.visibility_off_outlined,
-              color: CAPalette.grey[5],
+              color: context.colorScheme.tertiaryContainer,
             ),
           ),
         );
@@ -112,8 +112,9 @@ class _CreateNewAccountBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CAElevatedButton(
-      backgroundColor: CAPalette.grey[2],
-      foregroundColor: CAPalette.grey[5],
+      backgroundColor: context.colorScheme.secondary,
+      foregroundColor: context.colorScheme.tertiaryContainer,
+      // buttonStyle: ,
       text: S.of(context).loginCreateAccountBtn,
       onPressed: () => context.pushNamed(AppPaths.signUp.name),
     );

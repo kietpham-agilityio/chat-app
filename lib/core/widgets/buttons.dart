@@ -1,4 +1,3 @@
-import 'package:chat_app/core/themes/themes.dart' show CAPalette;
 import 'package:flutter/material.dart';
 
 // MARK: - ElevatedButton
@@ -49,25 +48,20 @@ class _CAElevatedButtonState extends State<CAElevatedButton> {
     return ElevatedButton(
       onPressed: widget.isDisabled ? null : widget.onPressed,
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-          if (states.contains(WidgetState.disabled)) {
-            return widget.backgroundColor?.withValues(
-                  alpha: 0.5, // Fully opaque
-                ) ??
-                CAPalette.primaryBlue.withValues(
-                  alpha: 0.5, // Fully opaque
-                );
-          }
+        backgroundColor: widget.backgroundColor != null
+            ? WidgetStateProperty.resolveWith<Color>((states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return widget.backgroundColor!.withValues(
+                    alpha: 0.5, // Fully opaque
+                  );
+                }
 
-          return widget.backgroundColor ??
-              CAPalette.primaryBlue; // Default background color
-        }),
-        foregroundColor: WidgetStatePropertyAll<Color>(
-          widget.foregroundColor ?? CAPalette.grey[1]!,
-        ),
-        minimumSize: WidgetStatePropertyAll<Size>(
-          Size.fromHeight(widget.minHeight ?? 48),
-        ),
+                return widget.backgroundColor!;
+              })
+            : null,
+        foregroundColor: widget.foregroundColor != null
+            ? WidgetStatePropertyAll<Color>(widget.foregroundColor!)
+            : null,
       ),
       child: Text(widget.text, style: TextStyle(fontSize: widget.value)),
     );

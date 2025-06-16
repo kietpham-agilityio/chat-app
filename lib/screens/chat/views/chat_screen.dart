@@ -1,7 +1,7 @@
+import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/extensions/datetime_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
-import 'package:chat_app/core/themes/themes.dart';
 import 'package:chat_app/core/widgets/text.dart';
 import 'package:chat_app/core/widgets/widgets.dart'
     show
@@ -295,14 +295,16 @@ class _ViewState extends State<_View> {
                               ),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: CAPalette.grey[3]!),
-                                color: CAPalette.grey[1],
+                                border: Border.all(
+                                  color: context.colorScheme.tertiaryFixedDim,
+                                ),
+                                color: context.colorScheme.tertiary,
                               ),
                               child: CABodyMediumText(
                                 text: message.timestamp
                                     .toDate()
                                     .formatChatDateTime(),
-                                color: CAPalette.grey[5],
+                                color: context.colorScheme.tertiaryContainer,
                               ),
                             ),
                             SizedBox(height: 16),
@@ -488,8 +490,8 @@ class MessageBubble extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: isMe
-                  ? Theme.of(context).colorScheme.primary
-                  : CAPalette.grey[1],
+                  ? context.colorScheme.primary
+                  : context.colorScheme.tertiary,
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(8),
                 topRight: const Radius.circular(8),
@@ -503,7 +505,9 @@ class MessageBubble extends StatelessWidget {
               ),
               child: CABodyLargeText(
                 text: message.content,
-                color: isMe ? CAPalette.genericWhite : CAPalette.grey[5],
+                color: isMe
+                    ? context.colorScheme.onPrimary
+                    : context.colorScheme.tertiaryContainer,
                 overflow: TextOverflow.visible,
               ),
             ),

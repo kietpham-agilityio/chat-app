@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:chat_app/core/extensions/context_extensions.dart';
-import 'package:chat_app/core/themes/app_palette.dart';
 import 'package:chat_app/core/widgets/buttons.dart';
 import 'package:chat_app/core/widgets/text.dart';
 import 'package:flutter/material.dart';
@@ -56,8 +55,8 @@ class CADialog extends StatelessWidget {
               minHeight: 40,
               onPressed: onCancel ?? () => Navigator.pop(context),
               text: cancelButtonTitle!,
-              backgroundColor: CAPalette.grey[2],
-              foregroundColor: CAPalette.grey[5],
+              backgroundColor: context.colorScheme.secondary,
+              foregroundColor: context.colorScheme.tertiaryContainer,
             ),
         ],
       ),
@@ -89,9 +88,8 @@ class CADialogManager {
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
                     child: Container(
-                      color: CAPalette.genericBlack.withValues(
-                        alpha: 0.2 * opacity,
-                      ),
+                      color: context.colorScheme.onSecondaryContainer
+                          .withValues(alpha: 0.2 * opacity),
                     ),
                   ),
                 ),
