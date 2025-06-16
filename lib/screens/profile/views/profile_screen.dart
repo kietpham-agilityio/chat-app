@@ -96,7 +96,7 @@ class _FullName extends StatelessWidget {
         final user = hive.get('userBox');
 
         return CAHeadlineMediumText(
-          text: user?.fullName.capitalizeEachWord() ?? '',
+          text: user?.fullName.capitalizeWords() ?? '',
         );
       },
     );

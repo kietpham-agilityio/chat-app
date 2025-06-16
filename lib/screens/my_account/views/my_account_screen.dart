@@ -13,7 +13,7 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAListTile,
         CATextField,
         CATitleMediumText,
-        WzSnackBar;
+        CASnackBar;
 import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:chat_app/screens/my_account/bloc/my_account_bloc.dart';
 import 'package:flutter/material.dart';
@@ -145,12 +145,12 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
               context.loaderOverlay.hide();
             }
             if (state.status == MyAccountStatus.profileUpdated) {
-              WzSnackBar.success(context, message: 'Updated successfully');
+              CASnackBar.success(context, message: 'Updated successfully');
               context.loaderOverlay.hide();
             }
             if (state.status == MyAccountStatus.failure &&
                 state.errorMessage != '') {
-              WzSnackBar.error(context, message: state.errorMessage ?? '');
+              CASnackBar.error(context, message: state.errorMessage ?? '');
               context.loaderOverlay.hide();
             }
           },
@@ -284,7 +284,7 @@ class _FullNameInput extends StatelessWidget {
         final shouldRebuild = previous.fullName != current.fullName;
 
         if (shouldRebuild && previous.fullName.value.isEmpty) {
-          fullNameController.text = current.fullName.value.capitalizeEachWord();
+          fullNameController.text = current.fullName.value.capitalizeWords();
         }
 
         return shouldRebuild;
@@ -300,7 +300,7 @@ class _FullNameInput extends StatelessWidget {
               : null,
           onChanged: (value) =>
               context.read<MyAccountBloc>().add(FullNameChangedEvent(value)),
-          onFocusLost: () => context.read<MyAccountBloc>().add(
+          onTapOutside: () => context.read<MyAccountBloc>().add(
             FullNameValidationEvent(state.fullName.value),
           ),
         );
@@ -339,7 +339,7 @@ class _PhoneNumberInput extends StatelessWidget {
               : null,
           onChanged: (value) =>
               context.read<MyAccountBloc>().add(PhoneNumberChangedEvent(value)),
-          onFocusLost: () => context.read<MyAccountBloc>().add(
+          onTapOutside: () => context.read<MyAccountBloc>().add(
             PhoneNumberValidationEvent(state.phoneNumber.value),
           ),
         );

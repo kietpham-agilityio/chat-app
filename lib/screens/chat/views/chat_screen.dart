@@ -1,6 +1,5 @@
 import 'package:chat_app/core/extensions/datetime_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
-import 'package:chat_app/core/extensions/timestamp_extensions.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/themes/themes.dart';
 import 'package:chat_app/core/widgets/text.dart';
@@ -92,8 +91,8 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
                     builder: (context, state) {
                       return CATitleMediumText(
                         text:
-                            state.receiverFullName?.capitalizeEachWord() ??
-                            widget.receiverName.capitalizeEachWord(),
+                            state.receiverFullName?.capitalizeWords() ??
+                            widget.receiverName.capitalizeWords(),
                       );
                     },
                   ),
@@ -105,7 +104,7 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
                 icon: CAAssets.arrowLeft(),
                 onPressed: () => context.pop(),
               ),
-              trailing: [
+              actions: [
                 BlocBuilder<ChatCubit, ChatState>(
                   bloc: _chatCubit,
                   builder: (context, state) {
@@ -126,10 +125,14 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
                               content: S
                                   .of(context)
                                   .chatMessageDialogBlockUserContent(
-                                    widget.receiverName.capitalizeEachWord(),
+                                    widget.receiverName.capitalizeWords(),
                                   ),
-                              confirmButton: S.of(context).chatMessageBlockBtn,
-                              cancelButton: S.of(context).chatMessageCancelBtn,
+                              confirmButtonTitle: S
+                                  .of(context)
+                                  .chatMessageBlockBtn,
+                              cancelButtonTitle: S
+                                  .of(context)
+                                  .chatMessageCancelBtn,
                               onCancel: () => context.pop(),
                               onConfirm: () {
                                 context.pop();
@@ -296,7 +299,9 @@ class _ViewState extends State<_View> {
                                 color: CAPalette.grey[1],
                               ),
                               child: CABodyMediumText(
-                                text: message.timestamp.formatChatDateTime(),
+                                text: message.timestamp
+                                    .toDate()
+                                    .formatChatDateTime(),
                                 color: CAPalette.grey[5],
                               ),
                             ),
@@ -377,12 +382,12 @@ class _ViewState extends State<_View> {
                           ? S
                                 .of(context)
                                 .chatMessageBlockedByMeBannerTitle(
-                                  widget.receiverName.capitalizeEachWord(),
+                                  widget.receiverName.capitalizeWords(),
                                 )
                           : S
                                 .of(context)
                                 .chatMessageBlockedByOtherBannerTitle(
-                                  widget.receiverName.capitalizeEachWord(),
+                                  widget.receiverName.capitalizeWords(),
                                 ),
                       textAlign: TextAlign.center,
                     ),
@@ -393,7 +398,7 @@ class _ViewState extends State<_View> {
                       text: S
                           .of(context)
                           .chatMessageBlockedByOtherBannerDescription(
-                            widget.receiverName.capitalizeEachWord(),
+                            widget.receiverName.capitalizeWords(),
                           ),
                       textAlign: TextAlign.center,
                     ),
@@ -413,12 +418,14 @@ class _ViewState extends State<_View> {
                               content: S
                                   .of(context)
                                   .chatMessageDialogUnblockUserContent(
-                                    widget.receiverName.capitalizeEachWord(),
+                                    widget.receiverName.capitalizeWords(),
                                   ),
-                              confirmButton: S
+                              confirmButtonTitle: S
                                   .of(context)
                                   .chatMessageUnblockBtn,
-                              cancelButton: S.of(context).chatMessageCancelBtn,
+                              cancelButtonTitle: S
+                                  .of(context)
+                                  .chatMessageCancelBtn,
                               onCancel: () => context.pop(),
                               onConfirm: () {
                                 context.pop();

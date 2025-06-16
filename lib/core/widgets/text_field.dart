@@ -18,7 +18,7 @@ class CATextField extends StatefulWidget {
     this.onSubmitted,
     this.keyboardType,
     this.focusNode,
-    this.onFocusLost,
+    this.onTapOutside,
     this.ontap,
     this.controller,
     this.initValue,
@@ -66,7 +66,7 @@ class CATextField extends StatefulWidget {
   ///
   /// This callback is useful for performing some action when the text
   /// field loses focus, such as validating the user's input.
-  final VoidCallback? onFocusLost;
+  final VoidCallback? onTapOutside;
 
   /// A boolean that indicates whether the text is obscured or not.
   ///
@@ -121,7 +121,7 @@ class _CATextFieldState extends State<CATextField> {
     }
     _focusNode?.addListener(() {
       if (!_focusNode.hasFocus) {
-        widget.onFocusLost?.call();
+        widget.onTapOutside?.call();
       }
     });
     super.initState();

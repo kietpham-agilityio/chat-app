@@ -56,16 +56,14 @@ class _FullNameInput extends StatelessWidget {
           focusNode: focusNode,
           title: S.of(context).generalFullName,
           hintText: S.of(context).generalFullNameHint,
-          errorMessage:
-              state.fullName.displayError != null
-                  ? S.of(context).errorInvalidFullName
-                  : null,
-          onChanged:
-              (value) => context.read<SignUpCubit>().fullNameChanged(value),
-          onFocusLost:
-              () => context.read<SignUpCubit>().fullNameValidation(
-                state.fullName.value,
-              ),
+          errorMessage: state.fullName.displayError != null
+              ? S.of(context).errorInvalidFullName
+              : null,
+          onChanged: (value) =>
+              context.read<SignUpCubit>().fullNameChanged(value),
+          onTapOutside: () => context.read<SignUpCubit>().fullNameValidation(
+            state.fullName.value,
+          ),
         );
       },
     );
@@ -80,8 +78,8 @@ class _PhoneNumberInput extends StatelessWidget {
     final focusNode = FocusNode();
 
     return BlocBuilder<SignUpCubit, SignUpState>(
-      buildWhen:
-          (previous, current) => previous.phoneNumber != current.phoneNumber,
+      buildWhen: (previous, current) =>
+          previous.phoneNumber != current.phoneNumber,
       builder: (context, state) {
         return CATextField(
           key: const Key('signUpForm_phoneNumberInput_textField'),
@@ -89,16 +87,14 @@ class _PhoneNumberInput extends StatelessWidget {
           title: S.of(context).generalPhoneNumber,
           hintText: S.of(context).generalPhoneNumberHint,
           keyboardType: TextInputType.number,
-          errorMessage:
-              state.phoneNumber.displayError != null
-                  ? S.of(context).errorInvalidPhoneNumber
-                  : null,
-          onChanged:
-              (value) => context.read<SignUpCubit>().phoneNumberChanged(value),
-          onFocusLost:
-              () => context.read<SignUpCubit>().phoneNumberValidation(
-                state.phoneNumber.value,
-              ),
+          errorMessage: state.phoneNumber.displayError != null
+              ? S.of(context).errorInvalidPhoneNumber
+              : null,
+          onChanged: (value) =>
+              context.read<SignUpCubit>().phoneNumberChanged(value),
+          onTapOutside: () => context.read<SignUpCubit>().phoneNumberValidation(
+            state.phoneNumber.value,
+          ),
         );
       },
     );
@@ -121,15 +117,12 @@ class _EmailInput extends StatelessWidget {
           keyboardType: TextInputType.emailAddress,
           title: S.of(context).generalEmailAddress,
           hintText: S.of(context).generalEmailAddressHint,
-          errorMessage:
-              state.email.displayError != null
-                  ? S.of(context).errorInvalidEmail
-                  : null,
+          errorMessage: state.email.displayError != null
+              ? S.of(context).errorInvalidEmail
+              : null,
           onChanged: (value) => context.read<SignUpCubit>().emailChanged(value),
-          onFocusLost:
-              () => context.read<SignUpCubit>().emailValidation(
-                state.email.value,
-              ),
+          onTapOutside: () =>
+              context.read<SignUpCubit>().emailValidation(state.email.value),
         );
       },
     );
@@ -144,10 +137,9 @@ class _PasswordInput extends StatelessWidget {
     final focusNode = FocusNode();
 
     return BlocBuilder<SignUpCubit, SignUpState>(
-      buildWhen:
-          (previous, current) =>
-              previous.password != current.password ||
-              previous.isObscuredPassword != current.isObscuredPassword,
+      buildWhen: (previous, current) =>
+          previous.password != current.password ||
+          previous.isObscuredPassword != current.isObscuredPassword,
       builder: (context, state) {
         return CATextField(
           key: const Key('signUpForm_passwordInput_textField'),
@@ -155,10 +147,9 @@ class _PasswordInput extends StatelessWidget {
           title: S.of(context).generalPassword,
           hintText: S.of(context).generalPasswordHint,
           obscureText: state.isObscuredPassword,
-          errorMessage:
-              state.password.displayError != null
-                  ? S.of(context).errorInvalidPassword
-                  : null,
+          errorMessage: state.password.displayError != null
+              ? S.of(context).errorInvalidPassword
+              : null,
           suffixIcon: IconButton(
             onPressed: context.read<SignUpCubit>().passwordVisibilityChanged,
             icon: Icon(
@@ -168,13 +159,11 @@ class _PasswordInput extends StatelessWidget {
               color: CAPalette.grey[5],
             ),
           ),
-          onChanged:
-              (password) =>
-                  context.read<SignUpCubit>().passwordChanged(password),
-          onFocusLost:
-              () => context.read<SignUpCubit>().passwordValidation(
-                state.password.value,
-              ),
+          onChanged: (password) =>
+              context.read<SignUpCubit>().passwordChanged(password),
+          onTapOutside: () => context.read<SignUpCubit>().passwordValidation(
+            state.password.value,
+          ),
         );
       },
     );
@@ -189,12 +178,11 @@ class _ConfirmedPasswordInput extends StatelessWidget {
     final focusNode = FocusNode();
 
     return BlocBuilder<SignUpCubit, SignUpState>(
-      buildWhen:
-          (previous, current) =>
-              previous.confirmedPassword != current.confirmedPassword ||
-              previous.password != current.password ||
-              previous.isObscuredConfirmedPassword !=
-                  current.isObscuredConfirmedPassword,
+      buildWhen: (previous, current) =>
+          previous.confirmedPassword != current.confirmedPassword ||
+          previous.password != current.password ||
+          previous.isObscuredConfirmedPassword !=
+              current.isObscuredConfirmedPassword,
       builder: (context, state) {
         return CATextField(
           key: const Key('signUpForm_confirmedPasswordInput_textField'),
@@ -202,13 +190,13 @@ class _ConfirmedPasswordInput extends StatelessWidget {
           title: S.of(context).generalConfirmedPassword,
           hintText: S.of(context).generalConfirmedPasswordHint,
           obscureText: state.isObscuredConfirmedPassword,
-          errorMessage:
-              state.confirmedPassword.displayError != null
-                  ? S.of(context).errorInvalidConfirmedPassword
-                  : null,
+          errorMessage: state.confirmedPassword.displayError != null
+              ? S.of(context).errorInvalidConfirmedPassword
+              : null,
           suffixIcon: IconButton(
-            onPressed:
-                context.read<SignUpCubit>().confirmedPasswordVisibilityChanged,
+            onPressed: context
+                .read<SignUpCubit>()
+                .confirmedPasswordVisibilityChanged,
             icon: Icon(
               !state.isObscuredConfirmedPassword
                   ? Icons.visibility_outlined
@@ -216,14 +204,12 @@ class _ConfirmedPasswordInput extends StatelessWidget {
               color: CAPalette.grey[5],
             ),
           ),
-          onChanged:
-              (confirmedPassword) => context
-                  .read<SignUpCubit>()
-                  .confirmedPasswordChanged(confirmedPassword),
-          onFocusLost:
-              () => context.read<SignUpCubit>().confirmedPasswordValidation(
-                state.confirmedPassword.value,
-              ),
+          onChanged: (confirmedPassword) => context
+              .read<SignUpCubit>()
+              .confirmedPasswordChanged(confirmedPassword),
+          onTapOutside: () => context
+              .read<SignUpCubit>()
+              .confirmedPasswordValidation(state.confirmedPassword.value),
         );
       },
     );

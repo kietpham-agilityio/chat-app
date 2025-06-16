@@ -14,7 +14,7 @@ class ChatMessage extends Equatable {
   final MessageType type;
   final MessageStatus status;
   final Timestamp timestamp;
-  final List<String> readBy;
+  final List<String> readByUserIds;
 
   const ChatMessage({
     required this.id,
@@ -22,10 +22,10 @@ class ChatMessage extends Equatable {
     required this.senderId,
     required this.receiverId,
     required this.content,
+    required this.timestamp,
+    required this.readByUserIds,
     this.type = MessageType.text,
     this.status = MessageStatus.sent,
-    required this.timestamp,
-    required this.readBy,
   });
 
   factory ChatMessage.fromFirestore(DocumentSnapshot doc) {
@@ -45,7 +45,7 @@ class ChatMessage extends Equatable {
         orElse: () => MessageStatus.sent,
       ),
       timestamp: data['timestamp'] as Timestamp,
-      readBy: List<String>.from(data['readBy'] ?? []),
+      readByUserIds: List<String>.from(data['readBy'] ?? []),
     );
   }
 
@@ -58,7 +58,7 @@ class ChatMessage extends Equatable {
       "type": type.toString(),
       "status": status.toString(),
       "timestamp": timestamp,
-      "readBy": readBy,
+      "readBy": readByUserIds,
     };
   }
 
@@ -71,7 +71,7 @@ class ChatMessage extends Equatable {
     MessageType? type,
     MessageStatus? status,
     Timestamp? timestamp,
-    List<String>? readBy,
+    List<String>? readByUserIds,
   }) {
     return ChatMessage(
       id: id ?? this.id,
@@ -82,7 +82,7 @@ class ChatMessage extends Equatable {
       type: type ?? this.type,
       status: status ?? this.status,
       timestamp: timestamp ?? this.timestamp,
-      readBy: readBy ?? this.readBy,
+      readByUserIds: readByUserIds ?? this.readByUserIds,
     );
   }
 
@@ -96,6 +96,6 @@ class ChatMessage extends Equatable {
     type,
     status,
     timestamp,
-    readBy,
+    readByUserIds,
   ];
 }

@@ -46,13 +46,11 @@ class _EmailInput extends StatelessWidget {
           focusNode: focusNode,
           onChanged: (value) => context.read<LoginCubit>().emailChanged(value),
           hintText: S.of(context).generalEmailAddress,
-          errorMessage:
-              state.email.displayError != null
-                  ? S.of(context).errorInvalidEmail
-                  : null,
-          onFocusLost:
-              () =>
-                  context.read<LoginCubit>().emailValidation(state.email.value),
+          errorMessage: state.email.displayError != null
+              ? S.of(context).errorInvalidEmail
+              : null,
+          onTapOutside: () =>
+              context.read<LoginCubit>().emailValidation(state.email.value),
         );
       },
     );
@@ -65,18 +63,16 @@ class _PasswordInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoginCubit, LoginState>(
-      buildWhen:
-          (previous, current) =>
-              previous.password != current.password ||
-              previous.isObscured != current.isObscured,
+      buildWhen: (previous, current) =>
+          previous.password != current.password ||
+          previous.isObscured != current.isObscured,
       builder: (context, state) {
         return CATextField(
           key: const Key('loginForm_passwordInput_textField'),
           hintText: S.of(context).generalPassword,
           obscureText: state.isObscured,
-          onChanged:
-              (password) =>
-                  context.read<LoginCubit>().passwordChanged(password),
+          onChanged: (password) =>
+              context.read<LoginCubit>().passwordChanged(password),
           suffixIcon: IconButton(
             onPressed: context.read<LoginCubit>().passwordVisibilityChanged,
             icon: Icon(

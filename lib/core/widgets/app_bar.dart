@@ -5,7 +5,7 @@ class CAAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title = const SizedBox.shrink(),
     this.toolbarHeight = 44,
     this.leading,
-    this.trailing,
+    this.actions,
     this.titleSpacing,
     super.key,
   });
@@ -28,9 +28,9 @@ class CAAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// A list of widgets to be displayed on the right side of the app bar.
   ///
-  /// The [trailing] property is optional and can be a list of widgets. They are
+  /// The [actions] property is optional and can be a list of widgets. They are
   /// displayed on the right side of the app bar.
-  final List<Widget>? trailing;
+  final List<Widget>? actions;
 
   final double? titleSpacing;
 
@@ -49,7 +49,7 @@ class CAAppBar extends StatelessWidget implements PreferredSizeWidget {
             automaticallyImplyLeading: false,
             leading: leading,
             leadingWidth: toolbarHeight,
-            actions: [if (trailing != null) ...trailing!],
+            actions: [if (actions != null) ...actions!],
             titleSpacing: titleSpacing,
             title: title,
           ),
