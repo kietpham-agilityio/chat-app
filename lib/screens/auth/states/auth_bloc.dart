@@ -5,7 +5,6 @@ import 'package:chat_app/core/local_database/hive_local_db.dart';
 import 'package:chat_app/models/models.dart' show UserModel;
 import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
 import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'auth_event.dart';
@@ -24,7 +23,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   final AuthRepository _authRepository;
-  StreamSubscription<User?>? authStateSubscription;
 
   Future<void> _authCheckAuthentication(
     AuthCheckAuthentication event,
@@ -34,7 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       _authRepository.authStateChanges,
       onData: (user) async {
         if (user != null) {
-          if (state.user == UserModel.empty) {
+          if (state.user?.uid != user.uid) {
             final userData = await _authRepository.getUserData(user.uid);
 
             userData.fold(

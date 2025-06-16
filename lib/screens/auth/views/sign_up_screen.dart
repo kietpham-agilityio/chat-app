@@ -1,5 +1,5 @@
+import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
-import 'package:chat_app/core/themes/themes.dart' show CAPalette;
 import 'package:chat_app/core/widgets/widgets.dart';
 import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
 import 'package:chat_app/screens/auth/states/sign_up_cubit.dart';

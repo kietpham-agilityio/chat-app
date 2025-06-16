@@ -1,3 +1,4 @@
+import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/themes/themes.dart';
 import 'package:chat_app/core/widgets/assets.dart';
 import 'package:chat_app/core/widgets/text.dart';
@@ -162,7 +163,7 @@ class _CATextFieldState extends State<CATextField> {
             fontSize: CATypography.fontSizeBodyLarge,
             fontWeight: FontWeight.w400,
             height: CATypography.heightBodyLarge,
-            color: CAPalette.grey[5],
+            color: context.colorScheme.tertiaryContainer,
           ),
           onTap: widget.ontap,
         ),
@@ -175,7 +176,7 @@ class _CATextFieldState extends State<CATextField> {
                 SizedBox(width: 8),
                 CABodyMediumText(
                   text: widget.errorMessage!,
-                  color: CAPalette.error,
+                  color: context.colorScheme.error,
                 ),
               ],
             ),

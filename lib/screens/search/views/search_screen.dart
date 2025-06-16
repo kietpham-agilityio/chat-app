@@ -1,8 +1,8 @@
 import 'dart:developer' show log;
 
+import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
 import 'package:chat_app/core/router/app_router.dart';
-import 'package:chat_app/core/themes/themes.dart' show CAPalette;
 import 'package:chat_app/core/widgets/divider.dart';
 import 'package:chat_app/core/widgets/list_tile.dart';
 import 'package:chat_app/core/widgets/widgets.dart'
@@ -64,7 +64,7 @@ class SearchScreen extends StatelessWidget {
                               child: CAAssets.search(
                                 width: 24,
                                 height: 24,
-                                color: CAPalette.grey[4],
+                                color: context.colorScheme.tertiaryFixed,
                               ),
                             ),
                             onSubmitted: (value) {

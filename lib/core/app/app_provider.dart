@@ -72,7 +72,7 @@ class AppProvider extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            lazy: true,
+            lazy: false,
             create: (context) =>
                 AuthBloc(authRepository: context.read<AuthRepository>())
                   ..add(const AuthCheckAuthentication()),

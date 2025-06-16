@@ -156,7 +156,7 @@ class _PasswordInput extends StatelessWidget {
               !state.isObscuredPassword
                   ? Icons.visibility_outlined
                   : Icons.visibility_off_outlined,
-              color: CAPalette.grey[5],
+              color: context.colorScheme.tertiaryContainer,
             ),
           ),
           onChanged: (password) =>
@@ -201,7 +201,7 @@ class _ConfirmedPasswordInput extends StatelessWidget {
               !state.isObscuredConfirmedPassword
                   ? Icons.visibility_outlined
                   : Icons.visibility_off_outlined,
-              color: CAPalette.grey[5],
+              color: context.colorScheme.tertiaryContainer,
             ),
           ),
           onChanged: (confirmedPassword) => context

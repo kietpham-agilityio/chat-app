@@ -1,7 +1,6 @@
 import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
-import 'package:chat_app/core/themes/themes.dart' show CAPalette;
 import 'package:chat_app/core/widgets/widgets.dart'
     show
         CAAppBar,
@@ -71,7 +70,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                 height: 8,
                 width: 32,
                 decoration: BoxDecoration(
-                  color: CAPalette.grey[1],
+                  color: context.colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),

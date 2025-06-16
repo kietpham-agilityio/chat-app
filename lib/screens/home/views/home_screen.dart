@@ -4,7 +4,6 @@ import 'package:chat_app/core/extensions/timestamp_extensions.dart';
 import 'package:chat_app/core/local_database/user_db_model.dart';
 import 'package:chat_app/core/notifications/notifications_service.dart';
 import 'package:chat_app/core/router/app_router.dart' show AppPaths;
-import 'package:chat_app/core/themes/themes.dart' show CAPalette;
 import 'package:chat_app/core/widgets/widgets.dart'
     show
         CAAppBar,
@@ -99,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: CAAssets.search(
                             width: 24,
                             height: 24,
-                            color: CAPalette.grey[4],
+                            color: context.colorScheme.tertiaryFixed,
                           ),
                         ),
                         ontap: () => Navigator.of(context).push(
@@ -284,7 +283,7 @@ class _ChatListTile extends StatelessWidget {
                 url: getOtherUserAvatar(),
                 avatarSize: 40,
               ),
-              tileColor: hasUnread ? CAPalette.grey[1] : null,
+              tileColor: hasUnread ? context.colorScheme.tertiary : null,
               trailing: hasUnread
                   ? Container(
                       height: 10,

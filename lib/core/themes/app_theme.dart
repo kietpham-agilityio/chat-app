@@ -112,6 +112,13 @@ class CATheme {
 
   static final _buttonTheme = ElevatedButtonThemeData(
     style: ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return CAPalette.primaryBlue.withValues(alpha: 0.5);
+        }
+
+        return CAPalette.primaryBlue;
+      }),
       overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
         if (states.contains(WidgetState.pressed)) {
           return CAPalette.genericWhite.withValues(alpha: 0.12);
@@ -119,7 +126,7 @@ class CATheme {
 
         return null;
       }),
-      foregroundColor: WidgetStatePropertyAll<Color>(CAPalette.genericWhite),
+      foregroundColor: WidgetStatePropertyAll<Color>(CAPalette.grey[1]!),
       minimumSize: WidgetStatePropertyAll<Size>(Size.fromHeight(48)),
       shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
