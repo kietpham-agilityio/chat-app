@@ -2,30 +2,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 class ChatRoomModel extends Equatable {
-  ChatRoomModel({
+  const ChatRoomModel({
     required this.id,
     required this.participants,
+    this.isTyping = false,
+    this.isCallActive = false,
+    this.lastReadTime = const {},
+    this.participantsName = const {},
+    this.participantsAvatar = const {},
     this.lastMessage,
     this.lastMessageSenderId,
     this.lastMessageTime,
-    Map<String, Timestamp>? lastReadTime,
-    Map<String, String>? participantsName,
-    Map<String, String>? participantsAvatar,
-    this.isTyping = false,
     this.typingUserId,
-    this.isCallActive = false,
-  }) : lastReadTime = lastReadTime ?? {},
-       participantsName = participantsName ?? {},
-       participantsAvatar = participantsAvatar ?? {};
+  });
 
   final String id;
   final List<String> participants;
   final String? lastMessage;
   final String? lastMessageSenderId;
   final Timestamp? lastMessageTime;
-  final Map<String, Timestamp>? lastReadTime;
-  final Map<String, String>? participantsName;
-  final Map<String, String>? participantsAvatar;
+  final Map<String, Timestamp> lastReadTime;
+  final Map<String, String> participantsName;
+  final Map<String, String> participantsAvatar;
   final bool isTyping;
   final String? typingUserId;
   final bool isCallActive;

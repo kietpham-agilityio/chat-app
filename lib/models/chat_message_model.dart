@@ -5,7 +5,7 @@ enum MessageType { text, image, video }
 
 enum MessageStatus { sent, read }
 
-class ChatMessage extends Equatable {
+class ChatMessageModel extends Equatable {
   final String id;
   final String chatRoomId;
   final String senderId;
@@ -16,7 +16,7 @@ class ChatMessage extends Equatable {
   final Timestamp timestamp;
   final List<String> readByUserIds;
 
-  const ChatMessage({
+  const ChatMessageModel({
     required this.id,
     required this.chatRoomId,
     required this.senderId,
@@ -28,9 +28,9 @@ class ChatMessage extends Equatable {
     this.status = MessageStatus.sent,
   });
 
-  factory ChatMessage.fromFirestore(DocumentSnapshot doc) {
+  factory ChatMessageModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return ChatMessage(
+    return ChatMessageModel(
       id: doc.id,
       chatRoomId: data['chatRoomId'] as String,
       senderId: data['senderId'] as String,
@@ -62,7 +62,7 @@ class ChatMessage extends Equatable {
     };
   }
 
-  ChatMessage copyWith({
+  ChatMessageModel copyWith({
     String? id,
     String? chatRoomId,
     String? senderId,
@@ -73,7 +73,7 @@ class ChatMessage extends Equatable {
     Timestamp? timestamp,
     List<String>? readByUserIds,
   }) {
-    return ChatMessage(
+    return ChatMessageModel(
       id: id ?? this.id,
       chatRoomId: chatRoomId ?? this.chatRoomId,
       senderId: senderId ?? this.senderId,

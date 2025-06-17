@@ -2,7 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart'
     show ReceivedAction;
 import 'package:chat_app/core/notifications/notifications_service.dart'
     show NotificationHandler, NotificationsService;
-import 'package:chat_app/models/chat_message.dart';
+import 'package:chat_app/models/chat_message_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -29,7 +29,7 @@ class NotificationController {
 
         final messageDoc = messageRef.doc();
 
-        final message = ChatMessage(
+        final message = ChatMessageModel(
           id: messageDoc.id,
           chatRoomId: chatRoomId,
           senderId: senderId,

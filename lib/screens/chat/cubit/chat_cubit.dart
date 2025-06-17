@@ -1,8 +1,8 @@
 import 'dart:async' show StreamSubscription;
 import 'dart:developer' show log;
 
-import 'package:chat_app/core/local_database/hive_local_db.dart';
-import 'package:chat_app/models/chat_message.dart' show ChatMessage;
+import 'package:chat_app/core/local_database/user_box.dart';
+import 'package:chat_app/models/chat_message_model.dart' show ChatMessageModel;
 import 'package:chat_app/repositories/repositories.dart' show ChatRepository;
 import 'package:cloud_firestore/cloud_firestore.dart'
     show DocumentSnapshot, Timestamp;
@@ -15,11 +15,13 @@ class ChatCubit extends Cubit<ChatState> {
   ChatCubit({
     required ChatRepository chatRepository,
     required this.currentUserId,
+    required this.userBox,
   }) : _chatRepository = chatRepository,
        super(const ChatState());
 
   final ChatRepository _chatRepository;
   final String currentUserId;
+  final UserBox userBox;
 
   bool _isInChat = false;
 
@@ -31,22 +33,9 @@ class ChatCubit extends Cubit<ChatState> {
   void messageChanged(String message) => emit(state.copyWith(message: message));
 
   Future<void> getMyAvatarUrl() async {
-    final userDB = await HiveLocalDb.instance.userBox.getUser();
+    final userDB = await userBox.getUser();
     emit(state.copyWith(myAvatarUrl: userDB?.avatarUrl));
   }
-
-  // Future<bool> checkExistingChatRoom(String receiverId) async {
-  //   try {
-  //     final docIds = [
-  //       '${currentUserId}_$receiverId',
-  //       '${receiverId}_$currentUserId',
-  //     ];
-  //     return _chatRepository.findExistingChatRoom(docIds);
-  //   } catch (e) {
-  //     log(e.toString());
-  //     return false;
-  //   }
-  // }
 
   Future<bool> checkExistingChatRoom(String receiverId) async {
     final docIds = [
@@ -158,33 +147,6 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
-  // void _subscribeToMessages(String chatRoomId) {
-  //   _messageSubscription?.cancel();
-  //   _messageSubscription = _chatRepository
-  //       .getMessages(chatRoomId)
-  //       .listen(
-  //         (messages) {
-  //           if (_isInChat) {
-  //             _markMessagesAsRead(chatRoomId);
-  //           }
-  //           emit(
-  //             state.copyWith(
-  //               messages: messages.items,
-  //               lastDoc: messages.lastDoc,
-  //             ),
-  //           );
-  //         },
-  //         onError: (error) {
-  //           emit(
-  //             state.copyWith(
-  //               error: "Failed to load messages",
-  //               status: ChatStatus.error,
-  //             ),
-  //           );
-  //         },
-  //       );
-  // }
-
   void _subscribeToMessages(String chatRoomId) {
     _messageSubscription?.cancel();
     _messageSubscription = _chatRepository.getMessages(chatRoomId).listen((
@@ -205,50 +167,6 @@ class ChatCubit extends Cubit<ChatState> {
       );
     });
   }
-
-  // Future<void> loadMoreMessages() async {
-  //   if (state.status != ChatStatus.loaded ||
-  //       state.messages.isEmpty ||
-  //       !state.hasMoreMessages ||
-  //       state.isLoadingMore) {
-  //     return;
-  //   }
-
-  //   try {
-  //     emit(state.copyWith(isLoadingMore: true));
-
-  //     final lastMessage = state.messages.last;
-  //     final lastDoc = await _chatRepository
-  //         .getChatRoomMessages(state.chatRoomId!)
-  //         .doc(lastMessage.id)
-  //         .get();
-
-  //     final moreMessages = await _chatRepository.getMoreMessages(
-  //       state.chatRoomId!,
-  //       lastDocument: lastDoc,
-  //     );
-
-  //     if (moreMessages.items.isEmpty) {
-  //       emit(state.copyWith(hasMoreMessages: false, isLoadingMore: false));
-  //       return;
-  //     }
-
-  //     emit(
-  //       state.copyWith(
-  //         messages: [...state.messages, ...moreMessages.items],
-  //         hasMoreMessages: moreMessages.items.length >= 20,
-  //         isLoadingMore: false,
-  //       ),
-  //     );
-  //   } catch (e) {
-  //     emit(
-  //       state.copyWith(
-  //         error: "Failed to load more messages",
-  //         isLoadingMore: false,
-  //       ),
-  //     );
-  //   }
-  // }
 
   Future<void> loadMoreMessages() async {
     if (state.status != ChatStatus.loaded ||
@@ -370,25 +288,6 @@ class ChatCubit extends Cubit<ChatState> {
         );
   }
 
-  // void _subscribeToUserInfo(String receiverId) {
-  //   _userInfoSubscription?.cancel();
-  //   _userInfoSubscription = _chatRepository
-  //       .getUserInfo(receiverId)
-  //       .listen(
-  //         (userInfo) {
-  //           emit(
-  //             state.copyWith(
-  //               receiverAvatarUrl: userInfo.avatarUrl,
-  //               receiverFullName: userInfo.fullName,
-  //             ),
-  //           );
-  //         },
-  //         onError: (error) {
-  //           log("error getting user info");
-  //         },
-  //       );
-  // }
-
   void _subscribeToUserInfo(String receiverId) {
     _userInfoSubscription?.cancel();
     _userInfoSubscription = _chatRepository.getUserInfo(receiverId).listen((
@@ -437,7 +336,7 @@ class ChatCubit extends Cubit<ChatState> {
     );
   }
 
-  Future<void> leaveChat() async {
+  Future<void> leaveRoom() async {
     _messageSubscription?.cancel();
     _amIBlockStatusSubscription?.cancel();
     _blockStatusSubscription?.cancel();
