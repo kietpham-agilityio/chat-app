@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chat_app/core/router/router_guard.dart' show RouterGuard;
 import 'package:chat_app/screens/auth/views/login_screen.dart';
 import 'package:chat_app/screens/auth/views/sign_up_screen.dart';
@@ -13,11 +15,11 @@ import 'package:go_router/go_router.dart';
 class AppRouter {
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
 
-  static GoRouter router(AuthNotifier authNotifier) => GoRouter(
+  static final router = GoRouter(
     debugLogDiagnostics: kDebugMode,
     initialLocation: AppPaths.home.path,
     navigatorKey: rootNavigatorKey,
-    refreshListenable: authNotifier,
+    refreshListenable: AuthNotifier.instance,
     routes: [
       GoRoute(
         name: AppPaths.login.name,
@@ -111,9 +113,21 @@ enum AppPaths {
 }
 
 class AuthNotifier extends ChangeNotifier {
-  AuthNotifier() {
-    FirebaseAuth.instance.authStateChanges().listen((user) {
+  static final AuthNotifier instance = AuthNotifier._internal();
+
+  factory AuthNotifier() => instance;
+
+  late final StreamSubscription _authSub;
+
+  AuthNotifier._internal() {
+    _authSub = FirebaseAuth.instance.authStateChanges().listen((user) {
       notifyListeners();
     });
+  }
+
+  @override
+  void dispose() {
+    _authSub.cancel();
+    super.dispose();
   }
 }

@@ -17,15 +17,11 @@ Future<void> main() async {
 
   await HiveLocalDb.instance.init();
 
-  final authNotifier = AuthNotifier();
-
-  runApp(MyApp(authNotifier: authNotifier));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({required this.authNotifier, super.key});
-
-  final AuthNotifier authNotifier;
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -35,11 +31,10 @@ class MyApp extends StatelessWidget {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: AppProvider(
-        authNotifier: authNotifier,
         child: MaterialApp.router(
           theme: CATheme.light,
           debugShowCheckedModeBanner: false,
-          routerConfig: AppRouter.router(authNotifier),
+          routerConfig: AppRouter.router,
           locale: const Locale('en', 'US'),
 
           localizationsDelegates: const [S.delegate],

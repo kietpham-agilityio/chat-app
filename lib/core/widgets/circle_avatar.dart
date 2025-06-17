@@ -1,4 +1,5 @@
 import 'package:chat_app/core/extensions/context_extensions.dart';
+import 'package:chat_app/core/resources/assets_generated/assets.gen.dart';
 import 'package:flutter/material.dart';
 
 import 'assets.dart' show CAAssets, CACachedNetworkImage;
@@ -29,19 +30,15 @@ class CACircleAvatar extends StatelessWidget {
         width: avatarSize,
         child: CircleAvatar(
           backgroundColor: context.colorScheme.tertiary,
+          backgroundImage: AssetImage(Assets.icons.icUser.path),
           child: ClipOval(
-            child: url == ''
-                ? CAAssets.user(
-                    width: avatarSize,
-                    height: avatarSize,
-                    boxFit: BoxFit.cover,
-                  )
-                : CACachedNetworkImage(
-                    width: avatarSize,
-                    height: avatarSize,
-                    url: url,
-                    boxFit: BoxFit.cover,
-                  ),
+            child: CACachedNetworkImage(
+              width: avatarSize,
+              height: avatarSize,
+              url: url,
+              boxFit: BoxFit.cover,
+              errorBuilder: CAAssets.user(),
+            ),
           ),
         ),
       ),
