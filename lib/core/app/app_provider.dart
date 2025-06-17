@@ -16,14 +16,9 @@ import 'package:flutter_bloc/flutter_bloc.dart'
         RepositoryProvider;
 
 class AppProvider extends StatelessWidget {
-  const AppProvider({
-    required this.child,
-    required this.authNotifier,
-    super.key,
-  });
+  const AppProvider({required this.child, super.key});
 
   final Widget child;
-  final AuthNotifier authNotifier;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +48,7 @@ class AppProvider extends StatelessWidget {
                 NotificationHandler.navigate(
                   notification: notificationsResponse,
                   onChatDetailsRedirect: (notifsRes) {
-                    AppRouter.router(authNotifier).pushNamed(
+                    AppRouter.router.pushNamed(
                       AppPaths.chat.name,
                       queryParameters: {
                         'receiverId': notifsRes.accountId,
