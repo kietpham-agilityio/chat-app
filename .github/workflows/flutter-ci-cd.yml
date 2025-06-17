@@ -74,3 +74,4 @@ jobs:
           groups: testers-group
           file: build/app/outputs/flutter-apk/app-release.apk
           releaseNotes: ${{ env.RELEASE_NOTES }}
+          #
