@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:developer' show log;
 
 import 'package:chat_app/core/utils/failure.dart';
-import 'package:chat_app/models/chat_message.dart'
-    show ChatMessage, MessageStatus, MessageType;
+import 'package:chat_app/models/chat_message_model.dart'
+    show ChatMessageModel, MessageStatus, MessageType;
 import 'package:chat_app/models/models.dart'
     show ChatRoomModel, PaginatedResult, UserModel;
 import 'package:cloud_firestore/cloud_firestore.dart'
@@ -79,7 +79,7 @@ class ChatRepository {
     }
   }
 
-  Stream<Either<Failure, PaginatedResult<ChatMessage>>> getMessages(
+  Stream<Either<Failure, PaginatedResult<ChatMessageModel>>> getMessages(
     String chatRoomId, {
     DocumentSnapshot? lastDocument,
   }) {
@@ -95,12 +95,12 @@ class ChatRepository {
         .snapshots()
         .map((snapshot) {
           final messages = snapshot.docs
-              .map((doc) => ChatMessage.fromFirestore(doc))
+              .map((doc) => ChatMessageModel.fromFirestore(doc))
               .toList();
 
           final lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
 
-          return right<Failure, PaginatedResult<ChatMessage>>(
+          return right<Failure, PaginatedResult<ChatMessageModel>>(
             PaginatedResult(items: messages, lastDoc: lastDoc),
           );
         })
@@ -123,7 +123,7 @@ class ChatRepository {
         });
   }
 
-  Future<Either<Failure, PaginatedResult<ChatMessage>>> getMoreMessages(
+  Future<Either<Failure, PaginatedResult<ChatMessageModel>>> getMoreMessages(
     String chatRoomId, {
     required DocumentSnapshot lastDocument,
   }) async {
@@ -138,7 +138,7 @@ class ChatRepository {
       final snapshot = await query.get().timeout(const Duration(seconds: 5));
 
       final messages = snapshot.docs
-          .map((doc) => ChatMessage.fromFirestore(doc))
+          .map((doc) => ChatMessageModel.fromFirestore(doc))
           .toList();
 
       final lastDoc = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
@@ -266,7 +266,7 @@ class ChatRepository {
 
     //chatmessage
 
-    final message = ChatMessage(
+    final message = ChatMessageModel(
       id: messageDoc.id,
       chatRoomId: chatRoomId,
       senderId: senderId,

@@ -1,6 +1,7 @@
 import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/extensions/datetime_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
+import 'package:chat_app/core/local_database/hive_local_db.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/widgets/text.dart';
 import 'package:chat_app/core/widgets/widgets.dart'
@@ -15,7 +16,7 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAIconButtons,
         CATextField,
         CATitleMediumText;
-import 'package:chat_app/models/chat_message.dart';
+import 'package:chat_app/models/chat_message_model.dart';
 import 'package:chat_app/repositories/repositories.dart' show ChatRepository;
 import 'package:chat_app/screens/chat/cubit/chat_cubit.dart'
     show ChatCubit, ChatState, ChatStatus;
@@ -50,6 +51,7 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
     _chatCubit = ChatCubit(
       currentUserId: FirebaseAuth.instance.currentUser?.uid ?? '',
       chatRepository: context.read<ChatRepository>(),
+      userBox: HiveLocalDb.instance.userBox,
     )..getMyAvatarUrl();
     super.initState();
   }
@@ -211,7 +213,7 @@ class _ViewState extends State<_View> {
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
-    _chatCubit.leaveChat();
+    _chatCubit.leaveRoom();
 
     super.dispose();
   }
@@ -245,8 +247,8 @@ class _ViewState extends State<_View> {
                     itemBuilder: (context, index) {
                       final message = state.messages[index];
                       final isMe = message.senderId == _chatCubit.currentUserId;
-                      ChatMessage? nextMessage;
-                      ChatMessage? prevMessage;
+                      ChatMessageModel? nextMessage;
+                      ChatMessageModel? prevMessage;
 
                       if (index + 1 < state.messages.length) {
                         nextMessage = state.messages[index + 1];
@@ -466,7 +468,7 @@ class MessageBubble extends StatelessWidget {
     super.key,
   });
 
-  final ChatMessage message;
+  final ChatMessageModel message;
   final bool isMe;
   final String? receiverAvatarUrl;
   final String? myAvatar;

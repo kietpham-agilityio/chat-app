@@ -5,7 +5,7 @@ enum ChatStatus { inital, loading, loaded, error }
 class ChatState extends Equatable {
   final ChatStatus status;
 
-  final List<ChatMessage> messages;
+  final List<ChatMessageModel> messages;
   final bool isReceiverTyping;
   final bool isReceiverOnline;
   final bool hasMoreMessages;
@@ -47,7 +47,7 @@ class ChatState extends Equatable {
     String? error,
     String? receiverId,
     String? chatRoomId,
-    List<ChatMessage>? messages,
+    List<ChatMessageModel>? messages,
     bool? isReceiverTyping,
     bool? isReceiverOnline,
     Timestamp? receiverLastSeen,

@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               final outherUserName =
                                   state
                                       .chats[index]
-                                      .participantsName?[otherUserId] ??
+                                      .participantsName[otherUserId] ??
                                   "Unknown";
                               context.pushNamed(
                                 AppPaths.chat.name,
@@ -249,7 +249,7 @@ class _ChatListTile extends StatelessWidget {
           (id) => id != currentUserId,
           orElse: () => 'Unknown User',
         );
-        return chatRoom.participantsName?[otherUserId] ?? "Unknown User";
+        return chatRoom.participantsName[otherUserId] ?? "Unknown User";
       } catch (e) {
         return "Unknown User";
       }
@@ -261,7 +261,7 @@ class _ChatListTile extends StatelessWidget {
           (id) => id != currentUserId,
           orElse: () => 'Unknown User',
         );
-        return chatRoom.participantsAvatar?[otherUserId] ?? "Unknown User";
+        return chatRoom.participantsAvatar[otherUserId] ?? "Unknown User";
       } catch (e) {
         return "Unknown User";
       }

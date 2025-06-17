@@ -36,15 +36,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             final userData = await _authRepository.getUserData(user.uid);
 
             userData.fold(
-              (l) => emit(const AuthState(user: UserModel.empty)),
-              (r) => emit(AuthState(user: r)),
+              (l) => emit(
+                const AuthState(
+                  user: UserModel.empty,
+                  status: AuthStatus.unauthenticated,
+                ),
+              ),
+              (r) => emit(AuthState(user: r, status: AuthStatus.authenticated)),
             );
           }
         } else {
-          emit(const AuthState(user: UserModel.empty));
+          emit(
+            const AuthState(
+              user: UserModel.empty,
+              status: AuthStatus.unauthenticated,
+            ),
+          );
         }
       },
-      onError: addError,
+      onError: (error, trace) => emit(
+        const AuthState(
+          user: UserModel.empty,
+          status: AuthStatus.unauthenticated,
+        ),
+      ),
     );
   }
 
@@ -54,6 +69,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     await _authRepository.signOut();
     await HiveLocalDb.instance.userBox.deleteUser();
-    emit(const AuthState(user: UserModel.empty));
+    emit(
+      const AuthState(
+        user: UserModel.empty,
+        status: AuthStatus.unauthenticated,
+      ),
+    );
   }
 }
