@@ -55,6 +55,60 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Create account"),
         "errorEmailAlreadyInUse": MessageLookupByLibrary.simpleMessage(
             "An account already exists for that email."),
+        "errorEmailNotFound": MessageLookupByLibrary.simpleMessage(
+            "Email is not found, please create an account."),
+        "errorFailedToAddFCMToken": MessageLookupByLibrary.simpleMessage(
+            "Failed to add FCM token. Please try again."),
+        "errorFailedToBlockUser": MessageLookupByLibrary.simpleMessage(
+            "Failed to block user. Please try again."),
+        "errorFailedToCheckIfUserIsBlocked":
+            MessageLookupByLibrary.simpleMessage(
+                "Failed to check if user is blocked. Please try again."),
+        "errorFailedToCreateChatRoom": MessageLookupByLibrary.simpleMessage(
+            "Failed to create chat room. Please try again."),
+        "errorFailedToFindChatRoomExistence":
+            MessageLookupByLibrary.simpleMessage(
+                "Failed to find chat room existence. Please try again."),
+        "errorFailedToGetChatRooms": MessageLookupByLibrary.simpleMessage(
+            "Failed to get chat rooms. Please try again."),
+        "errorFailedToGetMessages": MessageLookupByLibrary.simpleMessage(
+            "Failed to get messages. Please try again."),
+        "errorFailedToGetOrCreateChatRoom":
+            MessageLookupByLibrary.simpleMessage(
+                "Failed to get or create chat room. Please try again."),
+        "errorFailedToGetUserData": MessageLookupByLibrary.simpleMessage(
+            "Failed to get user data. Please try again."),
+        "errorFailedToGettingAmIBlocked": MessageLookupByLibrary.simpleMessage(
+            "Failed to getting am I blocked status. Please try again."),
+        "errorFailedToGettingIsUserBlocked":
+            MessageLookupByLibrary.simpleMessage(
+                "Failed to getting is user blocked status. Please try again."),
+        "errorFailedToLoadMoreMessages": MessageLookupByLibrary.simpleMessage(
+            "Failed to load more messages. Please try again."),
+        "errorFailedToLoadUserInfo": MessageLookupByLibrary.simpleMessage(
+            "Failed to load user info. Please try again."),
+        "errorFailedToMarkMessagesAsRead": MessageLookupByLibrary.simpleMessage(
+            "Failed to mark messages as read. Please try again."),
+        "errorFailedToParseUserData": MessageLookupByLibrary.simpleMessage(
+            "Failed to parse user data. Please try again."),
+        "errorFailedToPickImage": MessageLookupByLibrary.simpleMessage(
+            "Failed to pick image. Please try again."),
+        "errorFailedToRemoveFCMToken": MessageLookupByLibrary.simpleMessage(
+            "Failed to remove FCM token. Please try again."),
+        "errorFailedToSearchUsers": MessageLookupByLibrary.simpleMessage(
+            "Failed to search users. Please try again."),
+        "errorFailedToSendMessage": MessageLookupByLibrary.simpleMessage(
+            "Failed to send message. Please try again."),
+        "errorFailedToSignIn": MessageLookupByLibrary.simpleMessage(
+            "Failed to sign in. Please try again."),
+        "errorFailedToSignOut": MessageLookupByLibrary.simpleMessage(
+            "Failed to sign out. Please try again."),
+        "errorFailedToSignUp": MessageLookupByLibrary.simpleMessage(
+            "Failed to sign up. Please try again."),
+        "errorFailedToUnblockUser": MessageLookupByLibrary.simpleMessage(
+            "Failed to unblock user. Please try again."),
+        "errorFailedToUpdateUserData": MessageLookupByLibrary.simpleMessage(
+            "Failed to update user data. Please try again."),
         "errorInvalidConfirmedPassword":
             MessageLookupByLibrary.simpleMessage("Passwords do not match"),
         "errorInvalidEmail": MessageLookupByLibrary.simpleMessage(
@@ -65,14 +119,21 @@ class MessageLookup extends MessageLookupByLibrary {
             "Must be at 8 characters with letters and numbers"),
         "errorInvalidPhoneNumber": MessageLookupByLibrary.simpleMessage(
             "Phone number format (e.g., 0981234567)"),
+        "errorOneOrBothUsersNotFound": MessageLookupByLibrary.simpleMessage(
+            "One or both users not found. Please try again."),
         "errorOperationNotAllowed": MessageLookupByLibrary.simpleMessage(
             "Operation is not allowed. Please contact support."),
+        "errorUnexpectedErrorCheckingBlockStatus":
+            MessageLookupByLibrary.simpleMessage(
+                "Unexpected error checking block status. Please try again."),
         "errorUnknown": MessageLookupByLibrary.simpleMessage(
             "An unknown exception occurred. Please try again."),
+        "errorUserDataNotFound": MessageLookupByLibrary.simpleMessage(
+            "User data not found. Please try again."),
         "errorUserDisabled": MessageLookupByLibrary.simpleMessage(
             "This user has been disabled. Please contact support for help."),
         "errorUserNotFound": MessageLookupByLibrary.simpleMessage(
-            "Email is not found, please create an account."),
+            "User not found. Please try again."),
         "errorWrongPassword": MessageLookupByLibrary.simpleMessage(
             "Incorrect password, please try again."),
         "generalConfirmedPassword":
@@ -93,11 +154,37 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Phone Number"),
         "generalPhoneNumberHint":
             MessageLookupByLibrary.simpleMessage("Enter your phone number"),
+        "generalSearch": MessageLookupByLibrary.simpleMessage("Search"),
+        "generalUnknownUser":
+            MessageLookupByLibrary.simpleMessage("Unknown User"),
+        "homeDescription": MessageLookupByLibrary.simpleMessage(
+            "Type in the search bar to find and select a contact to start a new chat."),
+        "homeSubTitle":
+            MessageLookupByLibrary.simpleMessage("Let\'s start chatting"),
+        "homeTitle": MessageLookupByLibrary.simpleMessage("Chats"),
         "loginBtn": MessageLookupByLibrary.simpleMessage("Login"),
         "loginCreateAccountBtn":
             MessageLookupByLibrary.simpleMessage("Create a new account"),
         "loginForgotPasswordBtn":
             MessageLookupByLibrary.simpleMessage("Forgot your password?"),
-        "loginTitle": MessageLookupByLibrary.simpleMessage("Welcome to Chat")
+        "loginTitle": MessageLookupByLibrary.simpleMessage("Welcome to Chat"),
+        "myAccountChoosePhoto":
+            MessageLookupByLibrary.simpleMessage("Choose photo"),
+        "myAccountSelectFromGalleryBtn":
+            MessageLookupByLibrary.simpleMessage("Select from gallery"),
+        "myAccountTakeAPhotoBtn":
+            MessageLookupByLibrary.simpleMessage("Take a photo"),
+        "myAccountTitle": MessageLookupByLibrary.simpleMessage("My Account"),
+        "myAccountUpdateBtn": MessageLookupByLibrary.simpleMessage("Update"),
+        "myAccountUpdateSuccess":
+            MessageLookupByLibrary.simpleMessage("Update successfully"),
+        "profileLogoutBtn": MessageLookupByLibrary.simpleMessage("Logout"),
+        "profileMyAccountBtn":
+            MessageLookupByLibrary.simpleMessage("My Account"),
+        "profileTitle": MessageLookupByLibrary.simpleMessage("Profile"),
+        "searchDescriptionEmptyPage":
+            MessageLookupByLibrary.simpleMessage("No users found"),
+        "searchDescriptionInitPage":
+            MessageLookupByLibrary.simpleMessage("Search for users")
       };
 }

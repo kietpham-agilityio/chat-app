@@ -414,7 +414,7 @@ class _ViewState extends State<_View> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: CAElevatedButton(
-                        text: 'Unblock',
+                        text: S.of(context).chatMessageUnblockBtn,
                         onPressed: () {
                           CADialogManager.showDialog(
                             context: context,

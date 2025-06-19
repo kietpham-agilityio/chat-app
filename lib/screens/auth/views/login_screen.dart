@@ -18,26 +18,31 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoaderOverlay(
-      child: Scaffold(
-        body: BlocProvider(
-          create: (_) => LoginCubit(context.read<AuthRepository>()),
-          child: BlocListener<LoginCubit, LoginState>(
-            listener: (context, state) {
-              if (state.status == LoginStatus.failure) {
-                CASnackBar.error(
-                  context,
-                  message: state.errorMessage ?? S.of(context).errorUnknown,
-                );
-              }
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: LoaderOverlay(
+        child: Scaffold(
+          body: BlocProvider(
+            create: (_) => LoginCubit(context.read<AuthRepository>()),
+            child: BlocListener<LoginCubit, LoginState>(
+              listener: (context, state) {
+                if (state.status == LoginStatus.failure) {
+                  CASnackBar.error(
+                    context,
+                    message: state.errorMessage ?? S.of(context).errorUnknown,
+                  );
+                }
 
-              if (state.status == LoginStatus.inProgress) {
-                context.loaderOverlay.show();
-              } else {
-                context.loaderOverlay.hide();
-              }
-            },
-            child: _LoginForm(),
+                if (state.status == LoginStatus.inProgress) {
+                  context.loaderOverlay.show();
+                } else {
+                  context.loaderOverlay.hide();
+                }
+              },
+              child: _LoginForm(),
+            ),
           ),
         ),
       ),

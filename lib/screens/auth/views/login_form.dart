@@ -114,7 +114,6 @@ class _CreateNewAccountBtn extends StatelessWidget {
     return CAElevatedButton(
       backgroundColor: context.colorScheme.secondary,
       foregroundColor: context.colorScheme.tertiaryContainer,
-      // buttonStyle: ,
       text: S.of(context).loginCreateAccountBtn,
       onPressed: () => context.pushNamed(AppPaths.signUp.name),
     );

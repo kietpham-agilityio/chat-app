@@ -16,25 +16,7 @@ class HomeCubit extends Cubit<HomeState> {
 
   final ChatRepository _chatRepository;
 
-  // StreamSubscription<List<ChatRoomModel>>? _chatRoomSub;
   StreamSubscription<Either<Failure, List<ChatRoomModel>>>? _chatRoomSub;
-  // final _controller = StreamController<Either<Failure, List<ChatRoomModel>>>();
-
-  // void initialize(String currentUserId) {
-  //   emit(state.copyWith(status: HomeStatus.loading));
-
-  //   _chatRoomSub?.cancel();
-  //   _chatRoomSub = _chatRepository
-  //       .getChatRooms(currentUserId)
-  //       .listen(
-  //         (chatRooms) {
-  //           emit(state.copyWith(chats: chatRooms, status: HomeStatus.success));
-  //         },
-  //         onError: (error) {
-  //           emit(state.copyWith(status: HomeStatus.failure, errorMessage: ''));
-  //         },
-  //       );
-  // }
 
   void initialize(String currentUserId) {
     emit(state.copyWith(status: HomeStatus.loading));

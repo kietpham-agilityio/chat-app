@@ -3,6 +3,7 @@ import 'dart:developer' show log;
 import 'dart:io';
 
 import 'package:chat_app/core/local_database/hive_local_db.dart';
+import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/utils/failure.dart';
 import 'package:chat_app/models/models.dart' show UserModel;
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -39,7 +40,7 @@ class AuthRepository {
       // Get the user that was just created
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        return left(Failure('User not found!'));
+        return left(Failure(S.current.errorUserNotFound));
       }
 
       // Create a new [UserModel] from the created user
@@ -56,7 +57,7 @@ class AuthRepository {
       // Return the created user
       return right(user);
     } catch (_) {
-      return left(Failure('Failed to sign up!'));
+      return left(Failure(S.current.errorFailedToSignUp));
     }
   }
 
@@ -65,8 +66,7 @@ class AuthRepository {
       final doc = await firestore.collection('users').doc(uid).get();
 
       if (!doc.exists) {
-        // throw const AppException('User data not found');
-        return left(Failure('User data not found!'));
+        return left(Failure(S.current.errorUserDataNotFound));
       }
 
       log('User id: ${doc.id}');
@@ -82,7 +82,7 @@ class AuthRepository {
 
       return right(user);
     } catch (_) {
-      return left(Failure('Failed to get user data!'));
+      return left(Failure(S.current.errorFailedToGetUserData));
     }
   }
 
@@ -95,7 +95,7 @@ class AuthRepository {
           .timeout(const Duration(seconds: 5));
       return right(unit);
     } catch (_) {
-      return left(Failure('Failed to get user data!'));
+      return left(Failure(S.current.errorFailedToGetUserData));
     }
   }
 
@@ -160,7 +160,7 @@ class AuthRepository {
 
       return right(unit);
     } catch (_) {
-      return left(Failure('Failed to update user data!'));
+      return left(Failure(S.current.errorFailedToUpdateUserData));
     }
   }
 
@@ -176,7 +176,7 @@ class AuthRepository {
 
       return right(unit);
     } catch (_) {
-      return left(Failure('Failed to sign out!'));
+      return left(Failure(S.current.errorFailedToSignOut));
     }
   }
 
@@ -190,7 +190,7 @@ class AuthRepository {
           });
       return right(unit);
     } catch (_) {
-      return left(Failure('Failed to add fcm token!'));
+      return left(Failure(S.current.errorFailedToAddFCMToken));
     }
   }
 
@@ -204,7 +204,7 @@ class AuthRepository {
           });
       return right(unit);
     } catch (_) {
-      return left(Failure('Failed to remove fcm token!'));
+      return left(Failure(S.current.errorFailedToRemoveFCMToken));
     }
   }
 
@@ -219,7 +219,7 @@ class AuthRepository {
 
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        return left(Failure('User not found!'));
+        return left(Failure(S.current.errorUserNotFound));
       }
 
       final userData = await getUserData(
@@ -228,7 +228,7 @@ class AuthRepository {
 
       return userData;
     } catch (_) {
-      return left(Failure('Failed to sign in!'));
+      return left(Failure(S.current.errorFailedToSignIn));
     }
   }
 }
