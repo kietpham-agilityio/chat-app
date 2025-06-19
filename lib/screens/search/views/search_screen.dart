@@ -2,6 +2,7 @@ import 'dart:developer' show log;
 
 import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
+import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/router/app_router.dart';
 import 'package:chat_app/core/widgets/divider.dart';
 import 'package:chat_app/core/widgets/list_tile.dart';
@@ -44,7 +45,7 @@ class SearchScreen extends StatelessWidget {
             },
             child: Scaffold(
               appBar: CAAppBar(
-                title: CATitleMediumText(text: 'Search'),
+                title: CATitleMediumText(text: S.of(context).generalSearch),
                 leading: CAIconButtons(
                   icon: CAAssets.arrowLeft(),
                   onPressed: () => Navigator.of(context).pop(),
@@ -77,7 +78,7 @@ class SearchScreen extends StatelessWidget {
                               },
                               autofocus: true,
                               keyboardType: TextInputType.text,
-                              hintText: 'Search',
+                              hintText: S.of(context).generalSearch,
                             ),
                           ),
                         ),
@@ -90,11 +91,17 @@ class SearchScreen extends StatelessWidget {
                         if (state.users.isEmpty) {
                           if (state.status == SearchStatus.initial ||
                               state.status == SearchStatus.success) {
-                            return const Center(
-                              child: Text('Search for users'),
+                            return Center(
+                              child: Text(
+                                S.of(context).searchDescriptionInitPage,
+                              ),
                             );
                           } else if (state.status == SearchStatus.failure) {
-                            return const Center(child: Text('No users found'));
+                            return Center(
+                              child: Text(
+                                S.of(context).searchDescriptionEmptyPage,
+                              ),
+                            );
                           }
                         }
 

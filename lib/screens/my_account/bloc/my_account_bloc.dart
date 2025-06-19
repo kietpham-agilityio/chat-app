@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/utils/validations.dart'
     show ImageFile, Email, FullName, PhoneNumber;
 import 'package:chat_app/models/models.dart' show UserModel;
@@ -148,7 +149,7 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
       }
     } catch (e) {
       log(e.toString());
-      emit(state.copyWith(errorMessage: 'Failed to pick image'));
+      emit(state.copyWith(errorMessage: S.current.errorFailedToPickImage));
     }
   }
 
@@ -158,30 +159,30 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
   ) async {
     emit(state.copyWith(status: MyAccountStatus.loading));
 
-    try {
-      final user = UserModel(
-        uid: FirebaseAuth.instance.currentUser?.uid ?? '',
-        fullName: state.fullName.value.toLowerCase(),
-        email: state.email.value,
-        phoneNumber: state.phoneNumber.value,
-      );
-      await _authRepository.updateUserData(
-        user: user,
-        avatar: state.imageFile?.value,
-      );
-      emit(
+    final user = UserModel(
+      uid: FirebaseAuth.instance.currentUser?.uid ?? '',
+      fullName: state.fullName.value.toLowerCase(),
+      email: state.email.value,
+      phoneNumber: state.phoneNumber.value,
+    );
+    final res = await _authRepository.updateUserData(
+      user: user,
+      avatar: state.imageFile?.value,
+    );
+
+    res.fold(
+      (l) => emit(
+        state.copyWith(
+          status: MyAccountStatus.failure,
+          errorMessage: l.message,
+        ),
+      ),
+      (r) => emit(
         state.copyWith(
           status: MyAccountStatus.profileUpdated,
           isValidForm: false,
         ),
-      );
-    } catch (e) {
-      emit(
-        state.copyWith(
-          errorMessage: "Failed to update user info",
-          status: MyAccountStatus.failure,
-        ),
-      );
-    }
+      ),
+    );
   }
 }

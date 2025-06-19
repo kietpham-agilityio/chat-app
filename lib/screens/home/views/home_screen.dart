@@ -3,6 +3,7 @@ import 'package:chat_app/core/extensions/string_extensions.dart';
 import 'package:chat_app/core/extensions/timestamp_extensions.dart';
 import 'package:chat_app/core/local_database/user_db_model.dart';
 import 'package:chat_app/core/notifications/notifications_service.dart';
+import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/router/app_router.dart' show AppPaths;
 import 'package:chat_app/core/widgets/widgets.dart'
     show
@@ -82,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: Scaffold(
               appBar: CAAppBar(
-                title: CATitleMediumText(text: 'Chats'),
+                title: CATitleMediumText(text: S.of(context).homeTitle),
                 leading: _Avatar(),
               ),
               body: Column(
@@ -95,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18),
                         child: CATextField(
-                          hintText: 'Search',
+                          hintText: S.of(context).generalSearch,
                           readOnly: true,
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(right: 16),
@@ -144,11 +145,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 CAAssets.logo(),
                                 SizedBox(height: 28),
                                 CAHeadlineMediumText(
-                                  text: 'Let\'s start chatting',
+                                  text: S.of(context).homeSubTitle,
                                 ),
                                 CABodyLargeText(
-                                  text:
-                                      'Type in the search bar to find and select a contact to start a new chat.',
+                                  text: S.of(context).homeDescription,
                                   textAlign: TextAlign.center,
                                 ),
                                 SizedBox(height: 100),
@@ -255,11 +255,12 @@ class _ChatListTile extends StatelessWidget {
       try {
         final otherUserId = chatRoom.participants.firstWhere(
           (id) => id != currentUserId,
-          orElse: () => 'Unknown User',
+          orElse: () => S.of(context).generalUnknownUser,
         );
-        return chatRoom.participantsName[otherUserId] ?? "Unknown User";
+        return chatRoom.participantsName[otherUserId] ??
+            S.of(context).generalUnknownUser;
       } catch (e) {
-        return "Unknown User";
+        return S.of(context).generalUnknownUser;
       }
     }
 
@@ -267,11 +268,12 @@ class _ChatListTile extends StatelessWidget {
       try {
         final otherUserId = chatRoom.participants.firstWhere(
           (id) => id != currentUserId,
-          orElse: () => 'Unknown User',
+          orElse: () => S.of(context).generalUnknownUser,
         );
-        return chatRoom.participantsAvatar[otherUserId] ?? "Unknown User";
+        return chatRoom.participantsAvatar[otherUserId] ??
+            S.of(context).generalUnknownUser;
       } catch (e) {
-        return "Unknown User";
+        return S.of(context).generalUnknownUser;
       }
     }
 

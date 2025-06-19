@@ -1,5 +1,6 @@
 import 'package:chat_app/core/extensions/string_extensions.dart';
 import 'package:chat_app/core/local_database/user_db_model.dart';
+import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/router/app_router.dart';
 import 'package:chat_app/core/widgets/circle_avatar.dart';
 import 'package:chat_app/core/widgets/list_tile.dart';
@@ -24,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
       },
       child: Scaffold(
         appBar: CAAppBar(
-          title: CATitleMediumText(text: 'Profile'),
+          title: CATitleMediumText(text: S.of(context).profileTitle),
           leading: CAIconButtons(
             icon: CAAssets.arrowLeft(),
             onPressed: () => context.pop(),
@@ -42,7 +43,7 @@ class ProfileScreen extends StatelessWidget {
               _PhoneNumber(hive),
               SizedBox(height: 24),
               CAListTile(
-                title: Text('My Account'),
+                title: Text(S.of(context).profileMyAccountBtn),
                 leading: CAAssets.user(),
                 onTap: () {
                   final user = hive.get('userBox');
@@ -58,7 +59,7 @@ class ProfileScreen extends StatelessWidget {
                 },
               ),
               CAListTile(
-                title: Text('Log Out'),
+                title: Text(S.of(context).profileLogoutBtn),
                 leading: CAAssets.logOut(),
 
                 onTap: () =>

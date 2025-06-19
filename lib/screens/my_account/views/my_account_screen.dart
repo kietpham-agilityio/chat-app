@@ -82,11 +82,13 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: CAHeadlineSmallText(text: 'Choose photo'),
+                      child: CAHeadlineSmallText(
+                        text: S.of(context).myAccountChoosePhoto,
+                      ),
                     ),
                     SizedBox(height: 16),
                     CAListTile(
-                      title: Text('Take a photo'),
+                      title: Text(S.of(context).myAccountTakeAPhotoBtn),
                       leading: CAAssets.camera(),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -97,7 +99,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                       },
                     ),
                     CAListTile(
-                      title: Text('Select from gallery'),
+                      title: Text(S.of(context).myAccountSelectFromGalleryBtn),
                       leading: CAAssets.gallery(),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -148,7 +150,10 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                 context.loaderOverlay.hide();
               }
               if (state.status == MyAccountStatus.profileUpdated) {
-                CASnackBar.success(context, message: 'Updated successfully');
+                CASnackBar.success(
+                  context,
+                  message: S.of(context).myAccountUpdateSuccess,
+                );
                 context.loaderOverlay.hide();
               }
               if (state.status == MyAccountStatus.failure &&
@@ -159,7 +164,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
             },
             child: Scaffold(
               appBar: CAAppBar(
-                title: CATitleMediumText(text: 'My Account'),
+                title: CATitleMediumText(text: S.of(context).myAccountTitle),
                 leading: CAIconButtons(
                   icon: CAAssets.arrowLeft(),
                   onPressed: () => context.pop(),
@@ -366,7 +371,7 @@ class _SubmitButton extends StatelessWidget {
           isDisabled: !isValid,
           onPressed: () =>
               context.read<MyAccountBloc>().add(UpdateUserInfoEvent()),
-          text: 'Update',
+          text: S.of(context).myAccountUpdateBtn,
         );
       },
     );

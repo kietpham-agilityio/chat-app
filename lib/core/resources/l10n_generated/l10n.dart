@@ -91,10 +91,10 @@ class S {
   }
 
   /// `Email is not found, please create an account.`
-  String get errorUserNotFound {
+  String get errorEmailNotFound {
     return Intl.message(
       'Email is not found, please create an account.',
-      name: 'errorUserNotFound',
+      name: 'errorEmailNotFound',
       desc: '',
       args: [],
     );
@@ -155,6 +155,286 @@ class S {
     return Intl.message(
       'Full name must be at least two words',
       name: 'errorInvalidFullName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to send message. Please try again.`
+  String get errorFailedToSendMessage {
+    return Intl.message(
+      'Failed to send message. Please try again.',
+      name: 'errorFailedToSendMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to create chat room. Please try again.`
+  String get errorFailedToCreateChatRoom {
+    return Intl.message(
+      'Failed to create chat room. Please try again.',
+      name: 'errorFailedToCreateChatRoom',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to load more messages. Please try again.`
+  String get errorFailedToLoadMoreMessages {
+    return Intl.message(
+      'Failed to load more messages. Please try again.',
+      name: 'errorFailedToLoadMoreMessages',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to getting am I blocked status. Please try again.`
+  String get errorFailedToGettingAmIBlocked {
+    return Intl.message(
+      'Failed to getting am I blocked status. Please try again.',
+      name: 'errorFailedToGettingAmIBlocked',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to getting is user blocked status. Please try again.`
+  String get errorFailedToGettingIsUserBlocked {
+    return Intl.message(
+      'Failed to getting is user blocked status. Please try again.',
+      name: 'errorFailedToGettingIsUserBlocked',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to pick image. Please try again.`
+  String get errorFailedToPickImage {
+    return Intl.message(
+      'Failed to pick image. Please try again.',
+      name: 'errorFailedToPickImage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to sign up. Please try again.`
+  String get errorFailedToSignUp {
+    return Intl.message(
+      'Failed to sign up. Please try again.',
+      name: 'errorFailedToSignUp',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User not found. Please try again.`
+  String get errorUserNotFound {
+    return Intl.message(
+      'User not found. Please try again.',
+      name: 'errorUserNotFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to get user data. Please try again.`
+  String get errorFailedToGetUserData {
+    return Intl.message(
+      'Failed to get user data. Please try again.',
+      name: 'errorFailedToGetUserData',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `User data not found. Please try again.`
+  String get errorUserDataNotFound {
+    return Intl.message(
+      'User data not found. Please try again.',
+      name: 'errorUserDataNotFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to update user data. Please try again.`
+  String get errorFailedToUpdateUserData {
+    return Intl.message(
+      'Failed to update user data. Please try again.',
+      name: 'errorFailedToUpdateUserData',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to sign out. Please try again.`
+  String get errorFailedToSignOut {
+    return Intl.message(
+      'Failed to sign out. Please try again.',
+      name: 'errorFailedToSignOut',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to add FCM token. Please try again.`
+  String get errorFailedToAddFCMToken {
+    return Intl.message(
+      'Failed to add FCM token. Please try again.',
+      name: 'errorFailedToAddFCMToken',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to remove FCM token. Please try again.`
+  String get errorFailedToRemoveFCMToken {
+    return Intl.message(
+      'Failed to remove FCM token. Please try again.',
+      name: 'errorFailedToRemoveFCMToken',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to sign in. Please try again.`
+  String get errorFailedToSignIn {
+    return Intl.message(
+      'Failed to sign in. Please try again.',
+      name: 'errorFailedToSignIn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to get chat rooms. Please try again.`
+  String get errorFailedToGetChatRooms {
+    return Intl.message(
+      'Failed to get chat rooms. Please try again.',
+      name: 'errorFailedToGetChatRooms',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to search users. Please try again.`
+  String get errorFailedToSearchUsers {
+    return Intl.message(
+      'Failed to search users. Please try again.',
+      name: 'errorFailedToSearchUsers',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to get messages. Please try again.`
+  String get errorFailedToGetMessages {
+    return Intl.message(
+      'Failed to get messages. Please try again.',
+      name: 'errorFailedToGetMessages',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to load user info. Please try again.`
+  String get errorFailedToLoadUserInfo {
+    return Intl.message(
+      'Failed to load user info. Please try again.',
+      name: 'errorFailedToLoadUserInfo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to mark messages as read. Please try again.`
+  String get errorFailedToMarkMessagesAsRead {
+    return Intl.message(
+      'Failed to mark messages as read. Please try again.',
+      name: 'errorFailedToMarkMessagesAsRead',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `One or both users not found. Please try again.`
+  String get errorOneOrBothUsersNotFound {
+    return Intl.message(
+      'One or both users not found. Please try again.',
+      name: 'errorOneOrBothUsersNotFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to get or create chat room. Please try again.`
+  String get errorFailedToGetOrCreateChatRoom {
+    return Intl.message(
+      'Failed to get or create chat room. Please try again.',
+      name: 'errorFailedToGetOrCreateChatRoom',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to find chat room existence. Please try again.`
+  String get errorFailedToFindChatRoomExistence {
+    return Intl.message(
+      'Failed to find chat room existence. Please try again.',
+      name: 'errorFailedToFindChatRoomExistence',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to parse user data. Please try again.`
+  String get errorFailedToParseUserData {
+    return Intl.message(
+      'Failed to parse user data. Please try again.',
+      name: 'errorFailedToParseUserData',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unexpected error checking block status. Please try again.`
+  String get errorUnexpectedErrorCheckingBlockStatus {
+    return Intl.message(
+      'Unexpected error checking block status. Please try again.',
+      name: 'errorUnexpectedErrorCheckingBlockStatus',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to check if user is blocked. Please try again.`
+  String get errorFailedToCheckIfUserIsBlocked {
+    return Intl.message(
+      'Failed to check if user is blocked. Please try again.',
+      name: 'errorFailedToCheckIfUserIsBlocked',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to block user. Please try again.`
+  String get errorFailedToBlockUser {
+    return Intl.message(
+      'Failed to block user. Please try again.',
+      name: 'errorFailedToBlockUser',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to unblock user. Please try again.`
+  String get errorFailedToUnblockUser {
+    return Intl.message(
+      'Failed to unblock user. Please try again.',
+      name: 'errorFailedToUnblockUser',
       desc: '',
       args: [],
     );
@@ -260,6 +540,26 @@ class S {
     );
   }
 
+  /// `Search`
+  String get generalSearch {
+    return Intl.message(
+      'Search',
+      name: 'generalSearch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unknown User`
+  String get generalUnknownUser {
+    return Intl.message(
+      'Unknown User',
+      name: 'generalUnknownUser',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Welcome to Chat`
   String get loginTitle {
     return Intl.message(
@@ -325,6 +625,56 @@ class S {
     return Intl.message(
       'Create an account',
       name: 'createAccountBtn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Chats`
+  String get homeTitle {
+    return Intl.message(
+      'Chats',
+      name: 'homeTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Let's start chatting`
+  String get homeSubTitle {
+    return Intl.message(
+      'Let\'s start chatting',
+      name: 'homeSubTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Type in the search bar to find and select a contact to start a new chat.`
+  String get homeDescription {
+    return Intl.message(
+      'Type in the search bar to find and select a contact to start a new chat.',
+      name: 'homeDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search for users`
+  String get searchDescriptionInitPage {
+    return Intl.message(
+      'Search for users',
+      name: 'searchDescriptionInitPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No users found`
+  String get searchDescriptionEmptyPage {
+    return Intl.message(
+      'No users found',
+      name: 'searchDescriptionEmptyPage',
       desc: '',
       args: [],
     );
@@ -425,6 +775,96 @@ class S {
     return Intl.message(
       'Start typing...',
       name: 'chatMessageTextFieldHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Profile`
+  String get profileTitle {
+    return Intl.message(
+      'Profile',
+      name: 'profileTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `My Account`
+  String get profileMyAccountBtn {
+    return Intl.message(
+      'My Account',
+      name: 'profileMyAccountBtn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Logout`
+  String get profileLogoutBtn {
+    return Intl.message(
+      'Logout',
+      name: 'profileLogoutBtn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `My Account`
+  String get myAccountTitle {
+    return Intl.message(
+      'My Account',
+      name: 'myAccountTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Update successfully`
+  String get myAccountUpdateSuccess {
+    return Intl.message(
+      'Update successfully',
+      name: 'myAccountUpdateSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose photo`
+  String get myAccountChoosePhoto {
+    return Intl.message(
+      'Choose photo',
+      name: 'myAccountChoosePhoto',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Take a photo`
+  String get myAccountTakeAPhotoBtn {
+    return Intl.message(
+      'Take a photo',
+      name: 'myAccountTakeAPhotoBtn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select from gallery`
+  String get myAccountSelectFromGalleryBtn {
+    return Intl.message(
+      'Select from gallery',
+      name: 'myAccountSelectFromGalleryBtn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Update`
+  String get myAccountUpdateBtn {
+    return Intl.message(
+      'Update',
+      name: 'myAccountUpdateBtn',
       desc: '',
       args: [],
     );

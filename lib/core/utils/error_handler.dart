@@ -27,7 +27,7 @@ class CAError implements Exception {
     return switch (e.code) {
       'user-disabled' => S.current.errorInvalidEmail,
       'email-already-in-use' => S.current.errorEmailAlreadyInUse,
-      'user-not-found' => S.current.errorUserNotFound,
+      'user-not-found' => S.current.errorEmailNotFound,
       'wrong-password' => S.current.errorWrongPassword,
       'network-request-failed' =>
         'No Internet Connection. Check your network connection and try again.',

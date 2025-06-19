@@ -15,33 +15,38 @@ class SignUpScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoaderOverlay(
-      child: Scaffold(
-        appBar: CAAppBar(
-          title: CATitleMediumText(text: S.of(context).createAccountTitle),
-          leading: CAIconButtons(
-            icon: CAAssets.arrowLeft(),
-            onPressed: () => Navigator.of(context).pop(),
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: LoaderOverlay(
+        child: Scaffold(
+          appBar: CAAppBar(
+            title: CATitleMediumText(text: S.of(context).createAccountTitle),
+            leading: CAIconButtons(
+              icon: CAAssets.arrowLeft(),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
           ),
-        ),
-        body: BlocProvider(
-          create: (_) => SignUpCubit(context.read<AuthRepository>()),
-          child: BlocListener<SignUpCubit, SignUpState>(
-            listener: (context, state) {
-              if (state.status.isFailure) {
-                CASnackBar.error(
-                  context,
-                  message: state.errorMessage ?? S.of(context).errorUnknown,
-                );
-              }
+          body: BlocProvider(
+            create: (_) => SignUpCubit(context.read<AuthRepository>()),
+            child: BlocListener<SignUpCubit, SignUpState>(
+              listener: (context, state) {
+                if (state.status.isFailure) {
+                  CASnackBar.error(
+                    context,
+                    message: state.errorMessage ?? S.of(context).errorUnknown,
+                  );
+                }
 
-              if (state.status.isInProgress) {
-                context.loaderOverlay.show();
-              } else {
-                context.loaderOverlay.hide();
-              }
-            },
-            child: _SignUpForm(),
+                if (state.status.isInProgress) {
+                  context.loaderOverlay.show();
+                } else {
+                  context.loaderOverlay.hide();
+                }
+              },
+              child: _SignUpForm(),
+            ),
           ),
         ),
       ),

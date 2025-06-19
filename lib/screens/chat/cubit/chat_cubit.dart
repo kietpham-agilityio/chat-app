@@ -2,6 +2,7 @@ import 'dart:async' show StreamSubscription;
 import 'dart:developer' show log;
 
 import 'package:chat_app/core/local_database/user_box.dart';
+import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/models/chat_message_model.dart' show ChatMessageModel;
 import 'package:chat_app/repositories/repositories.dart' show ChatRepository;
 import 'package:cloud_firestore/cloud_firestore.dart'
@@ -97,7 +98,7 @@ class ChatCubit extends Cubit<ChatState> {
       );
     } catch (e) {
       log("Failed to send message: $e");
-      emit(state.copyWith(error: "Failed to send message"));
+      emit(state.copyWith(error: S.current.errorFailedToSendMessage));
     }
   }
 
@@ -141,7 +142,7 @@ class ChatCubit extends Cubit<ChatState> {
       emit(
         state.copyWith(
           status: ChatStatus.error,
-          error: "Failed to create chat room $e",
+          error: S.current.errorFailedToCreateChatRoom,
         ),
       );
     }
@@ -218,7 +219,7 @@ class ChatCubit extends Cubit<ChatState> {
     } catch (e) {
       emit(
         state.copyWith(
-          error: "Failed to load more messages",
+          error: S.current.errorFailedToLoadMoreMessages,
           isLoadingMore: false,
         ),
       );
@@ -268,7 +269,7 @@ class ChatCubit extends Cubit<ChatState> {
                       onError: (_) {
                         emit(
                           state.copyWith(
-                            error: 'Failed getting amIBlocked status',
+                            error: S.current.errorFailedToGettingAmIBlocked,
                             status: ChatStatus.error,
                           ),
                         );
@@ -280,7 +281,7 @@ class ChatCubit extends Cubit<ChatState> {
           onError: (_) {
             emit(
               state.copyWith(
-                error: 'Failed getting isUserBlocked status',
+                error: S.current.errorFailedToGettingIsUserBlocked,
                 status: ChatStatus.error,
               ),
             );

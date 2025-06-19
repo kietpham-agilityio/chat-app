@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' show log;
 
+import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/utils/failure.dart';
 import 'package:chat_app/models/chat_message_model.dart'
     show ChatMessageModel, MessageStatus, MessageType;
@@ -43,7 +44,7 @@ class ChatRepository {
           return right<Failure, List<ChatRoomModel>>(chatRooms);
         })
         .handleError((error, stackTrace) {
-          return left(Failure('Failed to get chat rooms!'));
+          return left(Failure(S.current.errorFailedToGetChatRooms));
         });
   }
 
@@ -75,7 +76,7 @@ class ChatRepository {
 
       return right(result);
     } catch (_) {
-      return left(Failure('Failed to search user!'));
+      return left(Failure(S.current.errorFailedToSearchUsers));
     }
   }
 
@@ -105,7 +106,7 @@ class ChatRepository {
           );
         })
         .handleError((error, stackTrace) {
-          return left(Failure('Failed to get messages'));
+          return left(Failure(S.current.errorFailedToGetMessages));
         });
   }
 
@@ -119,7 +120,7 @@ class ChatRepository {
           return right<Failure, UserModel>(userData);
         })
         .handleError((error, stackTrace) {
-          return left(Failure('Failed to load user info'));
+          return left(Failure(S.current.errorFailedToLoadUserInfo));
         });
   }
 
@@ -145,7 +146,7 @@ class ChatRepository {
 
       return right(PaginatedResult(items: messages, lastDoc: lastDoc));
     } catch (_) {
-      return left(Failure('Failed to load more messages'));
+      return left(Failure(S.current.errorFailedToLoadMoreMessages));
     }
   }
 
@@ -176,7 +177,7 @@ class ChatRepository {
       return right(unit);
     } catch (e) {
       log("Error marking messages as read: $e");
-      return left(Failure("Failed to mark messages as read"));
+      return left(Failure(S.current.errorFailedToMarkMessagesAsRead));
     }
   }
 
@@ -185,10 +186,6 @@ class ChatRepository {
     String otherUserId,
   ) async {
     try {
-      if (currentUserId == otherUserId) {
-        return left(Failure("Cannot create a chat room with yourself"));
-      }
-
       final users = [currentUserId, otherUserId]..sort();
       final roomId = users.join("_");
 
@@ -211,7 +208,7 @@ class ChatRepository {
           .get();
 
       if (!currentUserSnapshot.exists || !otherUserSnapshot.exists) {
-        return left(Failure("One or both users not found"));
+        return left(Failure(S.current.errorOneOrBothUsersNotFound));
       }
 
       final currentUserData = currentUserSnapshot.data()!;
@@ -245,7 +242,7 @@ class ChatRepository {
 
       return right(newRoom);
     } catch (e) {
-      return left(Failure("Failed to get or create chat room: $e"));
+      return left(Failure(S.current.errorFailedToGetOrCreateChatRoom));
     }
   }
 
@@ -305,7 +302,7 @@ class ChatRepository {
 
       return right(false);
     } catch (e) {
-      return left(Failure('Failed to find chat room existence'));
+      return left(Failure(S.current.errorFailedToFindChatRoomExistence));
     }
   }
 
@@ -338,30 +335,25 @@ class ChatRepository {
                 final isBlocked = userData.blockedUsers.contains(otherUserId);
                 controller.add(right(isBlocked));
               } catch (e) {
-                controller.add(left(Failure('Failed to parse user data')));
+                controller.add(
+                  left(Failure(S.current.errorFailedToParseUserData)),
+                );
               }
             },
             onError: (error) {
               controller.add(
-                left(Failure('Failed to check if user is blocked')),
+                left(Failure(S.current.errorFailedToCheckIfUserIsBlocked)),
               );
             },
           );
     } catch (e) {
-      controller.add(left(Failure('Unexpected error checking block status')));
+      controller.add(
+        left(Failure(S.current.errorUnexpectedErrorCheckingBlockStatus)),
+      );
     }
 
     return controller.stream;
   }
-
-  // Stream<bool> amIBlocked(String currentUserId, String otherUserId) {
-  //   return firestore.collection("users").doc(otherUserId).snapshots().map((
-  //     doc,
-  //   ) {
-  //     final userData = UserModel.fromFirestore(doc);
-  //     return userData.blockedUsers.contains(currentUserId);
-  //   });
-  // }
 
   Stream<Either<Failure, bool>> amIBlocked(
     String currentUserId,
@@ -380,12 +372,12 @@ class ChatRepository {
           })
           .handleError((error) {
             return left<Failure, bool>(
-              Failure('Failed to check if user is blocked'),
+              Failure(S.current.errorFailedToCheckIfUserIsBlocked),
             );
           });
     } catch (e) {
       return Stream.value(
-        left(Failure('Unexpected error checking block status')),
+        left(Failure(S.current.errorUnexpectedErrorCheckingBlockStatus)),
       );
     }
   }
@@ -403,7 +395,7 @@ class ChatRepository {
           .timeout(const Duration(seconds: 5));
       return right(unit);
     } catch (e) {
-      return left(Failure('Failed to block user'));
+      return left(Failure(S.current.errorFailedToBlockUser));
     }
   }
 
@@ -420,7 +412,7 @@ class ChatRepository {
           .timeout(const Duration(seconds: 5));
       return right(unit);
     } catch (e) {
-      return left(Failure('Failed to unblock user'));
+      return left(Failure(S.current.errorFailedToUnblockUser));
     }
   }
 }
