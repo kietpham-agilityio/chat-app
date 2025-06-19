@@ -42,12 +42,10 @@ class AppRouter {
             builder: (_, state) {
               final receiverName = state.uri.queryParameters['receiverName'];
               final receiverId = state.uri.queryParameters['receiverId'];
-              final avatarUrl = state.uri.queryParameters['receiverAvatarUrl'];
 
               return ChatMessageScreen(
                 receiverId: receiverId ?? '',
                 receiverName: receiverName ?? '',
-                receiverAvatarUrl: avatarUrl ?? '',
               );
             },
           ),

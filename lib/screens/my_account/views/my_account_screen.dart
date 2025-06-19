@@ -125,105 +125,110 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LoaderOverlay(
-      child: BlocProvider(
-        create: (context) => bloc
-          ..add(
-            InitialEvent(
-              email: widget.email,
-              fullName: widget.fullName,
-              phoneNumber: widget.phoneNumber,
-              avatarUrl: widget.avatarUrl,
-            ),
-          ),
-        child: BlocListener<MyAccountBloc, MyAccountState>(
-          listener: (context, state) {
-            if (state.status == MyAccountStatus.loading) {
-              context.loaderOverlay.show();
-            } else {
-              context.loaderOverlay.hide();
-            }
-            if (state.status == MyAccountStatus.profileUpdated) {
-              CASnackBar.success(context, message: 'Updated successfully');
-              context.loaderOverlay.hide();
-            }
-            if (state.status == MyAccountStatus.failure &&
-                state.errorMessage != '') {
-              CASnackBar.error(context, message: state.errorMessage ?? '');
-              context.loaderOverlay.hide();
-            }
-          },
-          child: Scaffold(
-            appBar: CAAppBar(
-              title: CATitleMediumText(text: 'My Account'),
-              leading: CAIconButtons(
-                icon: CAAssets.arrowLeft(),
-                onPressed: () => context.pop(),
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: LoaderOverlay(
+        child: BlocProvider(
+          create: (context) => bloc
+            ..add(
+              InitialEvent(
+                email: widget.email,
+                fullName: widget.fullName,
+                phoneNumber: widget.phoneNumber,
+                avatarUrl: widget.avatarUrl,
               ),
             ),
-            body: SafeArea(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 22),
-                      Stack(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: BlocBuilder<MyAccountBloc, MyAccountState>(
-                              builder: (context, state) {
-                                if (state.imageFile != null) {
-                                  return ClipOval(
-                                    child: Image.file(
-                                      state.imageFile!.value!,
-                                      fit: BoxFit.cover,
-                                      width: 96,
-                                      height: 96,
+          child: BlocListener<MyAccountBloc, MyAccountState>(
+            listener: (context, state) {
+              if (state.status == MyAccountStatus.loading) {
+                context.loaderOverlay.show();
+              } else {
+                context.loaderOverlay.hide();
+              }
+              if (state.status == MyAccountStatus.profileUpdated) {
+                CASnackBar.success(context, message: 'Updated successfully');
+                context.loaderOverlay.hide();
+              }
+              if (state.status == MyAccountStatus.failure &&
+                  state.errorMessage != '') {
+                CASnackBar.error(context, message: state.errorMessage ?? '');
+                context.loaderOverlay.hide();
+              }
+            },
+            child: Scaffold(
+              appBar: CAAppBar(
+                title: CATitleMediumText(text: 'My Account'),
+                leading: CAIconButtons(
+                  icon: CAAssets.arrowLeft(),
+                  onPressed: () => context.pop(),
+                ),
+              ),
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 22),
+                        Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: BlocBuilder<MyAccountBloc, MyAccountState>(
+                                builder: (context, state) {
+                                  if (state.imageFile != null) {
+                                    return ClipOval(
+                                      child: Image.file(
+                                        state.imageFile!.value!,
+                                        fit: BoxFit.cover,
+                                        width: 96,
+                                        height: 96,
+                                      ),
+                                    );
+                                  }
+
+                                  return Hero(
+                                    tag: 'avatar',
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: CACircleAvatar(
+                                        url:
+                                            state.avatarUrl ??
+                                            widget.avatarUrl ??
+                                            '',
+                                        avatarSize: 96,
+                                      ),
                                     ),
                                   );
-                                }
-
-                                return Hero(
-                                  tag: 'avatar',
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: CACircleAvatar(
-                                      url:
-                                          state.avatarUrl ??
-                                          widget.avatarUrl ??
-                                          '',
-                                      avatarSize: 96,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          Positioned(
-                            right: -5,
-                            child: CAIconButtons(
-                              backgroundColor: context.colorScheme.primary,
-                              icon: CAAssets.plus(
-                                color: context.colorScheme.onPrimary,
-                              ),
-                              size: 32,
-                              onPressed: () => _showBottomSheet(
-                                context: context,
-                                bloc: bloc,
+                                },
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      _EmailInput(),
-                      _FullNameInput(),
-                      _PhoneNumberInput(),
-                      SizedBox(height: 20),
-                      _SubmitButton(),
-                    ],
+                            Positioned(
+                              right: -5,
+                              child: CAIconButtons(
+                                backgroundColor: context.colorScheme.primary,
+                                icon: CAAssets.plus(
+                                  color: context.colorScheme.onPrimary,
+                                ),
+                                size: 32,
+                                onPressed: () => _showBottomSheet(
+                                  context: context,
+                                  bloc: bloc,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        _EmailInput(),
+                        _FullNameInput(),
+                        _PhoneNumberInput(),
+                        SizedBox(height: 20),
+                        _SubmitButton(),
+                      ],
+                    ),
                   ),
                 ),
               ),

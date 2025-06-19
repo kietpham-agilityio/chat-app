@@ -31,13 +31,11 @@ class ChatMessageScreen extends StatefulWidget {
   const ChatMessageScreen({
     required this.receiverId,
     required this.receiverName,
-    this.receiverAvatarUrl,
     super.key,
   });
 
   final String receiverId;
   final String receiverName;
-  final String? receiverAvatarUrl;
 
   @override
   State<ChatMessageScreen> createState() => _ChatMessageScreenState();
@@ -58,109 +56,112 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LoaderOverlay(
-      child: BlocProvider(
-        create: (context) => _chatCubit,
-        child: BlocListener<ChatCubit, ChatState>(
-          listener: (context, state) {
-            if (state.status == ChatStatus.loading) {
-              context.loaderOverlay.show();
-            } else {
-              context.loaderOverlay.hide();
-            }
-          },
-          child: Scaffold(
-            appBar: CAAppBar(
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: LoaderOverlay(
+        child: BlocProvider(
+          create: (context) => _chatCubit,
+          child: BlocListener<ChatCubit, ChatState>(
+            listener: (context, state) {
+              if (state.status == ChatStatus.loading) {
+                context.loaderOverlay.show();
+              } else {
+                context.loaderOverlay.hide();
+              }
+            },
+            child: Scaffold(
+              appBar: CAAppBar(
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    BlocBuilder<ChatCubit, ChatState>(
+                      buildWhen: (previous, current) =>
+                          previous.receiverAvatarUrl !=
+                          current.receiverAvatarUrl,
+                      builder: (context, state) {
+                        return CACircleAvatar(
+                          url: state.receiverAvatarUrl ?? '',
+                          avatarSize: 32,
+                        );
+                      },
+                    ),
+                    BlocBuilder<ChatCubit, ChatState>(
+                      buildWhen: (previous, current) =>
+                          previous.receiverFullName != current.receiverFullName,
+                      builder: (context, state) {
+                        return CATitleMediumText(
+                          text:
+                              state.receiverFullName?.capitalizeWords() ??
+                              widget.receiverName.capitalizeWords(),
+                        );
+                      },
+                    ),
+                    SizedBox(width: 32),
+                  ],
+                ),
+                titleSpacing: 0,
+                leading: CAIconButtons(
+                  icon: CAAssets.arrowLeft(),
+                  onPressed: () => context.pop(),
+                ),
+                actions: [
                   BlocBuilder<ChatCubit, ChatState>(
-                    buildWhen: (previous, current) =>
-                        previous.receiverAvatarUrl != current.receiverAvatarUrl,
+                    bloc: _chatCubit,
                     builder: (context, state) {
-                      return CACircleAvatar(
-                        url:
-                            state.receiverAvatarUrl ??
-                            widget.receiverAvatarUrl ??
-                            '',
-                        avatarSize: 32,
+                      if (state.amIBlocked || state.isUserBlocked) {
+                        return SizedBox(width: 48);
+                      }
+
+                      return PopupMenuButton<String>(
+                        icon: CAAssets.moreHorizontal(),
+                        onSelected: (value) async {
+                          if (value == "block") {
+                            CADialogManager.showDialog(
+                              context: context,
+                              dialog: CADialog(
+                                title: S
+                                    .of(context)
+                                    .chatMessageDialogBlockUserTitle,
+                                content: S
+                                    .of(context)
+                                    .chatMessageDialogBlockUserContent(
+                                      widget.receiverName.capitalizeWords(),
+                                    ),
+                                confirmButtonTitle: S
+                                    .of(context)
+                                    .chatMessageBlockBtn,
+                                cancelButtonTitle: S
+                                    .of(context)
+                                    .chatMessageCancelBtn,
+                                onCancel: () => context.pop(),
+                                onConfirm: () {
+                                  context.pop();
+                                  _chatCubit.blockUser(widget.receiverId);
+                                },
+                              ),
+                            );
+                          }
+                        },
+                        itemBuilder: (context) => <PopupMenuEntry<String>>[
+                          PopupMenuItem(
+                            value: 'block',
+                            child: CABodyLargeText(
+                              text: S.of(context).chatMessageBlockBtn,
+                            ),
+                          ),
+                        ],
                       );
                     },
                   ),
-                  BlocBuilder<ChatCubit, ChatState>(
-                    buildWhen: (previous, current) =>
-                        previous.receiverFullName != current.receiverFullName,
-                    builder: (context, state) {
-                      return CATitleMediumText(
-                        text:
-                            state.receiverFullName?.capitalizeWords() ??
-                            widget.receiverName.capitalizeWords(),
-                      );
-                    },
-                  ),
-                  SizedBox(width: 32),
                 ],
               ),
-              titleSpacing: 0,
-              leading: CAIconButtons(
-                icon: CAAssets.arrowLeft(),
-                onPressed: () => context.pop(),
-              ),
-              actions: [
-                BlocBuilder<ChatCubit, ChatState>(
-                  bloc: _chatCubit,
-                  builder: (context, state) {
-                    if (state.amIBlocked || state.isUserBlocked) {
-                      return SizedBox(width: 48);
-                    }
-
-                    return PopupMenuButton<String>(
-                      icon: CAAssets.moreHorizontal(),
-                      onSelected: (value) async {
-                        if (value == "block") {
-                          CADialogManager.showDialog(
-                            context: context,
-                            dialog: CADialog(
-                              title: S
-                                  .of(context)
-                                  .chatMessageDialogBlockUserTitle,
-                              content: S
-                                  .of(context)
-                                  .chatMessageDialogBlockUserContent(
-                                    widget.receiverName.capitalizeWords(),
-                                  ),
-                              confirmButtonTitle: S
-                                  .of(context)
-                                  .chatMessageBlockBtn,
-                              cancelButtonTitle: S
-                                  .of(context)
-                                  .chatMessageCancelBtn,
-                              onCancel: () => context.pop(),
-                              onConfirm: () {
-                                context.pop();
-                                _chatCubit.blockUser(widget.receiverId);
-                              },
-                            ),
-                          );
-                        }
-                      },
-                      itemBuilder: (context) => <PopupMenuEntry<String>>[
-                        PopupMenuItem(
-                          value: 'block',
-                          child: CABodyLargeText(
-                            text: S.of(context).chatMessageBlockBtn,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+              body: SafeArea(
+                child: _View(
+                  receiverId: widget.receiverId,
+                  receiverName: widget.receiverName,
                 ),
-              ],
-            ),
-            body: SafeArea(
-              child: _View(
-                receiverId: widget.receiverId,
-                receiverName: widget.receiverName,
               ),
             ),
           ),
