@@ -18,49 +18,54 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hive = Hive.box<UserDBModel>('userBox');
-    return Scaffold(
-      appBar: CAAppBar(
-        title: CATitleMediumText(text: 'Profile'),
-        leading: CAIconButtons(
-          icon: CAAssets.arrowLeft(),
-          onPressed: () => context.pop(),
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        appBar: CAAppBar(
+          title: CATitleMediumText(text: 'Profile'),
+          leading: CAIconButtons(
+            icon: CAAssets.arrowLeft(),
+            onPressed: () => context.pop(),
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: 32),
-            _Avatar(hive),
-            SizedBox(height: 6),
-            _FullName(hive),
-            SizedBox(height: 18),
-            _PhoneNumber(hive),
-            SizedBox(height: 24),
-            CAListTile(
-              title: Text('My Account'),
-              leading: CAAssets.user(),
-              onTap: () {
-                final user = hive.get('userBox');
-                context.pushNamed(
-                  AppPaths.myAccount.name,
-                  queryParameters: {
-                    'email': user?.email,
-                    'fullName': user?.fullName,
-                    'phoneNumber': user?.phoneNumber,
-                    'avatarUrl': user?.avatarUrl,
-                  },
-                );
-              },
-            ),
-            CAListTile(
-              title: Text('Log Out'),
-              leading: CAAssets.logOut(),
+        body: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 32),
+              _Avatar(hive),
+              SizedBox(height: 6),
+              _FullName(hive),
+              SizedBox(height: 18),
+              _PhoneNumber(hive),
+              SizedBox(height: 24),
+              CAListTile(
+                title: Text('My Account'),
+                leading: CAAssets.user(),
+                onTap: () {
+                  final user = hive.get('userBox');
+                  context.pushNamed(
+                    AppPaths.myAccount.name,
+                    queryParameters: {
+                      'email': user?.email,
+                      'fullName': user?.fullName,
+                      'phoneNumber': user?.phoneNumber,
+                      'avatarUrl': user?.avatarUrl,
+                    },
+                  );
+                },
+              ),
+              CAListTile(
+                title: Text('Log Out'),
+                leading: CAAssets.logOut(),
 
-              onTap: () =>
-                  context.read<AuthBloc>().add(const AuthLogoutPressed()),
-            ),
-          ],
+                onTap: () =>
+                    context.read<AuthBloc>().add(const AuthLogoutPressed()),
+              ),
+            ],
+          ),
         ),
       ),
     );

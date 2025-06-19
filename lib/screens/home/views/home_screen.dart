@@ -54,141 +54,149 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LoaderOverlay(
-      child: BlocProvider(
-        create: (_) {
-          final notificationsService = context.read<NotificationsService>();
-          notificationsService.initialize(context.read<AuthRepository>());
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: LoaderOverlay(
+        child: BlocProvider(
+          create: (_) {
+            final notificationsService = context.read<NotificationsService>();
+            notificationsService.initialize(context.read<AuthRepository>());
 
-          return _cubit
-            ..initialize(FirebaseAuth.instance.currentUser?.uid ?? '');
-        },
-        child: BlocListener<HomeCubit, HomeState>(
-          listener: (context, state) {
-            if (state.status == HomeStatus.loading) {
-              context.loaderOverlay.show();
-            } else {
-              context.loaderOverlay.hide();
-            }
-
-            if (state.status == HomeStatus.failure &&
-                state.errorMessage != '') {
-              CASnackBar.error(context, message: state.errorMessage ?? '');
-            }
+            return _cubit
+              ..initialize(FirebaseAuth.instance.currentUser?.uid ?? '');
           },
-          child: Scaffold(
-            appBar: CAAppBar(
-              title: CATitleMediumText(text: 'Chats'),
-              leading: _Avatar(),
-            ),
-            body: Column(
-              children: [
-                SizedBox(height: 32),
-                Hero(
-                  tag: 'searchInputHero',
-                  child: Material(
-                    color: Colors.transparent,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      child: CATextField(
-                        hintText: 'Search',
-                        readOnly: true,
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: CAAssets.search(
-                            width: 24,
-                            height: 24,
-                            color: context.colorScheme.tertiaryFixed,
-                          ),
-                        ),
-                        ontap: () => Navigator.of(context).push(
-                          PageRouteBuilder(
-                            opaque: false,
-                            transitionDuration: const Duration(
-                              milliseconds: 300,
+          child: BlocListener<HomeCubit, HomeState>(
+            listener: (context, state) {
+              if (state.status == HomeStatus.loading) {
+                context.loaderOverlay.show();
+              } else {
+                context.loaderOverlay.hide();
+              }
+
+              if (state.status == HomeStatus.failure &&
+                  state.errorMessage != '') {
+                CASnackBar.error(context, message: state.errorMessage ?? '');
+              }
+            },
+            child: Scaffold(
+              appBar: CAAppBar(
+                title: CATitleMediumText(text: 'Chats'),
+                leading: _Avatar(),
+              ),
+              body: Column(
+                children: [
+                  SizedBox(height: 32),
+                  Hero(
+                    tag: 'searchInputHero',
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        child: CATextField(
+                          hintText: 'Search',
+                          readOnly: true,
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: CAAssets.search(
+                              width: 24,
+                              height: 24,
+                              color: context.colorScheme.tertiaryFixed,
                             ),
-                            pageBuilder: (_, __, ___) => const SearchScreen(),
-                            transitionsBuilder:
-                                (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                  child,
-                                ) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: child,
-                                  );
-                                },
+                          ),
+                          ontap: () => Navigator.of(context).push(
+                            PageRouteBuilder(
+                              opaque: false,
+                              transitionDuration: const Duration(
+                                milliseconds: 300,
+                              ),
+                              pageBuilder: (_, __, ___) => const SearchScreen(),
+                              transitionsBuilder:
+                                  (
+                                    context,
+                                    animation,
+                                    secondaryAnimation,
+                                    child,
+                                  ) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: BlocBuilder<HomeCubit, HomeState>(
-                    builder: (context, state) {
-                      if (state.status == HomeStatus.success &&
-                          state.chats.isEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              CAAssets.logo(),
-                              SizedBox(height: 28),
-                              CAHeadlineMediumText(
-                                text: 'Let\'s start chatting',
-                              ),
-                              CABodyLargeText(
-                                text:
-                                    'Type in the search bar to find and select a contact to start a new chat.',
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(height: 100),
-                            ],
-                          ),
-                        );
-                      }
-
-                      return ListView.builder(
-                        itemCount: state.chats.length,
-                        itemBuilder: (_, index) {
-                          return _ChatListTile(
-                            chatRoom: state.chats[index],
-                            currentUserId:
-                                FirebaseAuth.instance.currentUser?.uid ?? '',
-                            onTap: () {
-                              final otherUserId = state
-                                  .chats[index]
-                                  .participants
-                                  .firstWhere(
-                                    (id) =>
-                                        id !=
-                                        FirebaseAuth.instance.currentUser?.uid,
-                                  );
-                              final outherUserName =
-                                  state
-                                      .chats[index]
-                                      .participantsName[otherUserId] ??
-                                  "Unknown";
-                              context.pushNamed(
-                                AppPaths.chat.name,
-                                queryParameters: {
-                                  'receiverId': otherUserId,
-                                  'receiverName': outherUserName,
-                                },
-                              );
-                            },
+                  Expanded(
+                    child: BlocBuilder<HomeCubit, HomeState>(
+                      builder: (context, state) {
+                        if (state.status == HomeStatus.success &&
+                            state.chats.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CAAssets.logo(),
+                                SizedBox(height: 28),
+                                CAHeadlineMediumText(
+                                  text: 'Let\'s start chatting',
+                                ),
+                                CABodyLargeText(
+                                  text:
+                                      'Type in the search bar to find and select a contact to start a new chat.',
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(height: 100),
+                              ],
+                            ),
                           );
-                        },
-                      );
-                    },
+                        }
+
+                        return ListView.builder(
+                          itemCount: state.chats.length,
+                          itemBuilder: (_, index) {
+                            return _ChatListTile(
+                              chatRoom: state.chats[index],
+                              currentUserId:
+                                  FirebaseAuth.instance.currentUser?.uid ?? '',
+                              onTap: () {
+                                final otherUserId = state
+                                    .chats[index]
+                                    .participants
+                                    .firstWhere(
+                                      (id) =>
+                                          id !=
+                                          FirebaseAuth
+                                              .instance
+                                              .currentUser
+                                              ?.uid,
+                                    );
+                                final outherUserName =
+                                    state
+                                        .chats[index]
+                                        .participantsName[otherUserId] ??
+                                    "Unknown";
+                                context.pushNamed(
+                                  AppPaths.chat.name,
+                                  queryParameters: {
+                                    'receiverId': otherUserId,
+                                    'receiverName': outherUserName,
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

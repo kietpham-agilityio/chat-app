@@ -26,131 +26,135 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoaderOverlay(
-      child: BlocProvider(
-        create: (context) =>
-            SearchCubit(chatRepository: context.read<ChatRepository>()),
-        child: BlocListener<SearchCubit, SearchState>(
-          listener: (BuildContext context, SearchState state) {
-            if (state.status == SearchStatus.loading) {
-              context.loaderOverlay.show();
-            } else {
-              context.loaderOverlay.hide();
-            }
-          },
-          child: Scaffold(
-            appBar: CAAppBar(
-              title: CATitleMediumText(text: 'Search'),
-              leading: CAIconButtons(
-                icon: CAAssets.arrowLeft(),
-                onPressed: () => Navigator.of(context).pop(),
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: LoaderOverlay(
+        child: BlocProvider(
+          create: (context) =>
+              SearchCubit(chatRepository: context.read<ChatRepository>()),
+          child: BlocListener<SearchCubit, SearchState>(
+            listener: (BuildContext context, SearchState state) {
+              if (state.status == SearchStatus.loading) {
+                context.loaderOverlay.show();
+              } else {
+                context.loaderOverlay.hide();
+              }
+            },
+            child: Scaffold(
+              appBar: CAAppBar(
+                title: CATitleMediumText(text: 'Search'),
+                leading: CAIconButtons(
+                  icon: CAAssets.arrowLeft(),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
               ),
-            ),
-            body: Column(
-              children: [
-                SizedBox(height: 32),
-                BlocBuilder<SearchCubit, SearchState>(
-                  builder: (context, state) {
-                    return Hero(
-                      tag: 'searchInputHero',
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: CATextField(
-                            key: const Key('searchInput_textField'),
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.only(right: 16),
-                              child: CAAssets.search(
-                                width: 24,
-                                height: 24,
-                                color: context.colorScheme.tertiaryFixed,
+              body: Column(
+                children: [
+                  SizedBox(height: 32),
+                  BlocBuilder<SearchCubit, SearchState>(
+                    builder: (context, state) {
+                      return Hero(
+                        tag: 'searchInputHero',
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: CATextField(
+                              key: const Key('searchInput_textField'),
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.only(right: 16),
+                                child: CAAssets.search(
+                                  width: 24,
+                                  height: 24,
+                                  color: context.colorScheme.tertiaryFixed,
+                                ),
                               ),
+                              onSubmitted: (value) {
+                                log("search value: $value");
+                                context.read<SearchCubit>().searchUser(value);
+                              },
+                              autofocus: true,
+                              keyboardType: TextInputType.text,
+                              hintText: 'Search',
                             ),
-                            onSubmitted: (value) {
-                              log("search value: $value");
-                              context.read<SearchCubit>().searchUser(value);
-                            },
-                            autofocus: true,
-                            keyboardType: TextInputType.text,
-                            hintText: 'Search',
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-                Expanded(
-                  child: BlocBuilder<SearchCubit, SearchState>(
-                    builder: (context, state) {
-                      if (state.users.isEmpty) {
-                        if (state.status == SearchStatus.initial ||
-                            state.status == SearchStatus.success) {
-                          return const Center(child: Text('Search for users'));
-                        } else if (state.status == SearchStatus.failure) {
-                          return const Center(child: Text('No users found'));
-                        }
-                      }
-
-                      return ListView.separated(
-                        itemCount: state.users.length,
-                        separatorBuilder: (context, index) => const CADivider(),
-                        itemBuilder: (_, index) {
-                          if (index == state.users.length - 1) {
-                            return Column(
-                              children: [
-                                CAListTile(
-                                  title: Text(
-                                    state.users[index].fullName
-                                        .capitalizeWords(),
-                                  ),
-                                  leading: CACircleAvatar(
-                                    url: state.users[index].avatarUrl ?? '',
-                                    avatarSize: 32,
-                                  ),
-                                  onTap: () {
-                                    context.pushNamed(
-                                      AppPaths.chat.name,
-                                      queryParameters: {
-                                        'receiverId': state.users[index].uid,
-                                        'receiverName':
-                                            state.users[index].fullName,
-                                        'receiverAvatarUrl':
-                                            state.users[index].avatarUrl,
-                                      },
-                                    );
-                                  },
-                                ),
-                                CADivider(),
-                              ],
-                            );
-                          }
-                          return CAListTile(
-                            title: Text(
-                              state.users[index].fullName.capitalizeWords(),
-                            ),
-                            leading: CACircleAvatar(
-                              url: state.users[index].avatarUrl ?? '',
-                              avatarSize: 32,
-                            ),
-                            onTap: () {
-                              context.pushNamed(
-                                AppPaths.chat.name,
-                                queryParameters: {
-                                  'receiverId': state.users[index].uid,
-                                  'receiverName': state.users[index].fullName,
-                                  'receiverAvatarUrl':
-                                      state.users[index].avatarUrl,
-                                },
-                              );
-                            },
-                          );
-                        },
                       );
                     },
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: BlocBuilder<SearchCubit, SearchState>(
+                      builder: (context, state) {
+                        if (state.users.isEmpty) {
+                          if (state.status == SearchStatus.initial ||
+                              state.status == SearchStatus.success) {
+                            return const Center(
+                              child: Text('Search for users'),
+                            );
+                          } else if (state.status == SearchStatus.failure) {
+                            return const Center(child: Text('No users found'));
+                          }
+                        }
+
+                        return ListView.separated(
+                          itemCount: state.users.length,
+                          separatorBuilder: (context, index) =>
+                              const CADivider(),
+                          itemBuilder: (_, index) {
+                            if (index == state.users.length - 1) {
+                              return Column(
+                                children: [
+                                  CAListTile(
+                                    title: Text(
+                                      state.users[index].fullName
+                                          .capitalizeWords(),
+                                    ),
+                                    leading: CACircleAvatar(
+                                      url: state.users[index].avatarUrl ?? '',
+                                      avatarSize: 32,
+                                    ),
+                                    onTap: () {
+                                      context.pushNamed(
+                                        AppPaths.chat.name,
+                                        queryParameters: {
+                                          'receiverId': state.users[index].uid,
+                                          'receiverName':
+                                              state.users[index].fullName,
+                                        },
+                                      );
+                                    },
+                                  ),
+                                  CADivider(),
+                                ],
+                              );
+                            }
+                            return CAListTile(
+                              title: Text(
+                                state.users[index].fullName.capitalizeWords(),
+                              ),
+                              leading: CACircleAvatar(
+                                url: state.users[index].avatarUrl ?? '',
+                                avatarSize: 32,
+                              ),
+                              onTap: () {
+                                context.pushNamed(
+                                  AppPaths.chat.name,
+                                  queryParameters: {
+                                    'receiverId': state.users[index].uid,
+                                    'receiverName': state.users[index].fullName,
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

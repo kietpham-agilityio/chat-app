@@ -200,24 +200,24 @@ class CATheme {
     suffixIconConstraints: const BoxConstraints(minWidth: 24, minHeight: 24),
 
     border: const OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(8)),
+      borderRadius: BorderRadius.all(Radius.circular(12)),
     ),
     enabledBorder: OutlineInputBorder(
       borderSide: BorderSide(color: CAPalette.grey[3]!),
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      borderRadius: const BorderRadius.all(Radius.circular(12)),
     ),
     focusedBorder: OutlineInputBorder(
       borderSide: BorderSide(color: CAPalette.grey[3]!),
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      borderRadius: const BorderRadius.all(Radius.circular(12)),
     ),
     floatingLabelBehavior: FloatingLabelBehavior.never,
     errorBorder: OutlineInputBorder(
       borderSide: BorderSide(color: CAPalette.error, width: 2),
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      borderRadius: const BorderRadius.all(Radius.circular(12)),
     ),
     focusedErrorBorder: OutlineInputBorder(
       borderSide: BorderSide(color: CAPalette.error, width: 2),
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      borderRadius: const BorderRadius.all(Radius.circular(12)),
     ),
     hintStyle: TextStyle(
       fontFamily: CATypography.fontSFProText,

@@ -1,8 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/resources/assets_generated/assets.gen.dart';
 import 'package:flutter/material.dart';
-
-import 'assets.dart' show CAAssets, CACachedNetworkImage;
+import 'package:flutter_svg/svg.dart';
 
 /// A [CircleAvatar] widget that loads its image from a network URL.
 ///
@@ -29,15 +29,20 @@ class CACircleAvatar extends StatelessWidget {
         height: avatarSize,
         width: avatarSize,
         child: CircleAvatar(
+          radius: avatarSize / 2,
           backgroundColor: context.colorScheme.tertiary,
-          backgroundImage: AssetImage(Assets.icons.icUser.path),
           child: ClipOval(
-            child: CACachedNetworkImage(
+            child: CachedNetworkImage(
+              imageUrl: url,
               width: avatarSize,
               height: avatarSize,
-              url: url,
-              boxFit: BoxFit.cover,
-              errorBuilder: CAAssets.user(),
+              fit: BoxFit.cover,
+              errorWidget: (context, url, error) => SvgPicture.asset(
+                Assets.icons.icUser.path,
+                width: avatarSize,
+                height: avatarSize,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),

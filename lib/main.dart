@@ -26,23 +26,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      child: AppProvider(
-        child: MaterialApp.router(
-          theme: CATheme.light,
-          debugShowCheckedModeBanner: false,
-          routerConfig: AppRouter.router,
-          locale: const Locale('en', 'US'),
+    return AppProvider(
+      child: MaterialApp.router(
+        theme: CATheme.light,
+        debugShowCheckedModeBanner: false,
+        routerConfig: AppRouter.router,
+        locale: const Locale('en', 'US'),
 
-          localizationsDelegates: const [S.delegate],
-          supportedLocales: [
-            ...S.delegate.supportedLocales,
-            const Locale('en', ''),
-          ],
-        ),
+        localizationsDelegates: const [S.delegate],
+        supportedLocales: [
+          ...S.delegate.supportedLocales,
+          const Locale('en', ''),
+        ],
       ),
     );
   }
