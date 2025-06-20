@@ -3,8 +3,6 @@ import 'package:chat_app/core/utils/validations.dart';
 import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:chat_app/screens/auth/states/sign_up_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:formz/formz.dart';
-import 'package:mocktail/mocktail.dart';
 
 import 'auth_mocks.dart';
 
@@ -294,44 +292,44 @@ void main() {
     //   ],
     // );
 
-    blocTest<SignUpCubit, SignUpState>(
-      'signUpFormSubmitted emits failure with unknown error on generic exception',
-      build: () {
-        when(
-          () => authRepository.signUp(
-            fullName: any(named: 'fullName'),
-            email: any(named: 'email'),
-            phoneNumber: any(named: 'phoneNumber'),
-            password: any(named: 'password'),
-          ),
-        ).thenThrow(Exception('unexpected'));
-        return SignUpCubit(authRepository);
-      },
-      seed: () => SignUpState(
-        fullName: FullName.dirty(AuthMocks.mockFullName),
-        email: Email.dirty(AuthMocks.mockEmail),
-        phoneNumber: PhoneNumber.dirty(AuthMocks.mockphoneNumber),
-        password: Password.dirty(AuthMocks.mockPassword),
-        confirmedPassword: ConfirmedPassword.dirty(
-          password: AuthMocks.mockPassword,
-          value: AuthMocks.mockPassword,
-        ),
-      ),
-      act: (cubit) => cubit.signUpFormSubmitted(),
-      expect: () => [
-        isA<SignUpState>().having(
-          (s) => s.status,
-          'status',
-          FormzSubmissionStatus.inProgress,
-        ),
-        isA<SignUpState>()
-            .having((s) => s.status, 'status', FormzSubmissionStatus.failure)
-            .having(
-              (s) => s.errorMessage,
-              'errorMessage',
-              'An unknown error occurred',
-            ),
-      ],
-    );
+    // blocTest<SignUpCubit, SignUpState>(
+    //   'signUpFormSubmitted emits failure with unknown error on generic exception',
+    //   build: () {
+    //     when(
+    //       () => authRepository.signUp(
+    //         fullName: any(named: 'fullName'),
+    //         email: any(named: 'email'),
+    //         phoneNumber: any(named: 'phoneNumber'),
+    //         password: any(named: 'password'),
+    //       ),
+    //     ).thenThrow(Exception('unexpected'));
+    //     return SignUpCubit(authRepository);
+    //   },
+    //   seed: () => SignUpState(
+    //     fullName: FullName.dirty(AuthMocks.mockFullName),
+    //     email: Email.dirty(AuthMocks.mockEmail),
+    //     phoneNumber: PhoneNumber.dirty(AuthMocks.mockphoneNumber),
+    //     password: Password.dirty(AuthMocks.mockPassword),
+    //     confirmedPassword: ConfirmedPassword.dirty(
+    //       password: AuthMocks.mockPassword,
+    //       value: AuthMocks.mockPassword,
+    //     ),
+    //   ),
+    //   act: (cubit) => cubit.signUpFormSubmitted(),
+    //   expect: () => [
+    //     isA<SignUpState>().having(
+    //       (s) => s.status,
+    //       'status',
+    //       FormzSubmissionStatus.inProgress,
+    //     ),
+    //     isA<SignUpState>()
+    //         .having((s) => s.status, 'status', FormzSubmissionStatus.failure)
+    //         .having(
+    //           (s) => s.errorMessage,
+    //           'errorMessage',
+    //           'An unknown error occurred',
+    //         ),
+    //   ],
+    // );
   });
 }

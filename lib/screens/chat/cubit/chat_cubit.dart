@@ -1,5 +1,6 @@
 import 'dart:async' show StreamSubscription;
 import 'dart:developer' show log;
+import 'dart:io';
 
 import 'package:chat_app/core/local_database/user_box.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
@@ -103,6 +104,9 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   Future<void> enterChat(String receiverId) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       final isExisting = await checkExistingChatRoom(receiverId);
 
@@ -142,7 +146,7 @@ class ChatCubit extends Cubit<ChatState> {
       emit(
         state.copyWith(
           status: ChatStatus.error,
-          error: S.current.errorFailedToCreateChatRoom,
+          error: current.errorFailedToCreateChatRoom,
         ),
       );
     }
@@ -170,6 +174,10 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   Future<void> loadMoreMessages() async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
+
     if (state.status != ChatStatus.loaded ||
         state.messages.isEmpty ||
         !state.hasMoreMessages ||
@@ -219,7 +227,7 @@ class ChatCubit extends Cubit<ChatState> {
     } catch (e) {
       emit(
         state.copyWith(
-          error: S.current.errorFailedToLoadMoreMessages,
+          error: current.errorFailedToLoadMoreMessages,
           isLoadingMore: false,
         ),
       );

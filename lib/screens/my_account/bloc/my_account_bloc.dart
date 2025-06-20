@@ -17,9 +17,12 @@ part 'my_account_event.dart';
 part 'my_account_state.dart';
 
 class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
-  MyAccountBloc({required AuthRepository authRepository})
-    : _authRepository = authRepository,
-      super(const MyAccountState()) {
+  MyAccountBloc({
+    required AuthRepository authRepository,
+    FirebaseAuth? firebaseAuth,
+  }) : _authRepository = authRepository,
+       _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       super(const MyAccountState()) {
     on<InitialEvent>(_onInitial);
     on<FullNameChangedEvent>(_onFullNameChanged);
     on<FullNameValidationEvent>(_onFullNameValidation);
@@ -30,6 +33,7 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
   }
 
   final AuthRepository _authRepository;
+  final FirebaseAuth _firebaseAuth;
 
   Future<void> _onInitial(
     InitialEvent event,
@@ -160,7 +164,7 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     emit(state.copyWith(status: MyAccountStatus.loading));
 
     final user = UserModel(
-      uid: FirebaseAuth.instance.currentUser?.uid ?? '',
+      uid: _firebaseAuth.currentUser?.uid ?? '',
       fullName: state.fullName.value.toLowerCase(),
       email: state.email.value,
       phoneNumber: state.phoneNumber.value,

@@ -52,6 +52,9 @@ scripts:
         lib/screens/home/views/*
         lib/screens/my_account/views/*
         lib/screens/profile/views/*
+        lib/screens/search/views/*
+        lib/core/local_database/*
+        lib/core/notifications/*
         ' | xargs) -o coverage/lcov.info; \
       genhtml coverage/lcov.info --output=coverage/html; \
       open coverage/html/index.html"

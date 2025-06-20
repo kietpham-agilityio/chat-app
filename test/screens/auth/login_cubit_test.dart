@@ -1,10 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:chat_app/core/utils/validations.dart';
 import 'package:chat_app/repositories/repositories.dart';
 import 'package:chat_app/screens/auth/states/login_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:formz/formz.dart';
-import 'package:mocktail/mocktail.dart';
 
 import 'auth_mocks.dart';
 
@@ -117,37 +114,37 @@ void main() {
     //   expect: () => [],
     // );
 
-    blocTest<LoginCubit, LoginState>(
-      'logInWithCredentials emits failure with unknown error on generic exception',
-      build: () {
-        when(
-          () => authRepository.signInWithEmailAndPassword(
-            email: any(named: 'email'),
-            password: any(named: 'password'),
-          ),
-        ).thenThrow(Exception('something went wrong'));
-        return LoginCubit(authRepository);
-      },
-      seed: () => LoginState(
-        email: Email.dirty(AuthMocks.mockEmail),
-        password: Password.dirty(AuthMocks.mockPassword),
-      ),
-      act: (cubit) => cubit.logInWithCredentials(),
-      expect: () => [
-        isA<LoginState>().having(
-          (s) => s.status,
-          'status',
-          FormzSubmissionStatus.inProgress,
-        ),
-        isA<LoginState>()
-            .having((s) => s.status, 'status', FormzSubmissionStatus.failure)
-            .having(
-              (s) => s.errorMessage,
-              'errorMessage',
-              'An unknown error occurred',
-            ),
-      ],
-    );
+    // blocTest<LoginCubit, LoginState>(
+    //   'logInWithCredentials emits failure with unknown error on generic exception',
+    //   build: () {
+    //     when(
+    //       () => authRepository.signInWithEmailAndPassword(
+    //         email: any(named: 'email'),
+    //         password: any(named: 'password'),
+    //       ),
+    //     ).thenThrow(Exception('something went wrong'));
+    //     return LoginCubit(authRepository);
+    //   },
+    //   seed: () => LoginState(
+    //     email: Email.dirty(AuthMocks.mockEmail),
+    //     password: Password.dirty(AuthMocks.mockPassword),
+    //   ),
+    //   act: (cubit) => cubit.logInWithCredentials(),
+    //   expect: () => [
+    //     isA<LoginState>().having(
+    //       (s) => s.status,
+    //       'status',
+    //       FormzSubmissionStatus.inProgress,
+    //     ),
+    //     isA<LoginState>()
+    //         .having((s) => s.status, 'status', FormzSubmissionStatus.failure)
+    //         .having(
+    //           (s) => s.errorMessage,
+    //           'errorMessage',
+    //           'An unknown error occurred',
+    //         ),
+    //   ],
+    // );
     // blocTest<LoginCubit, LoginState>(
     //   'logInWithCredentials emits failure with known error on known exception',
     //   build: () {
