@@ -174,9 +174,13 @@ class _CATextFieldState extends State<CATextField> {
               children: [
                 CAAssets.error(),
                 SizedBox(width: 8),
-                CABodyMediumText(
-                  text: widget.errorMessage!,
-                  color: context.colorScheme.error,
+                Expanded(
+                  child: CABodyMediumText(
+                    text: widget.errorMessage!,
+                    color: context.colorScheme.error,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ),
               ],
             ),
