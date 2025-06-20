@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer' show log;
+import 'dart:io';
 
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/utils/failure.dart';
@@ -31,6 +32,9 @@ class ChatRepository {
   }
 
   Stream<Either<Failure, List<ChatRoomModel>>> getChatRooms(String userId) {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     return firestore
         .collection('chatRooms')
         .where('participants', arrayContains: userId)
@@ -44,7 +48,7 @@ class ChatRepository {
           return right<Failure, List<ChatRoomModel>>(chatRooms);
         })
         .handleError((error, stackTrace) {
-          return left(Failure(S.current.errorFailedToGetChatRooms));
+          return left(Failure(current.errorFailedToGetChatRooms));
         });
   }
 
@@ -53,8 +57,11 @@ class ChatRepository {
     DocumentSnapshot? lastDoc,
     int limit = 20,
   }) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
-      Query query = FirebaseFirestore.instance
+      Query query = firestore
           .collection('users')
           .where('fullName', isGreaterThanOrEqualTo: searchText)
           .where('fullName', isLessThanOrEqualTo: '$searchText\uf8ff')
@@ -75,8 +82,8 @@ class ChatRepository {
       final result = PaginatedResult(items: users, lastDoc: lastDoc);
 
       return right(result);
-    } catch (_) {
-      return left(Failure(S.current.errorFailedToSearchUsers));
+    } catch (e) {
+      return left(Failure(current.errorFailedToSearchUsers));
     }
   }
 
@@ -84,6 +91,9 @@ class ChatRepository {
     String chatRoomId, {
     DocumentSnapshot? lastDocument,
   }) {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     var query = getChatRoomMessages(
       chatRoomId,
     ).orderBy('timestamp', descending: true).limit(20);
@@ -106,11 +116,14 @@ class ChatRepository {
           );
         })
         .handleError((error, stackTrace) {
-          return left(Failure(S.current.errorFailedToGetMessages));
+          return left(Failure(current.errorFailedToGetMessages));
         });
   }
 
   Stream<Either<Failure, UserModel>> getUserInfo(String userId) {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     return firestore
         .collection("users")
         .doc(userId)
@@ -120,7 +133,7 @@ class ChatRepository {
           return right<Failure, UserModel>(userData);
         })
         .handleError((error, stackTrace) {
-          return left(Failure(S.current.errorFailedToLoadUserInfo));
+          return left(Failure(current.errorFailedToLoadUserInfo));
         });
   }
 
@@ -128,6 +141,9 @@ class ChatRepository {
     String chatRoomId, {
     required DocumentSnapshot lastDocument,
   }) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       final query = getChatRoomMessages(chatRoomId)
           .orderBy('timestamp', descending: true)
@@ -146,7 +162,7 @@ class ChatRepository {
 
       return right(PaginatedResult(items: messages, lastDoc: lastDoc));
     } catch (_) {
-      return left(Failure(S.current.errorFailedToLoadMoreMessages));
+      return left(Failure(current.errorFailedToLoadMoreMessages));
     }
   }
 
@@ -154,6 +170,9 @@ class ChatRepository {
     String chatRoomId,
     String userId,
   ) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       final batch = firestore.batch();
 
@@ -177,7 +196,7 @@ class ChatRepository {
       return right(unit);
     } catch (e) {
       log("Error marking messages as read: $e");
-      return left(Failure(S.current.errorFailedToMarkMessagesAsRead));
+      return left(Failure(current.errorFailedToMarkMessagesAsRead));
     }
   }
 
@@ -185,6 +204,9 @@ class ChatRepository {
     String currentUserId,
     String otherUserId,
   ) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       final users = [currentUserId, otherUserId]..sort();
       final roomId = users.join("_");
@@ -208,7 +230,7 @@ class ChatRepository {
           .get();
 
       if (!currentUserSnapshot.exists || !otherUserSnapshot.exists) {
-        return left(Failure(S.current.errorOneOrBothUsersNotFound));
+        return left(Failure(current.errorOneOrBothUsersNotFound));
       }
 
       final currentUserData = currentUserSnapshot.data()!;
@@ -242,7 +264,7 @@ class ChatRepository {
 
       return right(newRoom);
     } catch (e) {
-      return left(Failure(S.current.errorFailedToGetOrCreateChatRoom));
+      return left(Failure(current.errorFailedToGetOrCreateChatRoom));
     }
   }
 
@@ -290,8 +312,11 @@ class ChatRepository {
   Future<Either<Failure, bool>> findExistingChatRoom(
     List<String> docIds,
   ) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
-      final collection = FirebaseFirestore.instance.collection('chatRooms');
+      final collection = firestore.collection('chatRooms');
 
       for (final id in docIds) {
         final docSnapshot = await collection.doc(id).get();
@@ -302,7 +327,7 @@ class ChatRepository {
 
       return right(false);
     } catch (e) {
-      return left(Failure(S.current.errorFailedToFindChatRoomExistence));
+      return left(Failure(current.errorFailedToFindChatRoomExistence));
     }
   }
 
@@ -320,6 +345,9 @@ class ChatRepository {
     String currentUserId,
     String otherUserId,
   ) {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     final controller = StreamController<Either<Failure, bool>>();
 
     try {
@@ -336,19 +364,19 @@ class ChatRepository {
                 controller.add(right(isBlocked));
               } catch (e) {
                 controller.add(
-                  left(Failure(S.current.errorFailedToParseUserData)),
+                  left(Failure(current.errorFailedToParseUserData)),
                 );
               }
             },
             onError: (error) {
               controller.add(
-                left(Failure(S.current.errorFailedToCheckIfUserIsBlocked)),
+                left(Failure(current.errorFailedToCheckIfUserIsBlocked)),
               );
             },
           );
     } catch (e) {
       controller.add(
-        left(Failure(S.current.errorUnexpectedErrorCheckingBlockStatus)),
+        left(Failure(current.errorUnexpectedErrorCheckingBlockStatus)),
       );
     }
 
@@ -359,6 +387,9 @@ class ChatRepository {
     String currentUserId,
     String otherUserId,
   ) {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       return firestore
           .collection("users")
@@ -372,12 +403,12 @@ class ChatRepository {
           })
           .handleError((error) {
             return left<Failure, bool>(
-              Failure(S.current.errorFailedToCheckIfUserIsBlocked),
+              Failure(current.errorFailedToCheckIfUserIsBlocked),
             );
           });
     } catch (e) {
       return Stream.value(
-        left(Failure(S.current.errorUnexpectedErrorCheckingBlockStatus)),
+        left(Failure(current.errorUnexpectedErrorCheckingBlockStatus)),
       );
     }
   }
@@ -386,6 +417,9 @@ class ChatRepository {
     String currentUserId,
     String blockedUserId,
   ) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       final userRef = firestore.collection("users").doc(currentUserId);
       await userRef
@@ -395,7 +429,7 @@ class ChatRepository {
           .timeout(const Duration(seconds: 5));
       return right(unit);
     } catch (e) {
-      return left(Failure(S.current.errorFailedToBlockUser));
+      return left(Failure(current.errorFailedToBlockUser));
     }
   }
 
@@ -403,6 +437,9 @@ class ChatRepository {
     String currentUserId,
     String blockedUserId,
   ) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       final userRef = firestore.collection("users").doc(currentUserId);
       await userRef
@@ -412,7 +449,7 @@ class ChatRepository {
           .timeout(const Duration(seconds: 5));
       return right(unit);
     } catch (e) {
-      return left(Failure(S.current.errorFailedToUnblockUser));
+      return left(Failure(current.errorFailedToUnblockUser));
     }
   }
 }
