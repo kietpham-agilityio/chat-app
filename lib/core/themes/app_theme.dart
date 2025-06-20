@@ -177,6 +177,7 @@ class CATheme {
   static final _appBarTheme = AppBarTheme(
     elevation: 0,
     scrolledUnderElevation: 0,
+    centerTitle: true,
     foregroundColor: CAPalette.grey[6],
     titleTextStyle: TextStyle(
       fontFamily: CATypography.fontSFProText,
