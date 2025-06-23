@@ -61,12 +61,14 @@ class AppRouter {
                   final avatarUrl = state.uri.queryParameters['avatarUrl'];
                   final email = state.uri.queryParameters['email'];
                   final fullName = state.uri.queryParameters['fullName'];
+                  final country = state.uri.queryParameters['country'];
                   final phoneNumber = state.uri.queryParameters['phoneNumber'];
 
                   return MyAccountScreen(
                     avatarUrl: avatarUrl ?? '',
                     email: email ?? '',
                     fullName: fullName ?? '',
+                    country: country ?? '',
                     phoneNumber: phoneNumber ?? '',
                   );
                 },

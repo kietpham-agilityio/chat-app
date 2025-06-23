@@ -540,6 +540,16 @@ class S {
     );
   }
 
+  /// `Country`
+  String get generalCountry {
+    return Intl.message(
+      'Country',
+      name: 'generalCountry',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Search`
   String get generalSearch {
     return Intl.message(

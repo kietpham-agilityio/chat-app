@@ -17,7 +17,8 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAListTile,
         CATextField,
         CATitleMediumText,
-        CASnackBar;
+        CASnackBar,
+        CAIconButtons;
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
 import 'package:chat_app/repositories/repositories.dart'
     show AuthRepository, ChatRepository;
@@ -85,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
               appBar: CAAppBar(
                 title: CATitleMediumText(text: S.of(context).homeTitle),
                 leading: _Avatar(),
+                actions: [CAIconButtons(icon: CAAssets.plus())],
               ),
               body: Column(
                 children: [

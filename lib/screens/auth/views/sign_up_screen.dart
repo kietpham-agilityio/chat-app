@@ -5,7 +5,6 @@ import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
 import 'package:chat_app/screens/auth/states/sign_up_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:formz/formz.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 part 'sign_up_form.dart';
@@ -34,14 +33,14 @@ class SignUpScreen extends StatelessWidget {
             create: (_) => SignUpCubit(context.read<AuthRepository>()),
             child: BlocListener<SignUpCubit, SignUpState>(
               listener: (context, state) {
-                if (state.status.isFailure) {
+                if (state.status == SignUpStatus.failure) {
                   CASnackBar.error(
                     context,
                     message: state.errorMessage ?? S.of(context).errorUnknown,
                   );
                 }
 
-                if (state.status.isInProgress) {
+                if (state.status == SignUpStatus.loading) {
                   context.loaderOverlay.show();
                 } else {
                   context.loaderOverlay.hide();

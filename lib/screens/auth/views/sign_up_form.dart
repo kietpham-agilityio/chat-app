@@ -11,32 +11,60 @@ class _SignUpForm extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              CAAssets.logo(),
-              SizedBox(height: 28),
-
-              CAHeadlineSmallText(text: S.of(context).createAccountSubTitle),
-              SizedBox(height: 28),
+              CountryDropdown(),
+              const SizedBox(height: 4),
 
               _FullNameInput(),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
 
               _PhoneNumberInput(),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
 
               _EmailInput(),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
 
               _PasswordInput(),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
 
               _ConfirmedPasswordInput(),
-              SizedBox(height: 28),
+              const SizedBox(height: 28),
 
               _CreateAccountBtn(),
+              const SizedBox(height: 28),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class CountryDropdown extends StatelessWidget {
+  const CountryDropdown({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final TextEditingController countryController = TextEditingController();
+    final focusNode = FocusNode();
+
+    return BlocBuilder<SignUpCubit, SignUpState>(
+      builder: (context, state) {
+        return CustomDropdownSuggestion(
+          label: Text(
+            S.of(context).generalCountry,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          items: state.countries,
+          textController: countryController,
+          onChanged: context.read<SignUpCubit>().onCountryChanged,
+          focusNode: focusNode,
+          isLoading: state.status == SignUpStatus.countriesFetching,
+          onTapped: state.countries.isEmpty
+              ? () => context.read<SignUpCubit>().onFetchCountries()
+              : null,
+          errorMessage: state.country.displayError,
+        );
+      },
     );
   }
 }

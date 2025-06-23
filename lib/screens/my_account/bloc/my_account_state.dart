@@ -5,6 +5,8 @@ class MyAccountState extends Equatable {
     this.fullName = const FullName.pure(),
     this.email = const Email.pure(),
     this.phoneNumber = const PhoneNumber.pure(),
+    this.country = const CountryInput.pure(),
+    this.countries = const [],
     this.isValidForm = false,
     this.status = MyAccountStatus.initial,
     this.imageFile,
@@ -15,6 +17,8 @@ class MyAccountState extends Equatable {
   final FullName fullName;
   final Email email;
   final PhoneNumber phoneNumber;
+  final CountryInput country;
+  final List<String> countries;
   final bool isValidForm;
   final MyAccountStatus status;
   final ImageFile? imageFile;
@@ -25,6 +29,8 @@ class MyAccountState extends Equatable {
     FullName? fullName,
     Email? email,
     PhoneNumber? phoneNumber,
+    CountryInput? country,
+    List<String>? countries,
     bool? isValidForm,
     MyAccountStatus? status,
     ImageFile? imageFile,
@@ -35,6 +41,8 @@ class MyAccountState extends Equatable {
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      country: country ?? this.country,
+      countries: countries ?? this.countries,
       isValidForm: isValidForm ?? this.isValidForm,
       status: status ?? this.status,
       imageFile: imageFile ?? this.imageFile,
@@ -48,6 +56,8 @@ class MyAccountState extends Equatable {
     fullName,
     email,
     phoneNumber,
+    country,
+    countries,
     isValidForm,
     status,
     imageFile,
@@ -56,4 +66,11 @@ class MyAccountState extends Equatable {
   ];
 }
 
-enum MyAccountStatus { initial, loading, success, failure, profileUpdated }
+enum MyAccountStatus {
+  initial,
+  loading,
+  success,
+  failure,
+  profileUpdated,
+  countriesFetching,
+}

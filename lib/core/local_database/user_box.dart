@@ -9,6 +9,7 @@ abstract class UserBox {
     String? email,
     String? phoneNumber,
     String? avatarUrl,
+    String? country,
     String? fcmToken,
   });
   Future<void> deleteUser();
@@ -39,6 +40,7 @@ class UserBoxImpl implements UserBox {
     String? email,
     String? phoneNumber,
     String? avatarUrl,
+    String? country,
     String? fcmToken,
   }) async {
     final userBox = Hive.box<UserDBModel>('userBox');
@@ -63,6 +65,11 @@ class UserBoxImpl implements UserBox {
 
     if (phoneNumber != null && phoneNumber != user.phoneNumber) {
       user.phoneNumber = phoneNumber;
+      hasChanged = true;
+    }
+
+    if (country != null && country != user.country) {
+      user.country = country;
       hasChanged = true;
     }
 

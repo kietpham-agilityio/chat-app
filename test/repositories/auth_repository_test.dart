@@ -79,6 +79,7 @@ void main() {
         fullName: 'John Doe',
         email: 'john@example.com',
         phoneNumber: '0123456789',
+        country: 'USA',
         password: 'password123',
       );
 
@@ -100,6 +101,7 @@ void main() {
         fullName: 'John Doe',
         email: 'john@example.com',
         phoneNumber: '0123456789',
+        country: 'USA',
         password: 'password123',
       );
 
@@ -118,6 +120,7 @@ void main() {
         fullName: 'John Doe',
         email: 'john@example.com',
         phoneNumber: '0123456789',
+        country: 'USA',
         password: 'password123',
       );
 

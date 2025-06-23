@@ -56,6 +56,7 @@ class ProfileScreen extends StatelessWidget {
                       'email': user?.email,
                       'fullName': user?.fullName,
                       'phoneNumber': user?.phoneNumber,
+                      'country': user?.country,
                       'avatarUrl': user?.avatarUrl,
                     },
                   );
