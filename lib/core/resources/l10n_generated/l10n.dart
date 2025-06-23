@@ -110,10 +110,10 @@ class S {
     );
   }
 
-  /// `Invalid email format. Example: email@domain`
+  /// `Invalid email format.`
   String get errorInvalidEmail {
     return Intl.message(
-      'Invalid email format. Example: email@domain',
+      'Invalid email format.',
       name: 'errorInvalidEmail',
       desc: '',
       args: [],
@@ -140,10 +140,10 @@ class S {
     );
   }
 
-  /// `Phone number format (e.g., 0981234567)`
+  /// `Phone number format.`
   String get errorInvalidPhoneNumber {
     return Intl.message(
-      'Phone number format (e.g., 0981234567)',
+      'Phone number format.',
       name: 'errorInvalidPhoneNumber',
       desc: '',
       args: [],
@@ -555,6 +555,76 @@ class S {
     return Intl.message(
       'Unknown User',
       name: 'generalUnknownUser',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show Password`
+  String get semanticShowPassword {
+    return Intl.message(
+      'Show Password',
+      name: 'semanticShowPassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hide Password`
+  String get semanticHidePassword {
+    return Intl.message(
+      'Hide Password',
+      name: 'semanticHidePassword',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Chat with {name}`
+  String semanticChatWith(String name) {
+    return Intl.message(
+      'Chat with $name',
+      name: 'semanticChatWith',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Navigate to the personal information editing screen`
+  String get semanticGoToEditProfile {
+    return Intl.message(
+      'Navigate to the personal information editing screen',
+      name: 'semanticGoToEditProfile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Go back`
+  String get semanticGoBack {
+    return Intl.message(
+      'Go back',
+      name: 'semanticGoBack',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `More options`
+  String get semanticMoreOptions {
+    return Intl.message(
+      'More options',
+      name: 'semanticMoreOptions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Change avatar`
+  String get semanticChangeAvatar {
+    return Intl.message(
+      'Change avatar',
+      name: 'semanticChangeAvatar',
       desc: '',
       args: [],
     );

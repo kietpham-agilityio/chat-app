@@ -7,6 +7,7 @@ class CAAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leading,
     this.actions,
     this.titleSpacing,
+    this.semanticsLabel,
     super.key,
   });
 
@@ -34,6 +35,8 @@ class CAAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   final double? titleSpacing;
 
+  final String? semanticsLabel;
+
   @override
   Size get preferredSize => Size.fromHeight(toolbarHeight);
 
@@ -44,14 +47,17 @@ class CAAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AppBar(
-            toolbarHeight: toolbarHeight,
-            automaticallyImplyLeading: false,
-            leading: leading,
-            leadingWidth: toolbarHeight,
-            actions: [if (actions != null) ...actions!],
-            titleSpacing: titleSpacing,
-            title: title,
+          Semantics(
+            label: semanticsLabel,
+            child: AppBar(
+              toolbarHeight: toolbarHeight,
+              automaticallyImplyLeading: false,
+              leading: leading,
+              leadingWidth: toolbarHeight,
+              actions: [if (actions != null) ...actions!],
+              titleSpacing: titleSpacing,
+              title: title,
+            ),
           ),
           Divider(height: 0),
         ],

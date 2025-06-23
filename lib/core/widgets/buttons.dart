@@ -17,6 +17,7 @@ class CAElevatedButton extends StatefulWidget {
     this.backgroundColor,
     this.foregroundColor,
     this.minHeight,
+    this.semanticsLabel,
     super.key,
   });
 
@@ -38,6 +39,8 @@ class CAElevatedButton extends StatefulWidget {
 
   final double? minHeight;
 
+  final String? semanticsLabel;
+
   @override
   State<CAElevatedButton> createState() => _CAElevatedButtonState();
 }
@@ -45,25 +48,28 @@ class CAElevatedButton extends StatefulWidget {
 class _CAElevatedButtonState extends State<CAElevatedButton> {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: widget.isDisabled ? null : widget.onPressed,
-      style: ButtonStyle(
-        backgroundColor: widget.backgroundColor != null
-            ? WidgetStateProperty.resolveWith<Color>((states) {
-                if (states.contains(WidgetState.disabled)) {
-                  return widget.backgroundColor!.withValues(
-                    alpha: 0.5, // Fully opaque
-                  );
-                }
+    return Semantics(
+      label: widget.semanticsLabel,
+      child: ElevatedButton(
+        onPressed: widget.isDisabled ? null : widget.onPressed,
+        style: ButtonStyle(
+          backgroundColor: widget.backgroundColor != null
+              ? WidgetStateProperty.resolveWith<Color>((states) {
+                  if (states.contains(WidgetState.disabled)) {
+                    return widget.backgroundColor!.withValues(
+                      alpha: 0.5, // Fully opaque
+                    );
+                  }
 
-                return widget.backgroundColor!;
-              })
-            : null,
-        foregroundColor: widget.foregroundColor != null
-            ? WidgetStatePropertyAll<Color>(widget.foregroundColor!)
-            : null,
+                  return widget.backgroundColor!;
+                })
+              : null,
+          foregroundColor: widget.foregroundColor != null
+              ? WidgetStatePropertyAll<Color>(widget.foregroundColor!)
+              : null,
+        ),
+        child: Text(widget.text, style: TextStyle(fontSize: widget.value)),
       ),
-      child: Text(widget.text, style: TextStyle(fontSize: widget.value)),
     );
   }
 }
@@ -82,6 +88,7 @@ class CAIconButtons extends StatelessWidget {
     this.onPressed,
     this.backgroundColor,
     this.size,
+    this.semanticsLabel,
     super.key,
   });
 
@@ -89,14 +96,21 @@ class CAIconButtons extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color? backgroundColor;
   final double? size;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      style: IconButton.styleFrom(backgroundColor: backgroundColor),
-      constraints: BoxConstraints(maxWidth: size ?? 40, maxHeight: size ?? 40),
-      icon: icon,
-      onPressed: onPressed,
+    return Semantics(
+      label: semanticsLabel,
+      child: IconButton(
+        style: IconButton.styleFrom(backgroundColor: backgroundColor),
+        constraints: BoxConstraints(
+          maxWidth: size ?? 40,
+          maxHeight: size ?? 40,
+        ),
+        icon: icon,
+        onPressed: onPressed,
+      ),
     );
   }
 }
@@ -115,15 +129,20 @@ class CATextButtons extends StatelessWidget {
     required this.text,
     this.onPressed,
     this.color,
+    this.semanticsLabel,
     super.key,
   });
 
   final String text;
   final VoidCallback? onPressed;
   final Color? color;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(onPressed: onPressed, child: Text(text));
+    return Semantics(
+      label: semanticsLabel,
+      child: TextButton(onPressed: onPressed, child: Text(text)),
+    );
   }
 }

@@ -166,7 +166,9 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
               appBar: CAAppBar(
                 title: CATitleMediumText(text: S.of(context).myAccountTitle),
                 leading: CAIconButtons(
-                  icon: CAAssets.arrowLeft(),
+                  icon: CAAssets.arrowLeft(
+                    semanticsLabel: S.of(context).semanticGoBack,
+                  ),
                   onPressed: () => context.pop(),
                 ),
               ),
@@ -217,6 +219,9 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 backgroundColor: context.colorScheme.primary,
                                 icon: CAAssets.plus(
                                   color: context.colorScheme.onPrimary,
+                                  semanticsLabel: S
+                                      .of(context)
+                                      .semanticChangeAvatar,
                                 ),
                                 size: 32,
                                 onPressed: () => _showBottomSheet(

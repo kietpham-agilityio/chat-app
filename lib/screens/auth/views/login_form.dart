@@ -17,7 +17,7 @@ class _LoginForm extends StatelessWidget {
               CAHeadlineSmallText(text: S.of(context).loginTitle),
               SizedBox(height: 64),
               _EmailInput(),
-              SizedBox(height: 4),
+              SizedBox(height: 16),
               _PasswordInput(),
               _LoginBtn(),
               SizedBox(height: 16),
@@ -75,11 +75,16 @@ class _PasswordInput extends StatelessWidget {
               context.read<LoginCubit>().passwordChanged(password),
           suffixIcon: IconButton(
             onPressed: context.read<LoginCubit>().passwordVisibilityChanged,
-            icon: Icon(
-              !state.isObscured
-                  ? Icons.visibility_outlined
-                  : Icons.visibility_off_outlined,
-              color: context.colorScheme.tertiaryContainer,
+            icon: Semantics(
+              label: state.isObscured
+                  ? S.of(context).semanticShowPassword
+                  : S.of(context).semanticHidePassword,
+              child: Icon(
+                !state.isObscured
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
+                color: context.colorScheme.tertiaryContainer,
+              ),
             ),
           ),
         );

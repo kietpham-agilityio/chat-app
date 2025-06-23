@@ -73,6 +73,9 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
             },
             child: Scaffold(
               appBar: CAAppBar(
+                semanticsLabel: S
+                    .of(context)
+                    .semanticChatWith(widget.receiverName.capitalizeWords()),
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -103,7 +106,9 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
                 ),
                 titleSpacing: 0,
                 leading: CAIconButtons(
-                  icon: CAAssets.arrowLeft(),
+                  icon: CAAssets.arrowLeft(
+                    semanticsLabel: S.of(context).semanticGoBack,
+                  ),
                   onPressed: () => context.pop(),
                 ),
                 actions: [
@@ -115,7 +120,9 @@ class _ChatMessageScreenState extends State<ChatMessageScreen> {
                       }
 
                       return PopupMenuButton<String>(
-                        icon: CAAssets.moreHorizontal(),
+                        icon: CAAssets.moreHorizontal(
+                          semanticsLabel: S.of(context).semanticMoreOptions,
+                        ),
                         onSelected: (value) async {
                           if (value == "block") {
                             CADialogManager.showDialog(
@@ -504,7 +511,7 @@ class MessageBubble extends StatelessWidget {
             ),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.7,
+                maxWidth: MediaQuery.of(context).size.width * 0.6,
               ),
               child: CABodyLargeText(
                 text: message.content,

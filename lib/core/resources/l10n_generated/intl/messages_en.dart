@@ -31,6 +31,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static String m4(name) => "Are you sure you want to unblock ${name}";
 
+  static String m5(name) => "Chat with ${name}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "chatMessageBlockBtn":
@@ -111,14 +113,14 @@ class MessageLookup extends MessageLookupByLibrary {
             "Failed to update user data. Please try again."),
         "errorInvalidConfirmedPassword":
             MessageLookupByLibrary.simpleMessage("Passwords do not match"),
-        "errorInvalidEmail": MessageLookupByLibrary.simpleMessage(
-            "Invalid email format. Example: email@domain"),
+        "errorInvalidEmail":
+            MessageLookupByLibrary.simpleMessage("Invalid email format."),
         "errorInvalidFullName": MessageLookupByLibrary.simpleMessage(
             "Full name must be at least two words"),
         "errorInvalidPassword": MessageLookupByLibrary.simpleMessage(
             "Must be at 8 characters with letters and numbers"),
-        "errorInvalidPhoneNumber": MessageLookupByLibrary.simpleMessage(
-            "Phone number format (e.g., 0981234567)"),
+        "errorInvalidPhoneNumber":
+            MessageLookupByLibrary.simpleMessage("Phone number format."),
         "errorOneOrBothUsersNotFound": MessageLookupByLibrary.simpleMessage(
             "One or both users not found. Please try again."),
         "errorOperationNotAllowed": MessageLookupByLibrary.simpleMessage(
@@ -185,6 +187,18 @@ class MessageLookup extends MessageLookupByLibrary {
         "searchDescriptionEmptyPage":
             MessageLookupByLibrary.simpleMessage("No users found"),
         "searchDescriptionInitPage":
-            MessageLookupByLibrary.simpleMessage("Search for users")
+            MessageLookupByLibrary.simpleMessage("Search for users"),
+        "semanticChangeAvatar":
+            MessageLookupByLibrary.simpleMessage("Change avatar"),
+        "semanticChatWith": m5,
+        "semanticGoBack": MessageLookupByLibrary.simpleMessage("Go back"),
+        "semanticGoToEditProfile": MessageLookupByLibrary.simpleMessage(
+            "Navigate to the personal information editing screen"),
+        "semanticHidePassword":
+            MessageLookupByLibrary.simpleMessage("Hide Password"),
+        "semanticMoreOptions":
+            MessageLookupByLibrary.simpleMessage("More options"),
+        "semanticShowPassword":
+            MessageLookupByLibrary.simpleMessage("Show Password")
       };
 }

@@ -6,10 +6,10 @@
   "errorOperationNotAllowed": "Operation is not allowed. Please contact support.",
   "errorEmailNotFound": "Email is not found, please create an account.",
   "errorWrongPassword": "Incorrect password, please try again.",
-  "errorInvalidEmail": "Invalid email format. Example: email@domain",
+  "errorInvalidEmail": "Invalid email format.",
   "errorInvalidPassword": "Must be at 8 characters with letters and numbers",
   "errorInvalidConfirmedPassword": "Passwords do not match",
-  "errorInvalidPhoneNumber": "Phone number format (e.g., 0981234567)",
+  "errorInvalidPhoneNumber": "Phone number format.",
   "errorInvalidFullName": "Full name must be at least two words",
   "errorFailedToSendMessage": "Failed to send message. Please try again.",
   "errorFailedToCreateChatRoom": "Failed to create chat room. Please try again.",
@@ -51,6 +51,21 @@
   "generalPhoneNumberHint": "Enter your phone number",
   "generalSearch": "Search",
   "generalUnknownUser": "Unknown User",
+  "semanticShowPassword": "Show Password",
+  "semanticHidePassword": "Hide Password",
+  "semanticChatWith": "Chat with {name}",
+  "@semanticChatWith": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "David"
+      }
+    }
+  },
+  "semanticGoToEditProfile": "Navigate to the personal information editing screen",
+  "semanticGoBack": "Go back",
+  "semanticMoreOptions": "More options",
+  "semanticChangeAvatar": "Change avatar",
   "loginTitle": "Welcome to Chat",
   "loginBtn": "Login",
   "loginCreateAccountBtn": "Create a new account",
