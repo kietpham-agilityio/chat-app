@@ -30,6 +30,9 @@ class AuthRepository {
     required String phoneNumber,
     required String password,
   }) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       // Create a new user with the given credentials
       final userCredential = await auth.createUserWithEmailAndPassword(
@@ -40,7 +43,7 @@ class AuthRepository {
       // Get the user that was just created
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        return left(Failure(S.current.errorUserNotFound));
+        return left(Failure(current.errorUserNotFound));
       }
 
       // Create a new [UserModel] from the created user
@@ -57,16 +60,19 @@ class AuthRepository {
       // Return the created user
       return right(user);
     } catch (_) {
-      return left(Failure(S.current.errorFailedToSignUp));
+      return left(Failure(current.errorFailedToSignUp));
     }
   }
 
   Future<Either<Failure, UserModel>> getUserData(String uid) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       final doc = await firestore.collection('users').doc(uid).get();
 
       if (!doc.exists) {
-        return left(Failure(S.current.errorUserDataNotFound));
+        return left(Failure(current.errorUserDataNotFound));
       }
 
       log('User id: ${doc.id}');
@@ -82,11 +88,14 @@ class AuthRepository {
 
       return right(user);
     } catch (_) {
-      return left(Failure(S.current.errorFailedToGetUserData));
+      return left(Failure(current.errorFailedToGetUserData));
     }
   }
 
   Future<Either<Failure, Unit>> saveUserData(UserModel user) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       await firestore
           .collection('users')
@@ -95,7 +104,7 @@ class AuthRepository {
           .timeout(const Duration(seconds: 5));
       return right(unit);
     } catch (_) {
-      return left(Failure(S.current.errorFailedToGetUserData));
+      return left(Failure(current.errorFailedToGetUserData));
     }
   }
 
@@ -103,6 +112,9 @@ class AuthRepository {
     required UserModel user,
     File? avatar,
   }) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       String? avatarUrl;
       if (avatar != null) {
@@ -160,11 +172,14 @@ class AuthRepository {
 
       return right(unit);
     } catch (_) {
-      return left(Failure(S.current.errorFailedToUpdateUserData));
+      return left(Failure(current.errorFailedToUpdateUserData));
     }
   }
 
   Future<Either<Failure, Unit>> signOut() async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       final userDB = await HiveLocalDb.instance.userBox.getUser();
 
@@ -176,35 +191,36 @@ class AuthRepository {
 
       return right(unit);
     } catch (_) {
-      return left(Failure(S.current.errorFailedToSignOut));
+      return left(Failure(current.errorFailedToSignOut));
     }
   }
 
   Future<Either<Failure, Unit>> addFcmToken(String token) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
-      await firestore
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .update({
-            'fcmToken': FieldValue.arrayUnion([token]),
-          });
+      await firestore.collection('users').doc(auth.currentUser!.uid).update({
+        'fcmToken': FieldValue.arrayUnion([token]),
+      });
       return right(unit);
     } catch (_) {
-      return left(Failure(S.current.errorFailedToAddFCMToken));
+      return left(Failure(current.errorFailedToAddFCMToken));
     }
   }
 
   Future<Either<Failure, Unit>> removeFcmToken(String token) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
+
     try {
-      await firestore
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .update({
-            'fcmToken': FieldValue.arrayRemove([token]),
-          });
+      await firestore.collection('users').doc(auth.currentUser!.uid).update({
+        'fcmToken': FieldValue.arrayRemove([token]),
+      });
       return right(unit);
     } catch (_) {
-      return left(Failure(S.current.errorFailedToRemoveFCMToken));
+      return left(Failure(current.errorFailedToRemoveFCMToken));
     }
   }
 
@@ -212,6 +228,9 @@ class AuthRepository {
     required String email,
     required String password,
   }) async {
+    final current = Platform.environment.containsKey('FLUTTER_TEST')
+        ? S()
+        : S.current;
     try {
       final userCredential = await auth
           .signInWithEmailAndPassword(email: email, password: password)
@@ -219,7 +238,7 @@ class AuthRepository {
 
       final firebaseUser = userCredential.user;
       if (firebaseUser == null) {
-        return left(Failure(S.current.errorUserNotFound));
+        return left(Failure(current.errorUserNotFound));
       }
 
       final userData = await getUserData(
@@ -228,7 +247,7 @@ class AuthRepository {
 
       return userData;
     } catch (_) {
-      return left(Failure(S.current.errorFailedToSignIn));
+      return left(Failure(current.errorFailedToSignIn));
     }
   }
 }
