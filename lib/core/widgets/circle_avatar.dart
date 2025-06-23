@@ -14,34 +14,39 @@ class CACircleAvatar extends StatelessWidget {
     required this.url,
     this.avatarSize = 40.0,
     this.onTap,
+    this.semanticsLabel,
   });
 
   /// The URL of the image to display.
   final String url;
   final double avatarSize;
   final VoidCallback? onTap;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        height: avatarSize,
-        width: avatarSize,
-        child: CircleAvatar(
-          radius: avatarSize / 2,
-          backgroundColor: context.colorScheme.tertiary,
-          child: ClipOval(
-            child: CachedNetworkImage(
-              imageUrl: url,
-              width: avatarSize,
-              height: avatarSize,
-              fit: BoxFit.cover,
-              errorWidget: (context, url, error) => SvgPicture.asset(
-                Assets.icons.icUser.path,
+    return Semantics(
+      label: semanticsLabel,
+      child: GestureDetector(
+        onTap: onTap,
+        child: SizedBox(
+          height: avatarSize,
+          width: avatarSize,
+          child: CircleAvatar(
+            radius: avatarSize / 2,
+            backgroundColor: context.colorScheme.tertiary,
+            child: ClipOval(
+              child: CachedNetworkImage(
+                imageUrl: url,
                 width: avatarSize,
                 height: avatarSize,
                 fit: BoxFit.cover,
+                errorWidget: (context, url, error) => SvgPicture.asset(
+                  Assets.icons.icUser.path,
+                  width: avatarSize,
+                  height: avatarSize,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),

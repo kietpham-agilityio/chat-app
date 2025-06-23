@@ -47,7 +47,9 @@ class SearchScreen extends StatelessWidget {
               appBar: CAAppBar(
                 title: CATitleMediumText(text: S.of(context).generalSearch),
                 leading: CAIconButtons(
-                  icon: CAAssets.arrowLeft(),
+                  icon: CAAssets.arrowLeft(
+                    semanticsLabel: S.of(context).semanticGoBack,
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ),

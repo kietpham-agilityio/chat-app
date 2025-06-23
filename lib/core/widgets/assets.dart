@@ -24,13 +24,14 @@ enum ImageLoaderType { assetPNG, assetSVG, cachedNetwork }
 class CAAssetImage extends StatelessWidget {
   CAAssetImage({
     required this.path,
-    super.key,
+    this.type = ImageLoaderType.assetPNG,
     this.errorBuilder,
     this.width,
     this.height,
     this.color,
     this.boxFit,
-    this.type = ImageLoaderType.assetPNG,
+    this.semanticsLabel,
+    super.key,
   }) : assert(
          !path.startsWith('http'),
          'Asset Image path should not start with http or https',
@@ -42,18 +43,22 @@ class CAAssetImage extends StatelessWidget {
   final double? height;
   final Color? color;
   final BoxFit? boxFit;
+  final String? semanticsLabel;
   final ImageLoaderType type;
 
   @override
   Widget build(BuildContext context) {
-    return _CAImageLoader(
-      url: path,
-      type: type,
-      errorBuilder: errorBuilder,
-      width: width,
-      height: height,
-      color: color,
-      boxFit: boxFit,
+    return Semantics(
+      label: semanticsLabel,
+      child: _CAImageLoader(
+        url: path,
+        type: type,
+        errorBuilder: errorBuilder,
+        width: width,
+        height: height,
+        color: color,
+        boxFit: boxFit,
+      ),
     );
   }
 }
@@ -125,14 +130,11 @@ class _CAImageLoader extends StatelessWidget {
         return Image.asset(
           url,
           fit: boxFit,
-          errorBuilder: (
-            BuildContext context,
-            Object error,
-            StackTrace? stackTrace,
-          ) {
-            log('Image $url load failed. Error: $error');
-            return errorBuilder ?? Icon(Icons.broken_image, size: width);
-          },
+          errorBuilder:
+              (BuildContext context, Object error, StackTrace? stackTrace) {
+                log('Image $url load failed. Error: $error');
+                return errorBuilder ?? Icon(Icons.broken_image, size: width);
+              },
           width: width,
           height: height,
           color: color,
@@ -140,8 +142,9 @@ class _CAImageLoader extends StatelessWidget {
       case ImageLoaderType.assetSVG:
         return SvgPicture.asset(
           url,
-          colorFilter:
-              color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
+          colorFilter: color != null
+              ? ColorFilter.mode(color!, BlendMode.srcIn)
+              : null,
           fit: boxFit ?? BoxFit.contain,
           placeholderBuilder: (BuildContext context) {
             return errorBuilder ?? Icon(Icons.broken_image, size: width);
@@ -172,34 +175,84 @@ class _CAImageLoader extends StatelessWidget {
 }
 
 class CAAssets {
-  static Widget Function({double? width, double? height, BoxFit? boxfit}) logo =
-      _CALogoImage.new;
+  static Widget Function({
+    double? width,
+    double? height,
+    BoxFit? boxfit,
+    String? semanticsLabel,
+  })
+  logo = _CALogoImage.new;
 
-  static Widget Function({Color? color, double? width, double? height})
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    String? semanticsLabel,
+  })
   arrowLeft = _CAArrowLeftImage.new;
 
-  static Widget Function({Color? color, double? width, double? height}) bell =
-      _CABellImage.new;
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    String? semanticsLabel,
+  })
+  bell = _CABellImage.new;
 
-  static Widget Function({Color? color, double? width, double? height}) error =
-      _CAErrorImage.new;
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    String? semanticsLabel,
+  })
+  error = _CAErrorImage.new;
 
-  static Widget Function({Color? color, double? width, double? height})
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    String? semanticsLabel,
+  })
   gallery = _CAGalleryImage.new;
 
-  static Widget Function({Color? color, double? width, double? height}) logOut =
-      _CALogOutImage.new;
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    String? semanticsLabel,
+  })
+  logOut = _CALogOutImage.new;
 
-  static Widget Function({Color? color, double? width, double? height})
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    String? semanticsLabel,
+  })
   moreHorizontal = _CAMoreHorizontalImage.new;
 
-  static Widget Function({Color? color, double? width, double? height}) plus =
-      _CAPlusImage.new;
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    String? semanticsLabel,
+  })
+  plus = _CAPlusImage.new;
 
-  static Widget Function({Color? color, double? width, double? height}) search =
-      _CASearchImage.new;
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    String? semanticsLabel,
+  })
+  search = _CASearchImage.new;
 
-  static Widget Function({Color? color, double? width, double? height})
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    String? semanticsLabel,
+  })
   thumpsUp = _CAThumbsUpImage.new;
 
   static Widget Function({
@@ -207,6 +260,7 @@ class CAAssets {
     double? width,
     double? height,
     BoxFit? boxFit,
+    String? semanticsLabel,
   })
   user = _CAUserImage.new;
 
@@ -215,20 +269,74 @@ class CAAssets {
     double? width,
     double? height,
     BoxFit? boxFit,
+    String? semanticsLabel,
   })
   camera = _CACameraImage.new;
+
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    BoxFit? boxFit,
+    String? semanticsLabel,
+  })
+  help = _CAHelpImage.new;
+
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    BoxFit? boxFit,
+    String? semanticsLabel,
+  })
+  pieChart = _CAPieChartImage.new;
+
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    BoxFit? boxFit,
+    String? semanticsLabel,
+  })
+  shield = _CAShieldImage.new;
+
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    BoxFit? boxFit,
+    String? semanticsLabel,
+  })
+  settings = _CASettingsImage.new;
+
+  static Widget Function({
+    Color? color,
+    double? width,
+    double? height,
+    BoxFit? boxFit,
+    String? semanticsLabel,
+  })
+  smartPhone = _CASmartPhoneImage.new;
 }
 
 // MARK: Logo
 class _CALogoImage extends StatelessWidget {
-  const _CALogoImage({this.width, this.height, this.boxfit});
+  const _CALogoImage({
+    this.width,
+    this.height,
+    this.boxfit,
+    this.semanticsLabel,
+  });
+
   final double? height;
   final double? width;
   final BoxFit? boxfit;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
+      semanticsLabel: semanticsLabel,
       boxFit: boxfit,
       path: Assets.images.imgMessage.path,
       width: width ?? 88,
@@ -239,15 +347,22 @@ class _CALogoImage extends StatelessWidget {
 
 // MARK: Arrow Left
 class _CAArrowLeftImage extends StatelessWidget {
-  const _CAArrowLeftImage({this.color, this.width, this.height});
+  const _CAArrowLeftImage({
+    this.color,
+    this.width,
+    this.height,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
+      semanticsLabel: semanticsLabel,
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icArrowLeft.path,
       width: width ?? 24,
@@ -259,31 +374,47 @@ class _CAArrowLeftImage extends StatelessWidget {
 
 // MARK: Bell
 class _CABellImage extends StatelessWidget {
-  const _CABellImage({this.color, this.width, this.height});
+  const _CABellImage({
+    this.color,
+    this.width,
+    this.height,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
-    return CAAssetImage(
-      type: ImageLoaderType.assetSVG,
-      path: Assets.icons.icBell.path,
-      width: width ?? 24,
-      height: height ?? 24,
-      color: color,
+    return Semantics(
+      label: semanticsLabel,
+      child: CAAssetImage(
+        semanticsLabel: semanticsLabel,
+        type: ImageLoaderType.assetSVG,
+        path: Assets.icons.icBell.path,
+        width: width ?? 24,
+        height: height ?? 24,
+        color: color,
+      ),
     );
   }
 }
 
 // MARK: Error
 class _CAErrorImage extends StatelessWidget {
-  const _CAErrorImage({this.color, this.width, this.height});
+  const _CAErrorImage({
+    this.color,
+    this.width,
+    this.height,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -299,15 +430,22 @@ class _CAErrorImage extends StatelessWidget {
 
 // MARK: Gallery
 class _CAGalleryImage extends StatelessWidget {
-  const _CAGalleryImage({this.color, this.width, this.height});
+  const _CAGalleryImage({
+    this.color,
+    this.width,
+    this.height,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
+      semanticsLabel: semanticsLabel,
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icGallery.path,
       width: width ?? 24,
@@ -319,15 +457,22 @@ class _CAGalleryImage extends StatelessWidget {
 
 // MARK: Log Out
 class _CALogOutImage extends StatelessWidget {
-  const _CALogOutImage({this.color, this.width, this.height});
+  const _CALogOutImage({
+    this.color,
+    this.width,
+    this.height,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
+      semanticsLabel: semanticsLabel,
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icLogOut.path,
       width: width ?? 24,
@@ -339,15 +484,22 @@ class _CALogOutImage extends StatelessWidget {
 
 // MARK: More Horizontal
 class _CAMoreHorizontalImage extends StatelessWidget {
-  const _CAMoreHorizontalImage({this.color, this.width, this.height});
+  const _CAMoreHorizontalImage({
+    this.color,
+    this.width,
+    this.height,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
+      semanticsLabel: semanticsLabel,
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icMoreHorizontal.path,
       width: width ?? 24,
@@ -359,15 +511,22 @@ class _CAMoreHorizontalImage extends StatelessWidget {
 
 // MARK: Plus
 class _CAPlusImage extends StatelessWidget {
-  const _CAPlusImage({this.color, this.width, this.height});
+  const _CAPlusImage({
+    this.color,
+    this.width,
+    this.height,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
+      semanticsLabel: semanticsLabel,
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icPlus.path,
       width: width ?? 24,
@@ -379,15 +538,22 @@ class _CAPlusImage extends StatelessWidget {
 
 // MARK: Search
 class _CASearchImage extends StatelessWidget {
-  const _CASearchImage({this.color, this.width, this.height});
+  const _CASearchImage({
+    this.color,
+    this.width,
+    this.height,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
+      semanticsLabel: semanticsLabel,
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icSearch.path,
       width: width ?? 24,
@@ -399,15 +565,22 @@ class _CASearchImage extends StatelessWidget {
 
 // MARK: ThubsUp
 class _CAThumbsUpImage extends StatelessWidget {
-  const _CAThumbsUpImage({this.color, this.width, this.height});
+  const _CAThumbsUpImage({
+    this.color,
+    this.width,
+    this.height,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
+      semanticsLabel: semanticsLabel,
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icThumbsUp.path,
       width: width ?? 24,
@@ -419,16 +592,24 @@ class _CAThumbsUpImage extends StatelessWidget {
 
 // MARK: User
 class _CAUserImage extends StatelessWidget {
-  const _CAUserImage({this.color, this.width, this.height, this.boxFit});
+  const _CAUserImage({
+    this.color,
+    this.width,
+    this.height,
+    this.boxFit,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
   final BoxFit? boxFit;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
+      semanticsLabel: semanticsLabel,
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icUser.path,
       boxFit: boxFit,
@@ -439,20 +620,178 @@ class _CAUserImage extends StatelessWidget {
   }
 }
 
-// MARK: User
+// MARK: Camera
 class _CACameraImage extends StatelessWidget {
-  const _CACameraImage({this.color, this.width, this.height, this.boxFit});
+  const _CACameraImage({
+    this.color,
+    this.width,
+    this.height,
+    this.boxFit,
+    this.semanticsLabel,
+  });
 
   final Color? color;
   final double? width;
   final double? height;
   final BoxFit? boxFit;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     return CAAssetImage(
+      semanticsLabel: semanticsLabel,
       type: ImageLoaderType.assetSVG,
       path: Assets.icons.icCamera.path,
+      boxFit: boxFit,
+      width: width ?? 24,
+      height: height ?? 24,
+      color: color,
+    );
+  }
+}
+
+// MARK: Help
+class _CAHelpImage extends StatelessWidget {
+  const _CAHelpImage({
+    this.color,
+    this.width,
+    this.height,
+    this.boxFit,
+    this.semanticsLabel,
+  });
+
+  final Color? color;
+  final double? width;
+  final double? height;
+  final BoxFit? boxFit;
+  final String? semanticsLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return CAAssetImage(
+      semanticsLabel: semanticsLabel,
+      type: ImageLoaderType.assetSVG,
+      path: Assets.icons.icHelp.path,
+      boxFit: boxFit,
+      width: width ?? 24,
+      height: height ?? 24,
+      color: color,
+    );
+  }
+}
+
+// MARK: Pie Chart
+class _CAPieChartImage extends StatelessWidget {
+  const _CAPieChartImage({
+    this.color,
+    this.width,
+    this.height,
+    this.boxFit,
+    this.semanticsLabel,
+  });
+
+  final Color? color;
+  final double? width;
+  final double? height;
+  final BoxFit? boxFit;
+  final String? semanticsLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return CAAssetImage(
+      semanticsLabel: semanticsLabel,
+      type: ImageLoaderType.assetSVG,
+      path: Assets.icons.icPieChart.path,
+      boxFit: boxFit,
+      width: width ?? 24,
+      height: height ?? 24,
+      color: color,
+    );
+  }
+}
+
+// MARK: Settings
+class _CASettingsImage extends StatelessWidget {
+  const _CASettingsImage({
+    this.color,
+    this.width,
+    this.height,
+    this.boxFit,
+    this.semanticsLabel,
+  });
+
+  final Color? color;
+  final double? width;
+  final double? height;
+  final BoxFit? boxFit;
+  final String? semanticsLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return CAAssetImage(
+      semanticsLabel: semanticsLabel,
+      type: ImageLoaderType.assetSVG,
+      path: Assets.icons.icSettings.path,
+      boxFit: boxFit,
+      width: width ?? 24,
+      height: height ?? 24,
+      color: color,
+    );
+  }
+}
+
+// MARK: Shield
+class _CAShieldImage extends StatelessWidget {
+  const _CAShieldImage({
+    this.color,
+    this.width,
+    this.height,
+    this.boxFit,
+    this.semanticsLabel,
+  });
+
+  final Color? color;
+  final double? width;
+  final double? height;
+  final BoxFit? boxFit;
+  final String? semanticsLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return CAAssetImage(
+      semanticsLabel: semanticsLabel,
+      type: ImageLoaderType.assetSVG,
+      path: Assets.icons.icShield.path,
+      boxFit: boxFit,
+      width: width ?? 24,
+      height: height ?? 24,
+      color: color,
+    );
+  }
+}
+
+// MARK: Smart Phone
+class _CASmartPhoneImage extends StatelessWidget {
+  const _CASmartPhoneImage({
+    this.color,
+    this.width,
+    this.height,
+    this.boxFit,
+    this.semanticsLabel,
+  });
+
+  final Color? color;
+  final double? width;
+  final double? height;
+  final BoxFit? boxFit;
+  final String? semanticsLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return CAAssetImage(
+      semanticsLabel: semanticsLabel,
+      type: ImageLoaderType.assetSVG,
+      path: Assets.icons.icSmartphone.path,
       boxFit: boxFit,
       width: width ?? 24,
       height: height ?? 24,

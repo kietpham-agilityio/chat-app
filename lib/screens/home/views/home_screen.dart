@@ -103,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: CAAssets.search(
                               width: 24,
                               height: 24,
-                              color: context.colorScheme.tertiaryFixed,
+                              color: context.colorScheme.onSecondary,
                             ),
                           ),
                           ontap: () => Navigator.of(context).push(
@@ -224,6 +224,7 @@ class _Avatar extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: CACircleAvatar(
+                semanticsLabel: 'Go to profile screen',
                 url: user?.avatarUrl ?? '',
                 onTap: () => context.pushNamed(AppPaths.profile.name),
                 avatarSize: 32,
@@ -289,6 +290,9 @@ class _ChatListTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             CAListTile(
+              semanticsLabel: S
+                  .of(context)
+                  .semanticChatWith(getOtherUsername()),
               leading: CACircleAvatar(
                 url: getOtherUserAvatar(),
                 avatarSize: 40,

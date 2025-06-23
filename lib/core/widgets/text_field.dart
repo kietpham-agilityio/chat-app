@@ -1,6 +1,5 @@
 import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/themes/themes.dart';
-import 'package:chat_app/core/widgets/assets.dart';
 import 'package:chat_app/core/widgets/text.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +22,7 @@ class CATextField extends StatefulWidget {
     this.ontap,
     this.controller,
     this.initValue,
+    this.semanticsLabel,
     super.key,
   });
 
@@ -104,6 +104,8 @@ class CATextField extends StatefulWidget {
 
   final String? initValue;
 
+  final String? semanticsLabel;
+
   @override
   State<CATextField> createState() => _CATextFieldState();
 }
@@ -136,58 +138,55 @@ class _CATextFieldState extends State<CATextField> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (widget.title != null) ...[
-          CATitleMediumText(text: widget.title!),
-          SizedBox(height: 8),
-        ],
-        TextField(
-          focusNode: widget.focusNode,
-          controller: _controller,
-          obscureText: widget.obscureText,
-          readOnly: widget.readOnly,
-          enabled: widget.enabled,
-          autofocus: widget.autofocus,
-          decoration: InputDecoration(
-            hintText: widget.hintText,
-            errorText: widget.errorMessage == null ? null : '',
-            suffixIcon: widget.suffixIcon,
-          ),
-          onChanged: widget.onChanged,
-          onSubmitted: widget.onSubmitted,
-          keyboardType: widget.keyboardType,
-          style: TextStyle(
-            fontFamily: CATypography.fontSFProText,
-            fontSize: CATypography.fontSizeBodyLarge,
-            fontWeight: FontWeight.w400,
-            height: CATypography.heightBodyLarge,
-            color: context.colorScheme.tertiaryContainer,
-          ),
-          onTap: widget.ontap,
-        ),
-        if (widget.hasValidation) ...[
-          if (widget.errorMessage != null) ...[
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CAAssets.error(),
-                SizedBox(width: 8),
-                Expanded(
-                  child: CABodyMediumText(
-                    text: widget.errorMessage!,
-                    color: context.colorScheme.error,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-              ],
+    return Semantics(
+      label: widget.semanticsLabel,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.title != null) ...[
+            CATitleMediumText(text: widget.title!),
+            SizedBox(height: 8),
+          ],
+          TextField(
+            focusNode: widget.focusNode,
+            controller: _controller,
+            obscureText: widget.obscureText,
+            readOnly: widget.readOnly,
+            enabled: widget.enabled,
+            autofocus: widget.autofocus,
+            decoration: InputDecoration(
+              hintText: widget.hintText,
+              errorText: widget.errorMessage == null ? null : '',
+              suffixIcon: widget.suffixIcon,
             ),
-          ] else
-            SizedBox(height: 20),
+            onChanged: widget.onChanged,
+            onSubmitted: widget.onSubmitted,
+            keyboardType: widget.keyboardType,
+            style: TextStyle(
+              fontFamily: CATypography.fontSFProText,
+              fontSize: CATypography.fontSizeBodyLarge,
+              fontWeight: FontWeight.w400,
+              height: CATypography.heightBodyLarge,
+              color: context.colorScheme.tertiaryContainer,
+            ),
+            onTap: widget.ontap,
+          ),
+          if (widget.hasValidation) ...[
+            if (widget.errorMessage != null) ...[
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: CABodyMediumText(
+                  text: widget.errorMessage!,
+                  color: context.colorScheme.error,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            ] else
+              SizedBox(height: 20),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

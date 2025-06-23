@@ -22,6 +22,7 @@ class CAListTile extends StatelessWidget {
     this.contentPadding,
     this.onTap,
     this.tileColor,
+    this.semanticsLabel,
     super.key,
   });
 
@@ -75,22 +76,27 @@ class CAListTile extends StatelessWidget {
 
   final Color? tileColor;
 
+  final String? semanticsLabel;
+
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      key: key,
-      tileColor: tileColor,
-      title: title,
-      subtitle: subtitle,
-      leading: leading,
-      trailing: trailing,
-      onTap: onTap,
-      selected: selected,
-      enabled: enabled,
-      titleAlignment: titleAlignment,
-      minLeadingWidth: minLeadingWidth,
-      minVerticalPadding: minVerticalPadding,
-      contentPadding: contentPadding,
+    return Semantics(
+      label: semanticsLabel,
+      child: ListTile(
+        key: key,
+        tileColor: tileColor,
+        title: title,
+        subtitle: subtitle,
+        leading: leading,
+        trailing: trailing,
+        onTap: onTap,
+        selected: selected,
+        enabled: enabled,
+        titleAlignment: titleAlignment,
+        minLeadingWidth: minLeadingWidth,
+        minVerticalPadding: minVerticalPadding,
+        contentPadding: contentPadding,
+      ),
     );
   }
 }

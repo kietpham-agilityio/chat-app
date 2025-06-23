@@ -27,7 +27,9 @@ class ProfileScreen extends StatelessWidget {
         appBar: CAAppBar(
           title: CATitleMediumText(text: S.of(context).profileTitle),
           leading: CAIconButtons(
-            icon: CAAssets.arrowLeft(),
+            icon: CAAssets.arrowLeft(
+              semanticsLabel: S.of(context).semanticGoBack,
+            ),
             onPressed: () => context.pop(),
           ),
         ),
@@ -43,6 +45,7 @@ class ProfileScreen extends StatelessWidget {
               _PhoneNumber(hive),
               SizedBox(height: 24),
               CAListTile(
+                semanticsLabel: S.of(context).semanticGoToEditProfile,
                 title: Text(S.of(context).profileMyAccountBtn),
                 leading: CAAssets.user(),
                 onTap: () {
@@ -59,9 +62,26 @@ class ProfileScreen extends StatelessWidget {
                 },
               ),
               CAListTile(
+                title: Text('Notifications'),
+                leading: CAAssets.bell(),
+              ),
+              CAListTile(
+                title: Text('Privacy and safety'),
+                leading: CAAssets.shield(),
+              ),
+              CAListTile(
+                title: Text('Data and storage'),
+                leading: CAAssets.pieChart(),
+              ),
+              CAListTile(
+                title: Text('Devices'),
+                leading: CAAssets.smartPhone(),
+              ),
+              CAListTile(title: Text('FAQ'), leading: CAAssets.help()),
+              CAListTile(title: Text('Settings'), leading: CAAssets.settings()),
+              CAListTile(
                 title: Text(S.of(context).profileLogoutBtn),
                 leading: CAAssets.logOut(),
-
                 onTap: () =>
                     context.read<AuthBloc>().add(const AuthLogoutPressed()),
               ),
