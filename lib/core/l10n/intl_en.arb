@@ -49,6 +49,7 @@
   "generalFullNameHint": "Enter your full name",
   "generalPhoneNumber": "Phone Number",
   "generalPhoneNumberHint": "Enter your phone number",
+  "generalCountry": "Country",
   "generalSearch": "Search",
   "generalUnknownUser": "Unknown User",
   "semanticShowPassword": "Show Password",

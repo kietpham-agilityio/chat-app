@@ -29,5 +29,6 @@ class AuthMocks {
     email: mockEmail,
     fullName: mockFullName,
     phoneNumber: mockphoneNumber,
+    country: 'USA',
   );
 }

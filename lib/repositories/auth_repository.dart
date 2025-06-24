@@ -29,6 +29,7 @@ class AuthRepository {
     required String email,
     required String phoneNumber,
     required String password,
+    required String country,
   }) async {
     final current = Platform.environment.containsKey('FLUTTER_TEST')
         ? S()
@@ -52,6 +53,7 @@ class AuthRepository {
         fullName: fullName,
         email: email,
         phoneNumber: phoneNumber,
+        country: country,
       );
 
       // Save the user's data to Firestore
@@ -83,6 +85,7 @@ class AuthRepository {
         fullName: user.fullName,
         email: user.email,
         phoneNumber: user.phoneNumber,
+        country: user.country,
         avatarUrl: user.avatarUrl,
       );
 
@@ -133,6 +136,7 @@ class AuthRepository {
         fullName: user.fullName,
         email: user.email,
         phoneNumber: user.phoneNumber,
+        country: user.country,
         blockedUsers: user.blockedUsers,
         fcmToken: user.fcmToken,
         avatarUrl: avatarUrl,

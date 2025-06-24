@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/utils/validations.dart'
-    show ImageFile, Email, FullName, PhoneNumber;
+    show ImageFile, Email, FullName, PhoneNumber, CountryInput;
 import 'package:chat_app/models/models.dart' show UserModel;
 import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
 import 'package:equatable/equatable.dart';
@@ -28,6 +28,8 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     on<FullNameValidationEvent>(_onFullNameValidation);
     on<PhoneNumberChangedEvent>(_onPhoneNumberChanged);
     on<PhoneNumberValidationEvent>(_onPhoneNumberValidation);
+    on<CountryChangedEvent>(_onCountryChanged);
+    on<CountryFetchingEvent>(_onCountryFetching);
     on<AvatarChangedEvent>(_onChangedAvatar);
     on<UpdateUserInfoEvent>(_onUpdateUserInfo);
   }
@@ -44,6 +46,7 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     final email = Email.pure(event.email);
     final fullName = FullName.pure(event.fullName);
     final phoneNumber = PhoneNumber.pure(event.phoneNumber);
+    final country = CountryInput.pure(event.country);
     final avatarUrl = event.avatarUrl;
 
     emit(
@@ -51,6 +54,7 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
         email: email,
         fullName: fullName,
         phoneNumber: phoneNumber,
+        country: country,
         isValidForm: false,
         status: MyAccountStatus.success,
         avatarUrl: avatarUrl,
@@ -76,7 +80,11 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     emit(
       state.copyWith(
         fullName: fullName,
-        isValidForm: Formz.validate([fullName, state.phoneNumber]),
+        isValidForm: Formz.validate([
+          fullName,
+          state.phoneNumber,
+          state.country,
+        ]),
         status: MyAccountStatus.success,
       ),
     );
@@ -91,7 +99,11 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     emit(
       state.copyWith(
         phoneNumber: phoneNumber,
-        isValidForm: Formz.validate([state.fullName, phoneNumber]),
+        isValidForm: Formz.validate([
+          state.fullName,
+          phoneNumber,
+          state.country,
+        ]),
         status: MyAccountStatus.success,
       ),
     );
@@ -107,10 +119,43 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     emit(
       state.copyWith(
         phoneNumber: phoneNumber,
-        isValidForm: Formz.validate([state.fullName, phoneNumber]),
+        isValidForm: Formz.validate([
+          state.fullName,
+          phoneNumber,
+          state.country,
+        ]),
         status: MyAccountStatus.success,
       ),
     );
+  }
+
+  void _onCountryChanged(
+    CountryChangedEvent event,
+    Emitter<MyAccountState> emit,
+  ) {
+    if (state.country.value == event.value) return;
+    final country = CountryInput.dirty(event.value);
+    emit(
+      state.copyWith(
+        country: country,
+        status: MyAccountStatus.success,
+        isValidForm: Formz.validate([
+          state.fullName,
+          state.phoneNumber,
+          country,
+        ]),
+      ),
+    );
+  }
+
+  Future<void> _onCountryFetching(
+    CountryFetchingEvent event,
+    Emitter<MyAccountState> emit,
+  ) async {
+    emit(state.copyWith(status: MyAccountStatus.countriesFetching));
+    await Future.delayed(const Duration(seconds: 2));
+    final items = ['VietNam', 'USA'];
+    emit(state.copyWith(countries: items, status: MyAccountStatus.success));
   }
 
   Future<void> _onChangedAvatar(
@@ -168,6 +213,7 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
       fullName: state.fullName.value.toLowerCase(),
       email: state.email.value,
       phoneNumber: state.phoneNumber.value,
+      country: state.country.value,
     );
     final res = await _authRepository.updateUserData(
       user: user,

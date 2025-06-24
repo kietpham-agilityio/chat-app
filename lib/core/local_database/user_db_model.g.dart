@@ -21,15 +21,16 @@ class UserDBModelAdapter extends TypeAdapter<UserDBModel> {
       fullName: fields[1] as String,
       email: fields[2] as String,
       phoneNumber: fields[3] as String,
-      avatarUrl: fields[4] as String?,
-      fcmToken: fields[5] as String?,
+      country: fields[4] as String,
+      avatarUrl: fields[5] as String?,
+      fcmToken: fields[6] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserDBModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.uid)
       ..writeByte(1)
@@ -39,8 +40,10 @@ class UserDBModelAdapter extends TypeAdapter<UserDBModel> {
       ..writeByte(3)
       ..write(obj.phoneNumber)
       ..writeByte(4)
-      ..write(obj.avatarUrl)
+      ..write(obj.country)
       ..writeByte(5)
+      ..write(obj.avatarUrl)
+      ..writeByte(6)
       ..write(obj.fcmToken);
   }
 

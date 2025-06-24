@@ -12,16 +12,18 @@ class InitialEvent extends MyAccountEvent {
     required this.email,
     required this.fullName,
     required this.phoneNumber,
+    required this.country,
     this.avatarUrl,
   });
 
   final String email;
   final String fullName;
   final String phoneNumber;
+  final String country;
   final String? avatarUrl;
 
   @override
-  List<Object?> get props => [email, fullName, phoneNumber, avatarUrl];
+  List<Object?> get props => [email, fullName, phoneNumber, country, avatarUrl];
 }
 
 class FullNameChangedEvent extends MyAccountEvent {
@@ -58,6 +60,22 @@ class PhoneNumberValidationEvent extends MyAccountEvent {
 
   @override
   List<Object> get props => [value];
+}
+
+class CountryChangedEvent extends MyAccountEvent {
+  const CountryChangedEvent(this.value);
+
+  final String value;
+
+  @override
+  List<Object> get props => [value];
+}
+
+class CountryFetchingEvent extends MyAccountEvent {
+  const CountryFetchingEvent();
+
+  @override
+  List<Object> get props => [];
 }
 
 class AvatarChangedEvent extends MyAccountEvent {

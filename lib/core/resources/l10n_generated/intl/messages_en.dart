@@ -142,6 +142,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Confirmed Password"),
         "generalConfirmedPasswordHint":
             MessageLookupByLibrary.simpleMessage("Re-enter your password"),
+        "generalCountry": MessageLookupByLibrary.simpleMessage("Country"),
         "generalEmailAddress":
             MessageLookupByLibrary.simpleMessage("Email Address"),
         "generalEmailAddressHint":

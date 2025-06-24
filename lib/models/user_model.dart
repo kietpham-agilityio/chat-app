@@ -8,6 +8,7 @@ class UserModel extends Equatable {
     required this.fullName,
     required this.email,
     required this.phoneNumber,
+    required this.country,
     this.blockedUsers = const [],
     this.avatarUrl,
     this.fcmToken,
@@ -17,6 +18,7 @@ class UserModel extends Equatable {
   final String fullName;
   final String email;
   final String phoneNumber;
+  final String country;
   final List<String> blockedUsers;
   final String? avatarUrl;
   final List<String>? fcmToken;
@@ -27,6 +29,7 @@ class UserModel extends Equatable {
     fullName: '',
     email: '',
     phoneNumber: '',
+    country: '',
     blockedUsers: [],
   );
 
@@ -35,6 +38,7 @@ class UserModel extends Equatable {
     String? fullName,
     String? email,
     String? phoneNumber,
+    String? country,
     List<String>? blockedUsers,
     String? avatarUrl,
     List<String>? fcmToken,
@@ -44,6 +48,7 @@ class UserModel extends Equatable {
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      country: country ?? this.country,
       blockedUsers: blockedUsers ?? this.blockedUsers,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       fcmToken: fcmToken ?? this.fcmToken,
@@ -57,6 +62,7 @@ class UserModel extends Equatable {
       fullName: data["fullName"] ?? "",
       email: data["email"] ?? "",
       phoneNumber: data["phoneNumber"] ?? "",
+      country: data["country"] ?? "",
       blockedUsers: List<String>.from(data["blockedUsers"] ?? []),
       avatarUrl: data["avatarUrl"],
       fcmToken: List<String>.from(data["fcmToken"] ?? []),
@@ -69,6 +75,7 @@ class UserModel extends Equatable {
       fullName: map.fullName,
       email: map.email,
       phoneNumber: map.phoneNumber,
+      country: map.country,
       avatarUrl: map.avatarUrl,
       fcmToken: List.from([map.fcmToken]),
     );
@@ -80,6 +87,7 @@ class UserModel extends Equatable {
       'fullName': fullName,
       'phoneNumber': phoneNumber,
       'blockedUsers': blockedUsers,
+      'country': country,
       if (avatarUrl != null) 'avatarUrl': avatarUrl,
       if (fcmToken != null) 'fcmToken': fcmToken,
     };

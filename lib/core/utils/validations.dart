@@ -121,3 +121,11 @@ class ImageFile extends FormzInput<File?, ValidationError> {
     return value != null ? null : ValidationError.invalid;
   }
 }
+
+class CountryInput extends FormzInput<String, String> {
+  const CountryInput.pure([super.value = '']) : super.pure();
+  const CountryInput.dirty([super.value = '']) : super.dirty();
+
+  @override
+  String? validator(String value) => value.isEmpty ? 'Country required' : null;
+}

@@ -12,7 +12,8 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CAListTile,
         CATextField,
         CATitleMediumText,
-        CASnackBar;
+        CASnackBar,
+        CustomDropdownSuggestion;
 import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:chat_app/screens/my_account/bloc/my_account_bloc.dart';
 import 'package:flutter/material.dart';
@@ -27,12 +28,14 @@ class MyAccountScreen extends StatefulWidget {
     required this.email,
     required this.fullName,
     required this.phoneNumber,
+    required this.country,
     this.avatarUrl,
   });
 
   final String email;
   final String fullName;
   final String phoneNumber;
+  final String country;
   final String? avatarUrl;
 
   @override
@@ -139,6 +142,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                 email: widget.email,
                 fullName: widget.fullName,
                 phoneNumber: widget.phoneNumber,
+                country: widget.country,
                 avatarUrl: widget.avatarUrl,
               ),
             ),
@@ -235,6 +239,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         _EmailInput(),
                         _FullNameInput(),
                         _PhoneNumberInput(),
+                        CountryDropdown(initialValue: widget.country),
                         SizedBox(height: 20),
                         _SubmitButton(),
                       ],
@@ -356,6 +361,40 @@ class _PhoneNumberInput extends StatelessWidget {
           onTapOutside: () => context.read<MyAccountBloc>().add(
             PhoneNumberValidationEvent(state.phoneNumber.value),
           ),
+        );
+      },
+    );
+  }
+}
+
+class CountryDropdown extends StatelessWidget {
+  const CountryDropdown({this.initialValue, super.key});
+
+  final String? initialValue;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextEditingController countryController = TextEditingController();
+    final focusNode = FocusNode();
+
+    return BlocBuilder<MyAccountBloc, MyAccountState>(
+      builder: (context, state) {
+        return CustomDropdownSuggestion(
+          label: Text(
+            S.of(context).generalCountry,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          items: state.countries,
+          initialValue: initialValue,
+          textController: countryController,
+          onChanged: (value) =>
+              context.read<MyAccountBloc>().add(CountryChangedEvent(value)),
+          focusNode: focusNode,
+          isLoading: state.status == MyAccountStatus.countriesFetching,
+          onTapped: state.countries.isEmpty
+              ? () => context.read<MyAccountBloc>().add(CountryFetchingEvent())
+              : null,
+          errorMessage: state.country.displayError,
         );
       },
     );
