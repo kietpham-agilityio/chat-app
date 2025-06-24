@@ -13,6 +13,9 @@ class SearchCubit extends Cubit<SearchState> {
   final ChatRepository _authRepository;
 
   Future<void> searchUser(String username) async {
+    if (username.isEmpty) {
+      return;
+    }
     emit(state.copyWith(status: SearchStatus.loading));
 
     final res = await _authRepository.searchUser(searchText: username);

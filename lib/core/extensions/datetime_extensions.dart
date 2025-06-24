@@ -7,8 +7,7 @@ extension DateTimeExtensions on DateTime {
   String formatChatDateTime({String locale = 'en'}) {
     final now = DateTime.now();
 
-    final timeStr =
-        "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
+    final timeStr = DateFormat('hh:mm a', locale).format(this);
 
     if (isSameDay(now)) {
       return timeStr;
