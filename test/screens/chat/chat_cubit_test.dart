@@ -333,12 +333,10 @@ void main() {
           () => mockChatRepository.getMessages(mockChatRoom.id),
         ).thenAnswer((_) => controller.stream);
 
-        // Emit một giá trị để không bị treo
         Future.microtask(() {
           controller.add(Right(PaginatedResult(items: [], lastDoc: null)));
         });
 
-        // Mock các stream còn lại
         when(
           () => mockChatRepository.isUserBlocked(any(), any()),
         ).thenAnswer((_) => const Stream.empty());

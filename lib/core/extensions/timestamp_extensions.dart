@@ -11,7 +11,7 @@ extension TimestampExtension on Timestamp {
         now.year == time.year && now.month == time.month && now.day == time.day;
 
     if (isSameDay) {
-      return DateFormat.Hm('en').format(time);
+      return DateFormat('hh:mm a', 'en').format(time);
     } else if (diff.inDays < 7) {
       return DateFormat.E('en').format(time);
     } else if (diff.inDays < 30) {
