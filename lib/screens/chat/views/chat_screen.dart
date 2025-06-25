@@ -449,6 +449,7 @@ class _ViewState extends State<_View> {
                       ),
                     ),
                   ],
+                  SizedBox(height: 20),
                 ],
               ],
             ),

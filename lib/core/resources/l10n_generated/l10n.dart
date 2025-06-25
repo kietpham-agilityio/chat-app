@@ -670,10 +670,10 @@ class S {
     );
   }
 
-  /// `Forgot your password?`
+  /// `Forgot password?`
   String get loginForgotPasswordBtn {
     return Intl.message(
-      'Forgot your password?',
+      'Forgot password?',
       name: 'loginForgotPasswordBtn',
       desc: '',
       args: [],
@@ -755,6 +755,16 @@ class S {
     return Intl.message(
       'No users found',
       name: 'searchDescriptionEmptyPage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search contacts`
+  String get searchHint {
+    return Intl.message(
+      'Search contacts',
+      name: 'searchHint',
       desc: '',
       args: [],
     );

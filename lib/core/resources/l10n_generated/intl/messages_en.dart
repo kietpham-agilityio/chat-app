@@ -169,7 +169,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "loginCreateAccountBtn":
             MessageLookupByLibrary.simpleMessage("Create a new account"),
         "loginForgotPasswordBtn":
-            MessageLookupByLibrary.simpleMessage("Forgot your password?"),
+            MessageLookupByLibrary.simpleMessage("Forgot password?"),
         "loginTitle": MessageLookupByLibrary.simpleMessage("Welcome to Chat"),
         "myAccountChoosePhoto":
             MessageLookupByLibrary.simpleMessage("Choose photo"),
@@ -189,6 +189,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("No users found"),
         "searchDescriptionInitPage":
             MessageLookupByLibrary.simpleMessage("Search for users"),
+        "searchHint": MessageLookupByLibrary.simpleMessage("Search contacts"),
         "semanticChangeAvatar":
             MessageLookupByLibrary.simpleMessage("Change avatar"),
         "semanticChatWith": m5,

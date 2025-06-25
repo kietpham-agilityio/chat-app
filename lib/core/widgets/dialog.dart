@@ -49,7 +49,7 @@ class CADialog extends StatelessWidget {
               text: confirmButtonTitle ?? '',
               minHeight: 40,
             ),
-          SizedBox(height: 2),
+          SizedBox(height: 8),
           if (cancelButtonTitle != null)
             CAElevatedButton(
               minHeight: 40,

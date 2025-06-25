@@ -22,6 +22,8 @@ class _LoginForm extends StatelessWidget {
               _LoginBtn(),
               SizedBox(height: 16),
               _CreateNewAccountBtn(),
+              SizedBox(height: 8),
+              CATextButtons(text: S.of(context).loginForgotPasswordBtn),
             ],
           ),
         ),

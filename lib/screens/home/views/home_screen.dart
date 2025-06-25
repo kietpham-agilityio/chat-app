@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18),
                         child: CATextField(
-                          hintText: S.of(context).generalSearch,
+                          hintText: S.of(context).searchHint,
                           readOnly: true,
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(right: 16),

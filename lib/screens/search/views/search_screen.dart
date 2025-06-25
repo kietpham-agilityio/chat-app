@@ -80,7 +80,7 @@ class SearchScreen extends StatelessWidget {
                               },
                               autofocus: true,
                               keyboardType: TextInputType.text,
-                              hintText: S.of(context).generalSearch,
+                              hintText: S.of(context).searchHint,
                             ),
                           ),
                         ),
