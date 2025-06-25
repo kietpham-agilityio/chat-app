@@ -3,7 +3,12 @@ import 'package:chat_app/core/resources/l10n_generated/l10n.dart' show S;
 import 'package:chat_app/core/router/app_router.dart' show AppPaths;
 import 'package:chat_app/core/widgets/assets.dart';
 import 'package:chat_app/core/widgets/widgets.dart'
-    show CAElevatedButton, CAHeadlineSmallText, CATextField, CASnackBar;
+    show
+        CAElevatedButton,
+        CAHeadlineSmallText,
+        CATextField,
+        CASnackBar,
+        CATextButtons;
 import 'package:chat_app/repositories/repositories.dart' show AuthRepository;
 import 'package:chat_app/screens/auth/states/login_cubit.dart';
 import 'package:flutter/material.dart';
