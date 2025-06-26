@@ -189,7 +189,6 @@ void main() {
         'participantsName': {userId: 'User 123', 'user456': 'User 456'},
         'participantsAvatar': {userId: '', 'user456': ''},
         'lastReadTime': {},
-        'isTyping': false,
       });
 
       // Fake ChatRoomModel.fromFirestore
@@ -203,7 +202,6 @@ void main() {
         participantsName: {userId: 'User 123', 'user456': 'User 456'},
         participantsAvatar: {userId: '', 'user456': ''},
         lastReadTime: {},
-        isTyping: false,
       );
 
       // Run test

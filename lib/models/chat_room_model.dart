@@ -5,11 +5,11 @@ class ChatRoomModel extends Equatable {
   const ChatRoomModel({
     required this.id,
     required this.participants,
-    this.isTyping = false,
     this.isCallActive = false,
     this.lastReadTime = const {},
     this.participantsName = const {},
     this.participantsAvatar = const {},
+    this.isTypingByUser = const {},
     this.lastMessage,
     this.lastMessageSenderId,
     this.lastMessageTime,
@@ -24,7 +24,7 @@ class ChatRoomModel extends Equatable {
   final Map<String, Timestamp> lastReadTime;
   final Map<String, String> participantsName;
   final Map<String, String> participantsAvatar;
-  final bool isTyping;
+  final Map<String, bool> isTypingByUser;
   final String? typingUserId;
   final bool isCallActive;
 
@@ -43,7 +43,7 @@ class ChatRoomModel extends Equatable {
       participantsAvatar: Map<String, String>.from(
         data['participantsAvatar'] ?? {},
       ),
-      isTyping: data['isTyping'] ?? false,
+      isTypingByUser: Map<String, bool>.from(data['isTypingByUser'] ?? {}),
       typingUserId: data['typingUserId'],
       isCallActive: data['isCallActive'] ?? false,
     );
@@ -57,7 +57,7 @@ class ChatRoomModel extends Equatable {
     Map<String, Timestamp>? lastReadTime,
     Map<String, String>? participantsName,
     Map<String, String>? participantsAvatar,
-    bool? isTyping,
+    Map<String, bool>? isTypingByUser,
     String? typingUserId,
     bool? isCallActive,
   }) {
@@ -70,7 +70,7 @@ class ChatRoomModel extends Equatable {
       lastReadTime: lastReadTime ?? this.lastReadTime,
       participantsName: participantsName ?? this.participantsName,
       participantsAvatar: participantsAvatar ?? this.participantsAvatar,
-      isTyping: isTyping ?? this.isTyping,
+      isTypingByUser: isTypingByUser ?? this.isTypingByUser,
       typingUserId: typingUserId ?? this.typingUserId,
       isCallActive: isCallActive ?? this.isCallActive,
     );
@@ -83,7 +83,7 @@ class ChatRoomModel extends Equatable {
       'lastMessageSenderId': lastMessageSenderId,
       'lastMessageTime': lastMessageTime,
       'lastReadTime': lastReadTime,
-      'isTyping': isTyping,
+      'isTypingByUser': isTypingByUser,
       'participantsName': participantsName,
       'participantsAvatar': participantsAvatar,
       'typingUserId': typingUserId,
@@ -101,7 +101,7 @@ class ChatRoomModel extends Equatable {
     lastReadTime,
     participantsName,
     participantsAvatar,
-    isTyping,
+    isTypingByUser,
     typingUserId,
     isCallActive,
   ];
