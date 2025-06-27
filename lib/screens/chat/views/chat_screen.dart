@@ -320,7 +320,7 @@ class _ViewState extends State<_View> {
                             SizedBox(height: 16),
                           ] else
                             SizedBox(height: 10),
-                          MessageBubble(
+                          _MessageBubble(
                             message: message,
                             isMe: isMe,
                             receiverAvatarUrl: state.receiverAvatarUrl,
@@ -332,6 +332,8 @@ class _ViewState extends State<_View> {
                     },
                   ),
                 ),
+                if (state.isReceiverTyping)
+                  _TypingBubble(receiverAvatarUrl: state.receiverAvatarUrl),
                 if (!state.amIBlocked && !state.isUserBlocked)
                   Padding(
                     padding: const EdgeInsets.all(8),
@@ -467,14 +469,13 @@ class _ViewState extends State<_View> {
   }
 }
 
-class MessageBubble extends StatelessWidget {
-  const MessageBubble({
+class _MessageBubble extends StatelessWidget {
+  const _MessageBubble({
     required this.message,
     required this.isMe,
     required this.isLastBeforeTimestamp,
     this.receiverAvatarUrl,
     this.myAvatar,
-    super.key,
   });
 
   final ChatMessageModel message;
@@ -531,6 +532,121 @@ class MessageBubble extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _TypingBubble extends StatelessWidget {
+  const _TypingBubble({this.receiverAvatarUrl});
+
+  final String? receiverAvatarUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            CACircleAvatar(url: receiverAvatarUrl ?? '', avatarSize: 32),
+            SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              decoration: BoxDecoration(
+                color: context.colorScheme.tertiary,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(8),
+                  topRight: const Radius.circular(8),
+                  bottomLeft: Radius.circular(4),
+                  bottomRight: Radius.circular(8),
+                ),
+              ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.6,
+                ),
+                child: LoadingDots(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LoadingDots extends StatefulWidget {
+  const LoadingDots({super.key});
+
+  @override
+  State<LoadingDots> createState() => _LoadingDotsState();
+}
+
+class _LoadingDotsState extends State<LoadingDots>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  double _getOffset(double value) {
+    // func create effect
+    // value = 0.0 -> offset = 0
+    // value = 0.5 -> offset = -4
+    // value = 1.0 -> offset = 0
+    return -4 * (1 - (2 * value - 1).abs());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(3, (index) {
+        return AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            final animation = CurvedAnimation(
+              parent: _controller,
+              curve: Interval(
+                index * 0.2,
+                index * 0.2 + 0.5,
+                curve: Curves.easeInOut,
+              ),
+            );
+            final offsetY = _getOffset(animation.value);
+
+            return Transform.translate(
+              offset: Offset(0, offsetY),
+              child: Container(
+                width: 6,
+                height: 6,
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                decoration: BoxDecoration(
+                  color: context.colorScheme.primary.withValues(
+                    alpha: 0.3 + (0.7 * animation.value),
+                  ),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 }

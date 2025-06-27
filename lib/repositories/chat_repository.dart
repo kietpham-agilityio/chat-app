@@ -246,6 +246,8 @@ class ChatRepository {
         otherUserId: otherUserData['avatarUrl']?.toString() ?? "",
       };
 
+      final isTypingByUser = {currentUserId: false, otherUserId: false};
+
       final newRoom = ChatRoomModel(
         id: roomId,
         participants: users,
@@ -255,6 +257,7 @@ class ChatRepository {
           otherUserId: Timestamp.now(),
         },
         participantsAvatar: participantsAvatar,
+        isTypingByUser: isTypingByUser,
       );
 
       await _chatRooms
@@ -450,6 +453,40 @@ class ChatRepository {
       return right(unit);
     } catch (e) {
       return left(Failure(current.errorFailedToUnblockUser));
+    }
+  }
+
+  Stream<bool> getTypingStatus({
+    required String chatRoomId,
+    required String receiverId,
+  }) {
+    return _chatRooms.doc(chatRoomId).snapshots().map((snapshot) {
+      if (!snapshot.exists) {
+        return false;
+      }
+      final data = snapshot.data() as Map<String, dynamic>;
+      final isTypingByUser = data['isTypingByUser'] as Map<String, dynamic>;
+
+      return isTypingByUser[receiverId] ?? false;
+    });
+  }
+
+  Future<void> updateTypingStatus(
+    String chatRoomId,
+    String userId,
+    bool isTyping,
+  ) async {
+    try {
+      final doc = await _chatRooms.doc(chatRoomId).get();
+      if (!doc.exists) {
+        return;
+      }
+      await _chatRooms
+          .doc(chatRoomId)
+          .update({'isTypingByUser.$userId': isTyping})
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      log("error updating typing status");
     }
   }
 }

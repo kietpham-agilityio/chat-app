@@ -1,4 +1,4 @@
-import 'dart:async' show StreamSubscription;
+import 'dart:async' show StreamSubscription, Timer;
 import 'dart:developer' show log;
 import 'dart:io';
 
@@ -26,13 +26,25 @@ class ChatCubit extends Cubit<ChatState> {
   final UserBox userBox;
 
   bool _isInChat = false;
+  Timer? typingTimer;
 
   StreamSubscription? _messageSubscription;
   StreamSubscription? _blockStatusSubscription;
   StreamSubscription? _amIBlockStatusSubscription;
   StreamSubscription? _userInfoSubscription;
+  StreamSubscription? _typingSubscription;
 
-  void messageChanged(String message) => emit(state.copyWith(message: message));
+  void messageChanged(String message) {
+    final isComposing = message.isNotEmpty;
+    if (isComposing && state.isComposing != isComposing) {
+      startTyping();
+    } else if (!isComposing) {
+      typingTimer?.cancel();
+      _updateTypingStatus(false);
+    }
+
+    emit(state.copyWith(message: message, isComposing: isComposing));
+  }
 
   Future<void> getMyAvatarUrl() async {
     final userDB = await userBox.getUser();
@@ -79,6 +91,10 @@ class ChatCubit extends Cubit<ChatState> {
             _subscribeToMessages(chatRoom.id);
             _subscribeToBlockStatus(receiverId);
             _subscribeToUserInfo(receiverId);
+            _subscribeToTypingStatus(
+              chatRoomId: chatRoom.id,
+              receiverId: receiverId,
+            );
 
             emit(
               state.copyWith(
@@ -131,6 +147,10 @@ class ChatCubit extends Cubit<ChatState> {
             _subscribeToMessages(chatRoom.id);
             _subscribeToBlockStatus(receiverId);
             _subscribeToUserInfo(receiverId);
+            _subscribeToTypingStatus(
+              chatRoomId: chatRoom.id,
+              receiverId: receiverId,
+            );
 
             emit(
               state.copyWith(
@@ -345,11 +365,50 @@ class ChatCubit extends Cubit<ChatState> {
     );
   }
 
+  void _subscribeToTypingStatus({
+    required String chatRoomId,
+    required String receiverId,
+  }) {
+    _typingSubscription?.cancel();
+    _typingSubscription = _chatRepository
+        .getTypingStatus(chatRoomId: chatRoomId, receiverId: receiverId)
+        .listen(
+          (status) {
+            emit(state.copyWith(isReceiverTyping: status));
+          },
+          onError: (error) {
+            // print("error getting online status");
+          },
+        );
+  }
+
+  void startTyping() {
+    if (state.chatRoomId == null) return;
+
+    typingTimer?.cancel();
+    _updateTypingStatus(true);
+  }
+
+  Future<void> _updateTypingStatus(bool isTyping) async {
+    if (state.chatRoomId == null) return;
+
+    try {
+      await _chatRepository.updateTypingStatus(
+        state.chatRoomId!,
+        currentUserId,
+        isTyping,
+      );
+    } catch (e) {
+      log("error updating typing status $e");
+    }
+  }
+
   Future<void> leaveRoom() async {
     _messageSubscription?.cancel();
     _amIBlockStatusSubscription?.cancel();
     _blockStatusSubscription?.cancel();
     _userInfoSubscription?.cancel();
+    _typingSubscription?.cancel();
     _isInChat = false;
   }
 
@@ -359,6 +418,7 @@ class ChatCubit extends Cubit<ChatState> {
     _amIBlockStatusSubscription?.cancel();
     _blockStatusSubscription?.cancel();
     _userInfoSubscription?.cancel();
+    _typingSubscription?.cancel();
     _isInChat = false;
     return super.close();
   }

@@ -7,6 +7,7 @@ class ChatState extends Equatable {
 
   final List<ChatMessageModel> messages;
   final bool isReceiverTyping;
+  final bool isComposing;
   final bool isReceiverOnline;
   final bool hasMoreMessages;
   final bool isLoadingMore;
@@ -26,6 +27,7 @@ class ChatState extends Equatable {
     this.status = ChatStatus.inital,
     this.messages = const [],
     this.isReceiverTyping = false,
+    this.isComposing = false,
     this.isReceiverOnline = false,
     this.hasMoreMessages = true,
     this.isLoadingMore = false,
@@ -49,6 +51,7 @@ class ChatState extends Equatable {
     String? chatRoomId,
     List<ChatMessageModel>? messages,
     bool? isReceiverTyping,
+    bool? isComposing,
     bool? isReceiverOnline,
     Timestamp? receiverLastSeen,
     bool? hasMoreMessages,
@@ -68,6 +71,7 @@ class ChatState extends Equatable {
       chatRoomId: chatRoomId ?? this.chatRoomId,
       messages: messages ?? this.messages,
       isReceiverTyping: isReceiverTyping ?? this.isReceiverTyping,
+      isComposing: isComposing ?? this.isComposing,
       isReceiverOnline: isReceiverOnline ?? this.isReceiverOnline,
       receiverLastSeen: receiverLastSeen ?? this.receiverLastSeen,
       hasMoreMessages: hasMoreMessages ?? this.hasMoreMessages,
@@ -91,6 +95,7 @@ class ChatState extends Equatable {
       chatRoomId,
       messages,
       isReceiverTyping,
+      isComposing,
       isReceiverOnline,
       receiverLastSeen,
       hasMoreMessages,

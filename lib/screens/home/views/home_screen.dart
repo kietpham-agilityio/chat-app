@@ -22,6 +22,7 @@ import 'package:chat_app/core/widgets/widgets.dart'
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
 import 'package:chat_app/repositories/repositories.dart'
     show AuthRepository, ChatRepository;
+import 'package:chat_app/screens/chat/views/chat_screen.dart';
 import 'package:chat_app/screens/home/cubit/home_cubit.dart';
 import 'package:chat_app/screens/search/views/search_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
@@ -162,22 +163,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         return ListView.builder(
                           itemCount: state.chats.length,
                           itemBuilder: (_, index) {
+                            final otherUserId = state.chats[index].participants
+                                .firstWhere(
+                                  (id) =>
+                                      id !=
+                                      FirebaseAuth.instance.currentUser?.uid,
+                                );
                             return _ChatListTile(
                               chatRoom: state.chats[index],
                               currentUserId:
                                   FirebaseAuth.instance.currentUser?.uid ?? '',
+                              otherUserId: otherUserId,
                               onTap: () {
-                                final otherUserId = state
-                                    .chats[index]
-                                    .participants
-                                    .firstWhere(
-                                      (id) =>
-                                          id !=
-                                          FirebaseAuth
-                                              .instance
-                                              .currentUser
-                                              ?.uid,
-                                    );
                                 final outherUserName =
                                     state
                                         .chats[index]
@@ -243,11 +240,13 @@ class _ChatListTile extends StatelessWidget {
   const _ChatListTile({
     required this.chatRoom,
     required this.currentUserId,
+    required this.otherUserId,
     required this.onTap,
   });
 
   final ChatRoomModel chatRoom;
   final String currentUserId;
+  final String otherUserId;
   final VoidCallback onTap;
 
   @override
@@ -313,23 +312,25 @@ class _ChatListTile extends StatelessWidget {
               title: CATitleMediumText(
                 text: getOtherUsername().capitalizeWords(),
               ),
-              subtitle: Row(
-                children: [
-                  Flexible(
-                    child: CABodyMediumText(
-                      text: isMe
-                          ? 'You: ${chatRoom.lastMessage ?? ''}'
-                          : chatRoom.lastMessage ?? '',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+              subtitle: chatRoom.isTypingByUser[otherUserId] ?? false
+                  ? LoadingDots()
+                  : Row(
+                      children: [
+                        Flexible(
+                          child: CABodyMediumText(
+                            text: isMe
+                                ? 'You: ${chatRoom.lastMessage ?? ''}'
+                                : chatRoom.lastMessage ?? '',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        CABodyMediumText(
+                          text: chatRoom.lastMessageTime?.timeAgo() ?? '',
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  CABodyMediumText(
-                    text: chatRoom.lastMessageTime?.timeAgo() ?? '',
-                  ),
-                ],
-              ),
               onTap: onTap,
             ),
             const CADivider(),
