@@ -18,7 +18,7 @@ class AuthMocks {
 
   static final mockFullName = 'Test User';
 
-  static final mockphoneNumber = '0123456789';
+  static final mockPhoneNumber = '0123456789';
 
   static final mockPassword = 'password123';
 
@@ -28,7 +28,7 @@ class AuthMocks {
     uid: mockUid,
     email: mockEmail,
     fullName: mockFullName,
-    phoneNumber: mockphoneNumber,
+    phoneNumber: mockPhoneNumber,
     country: 'USA',
   );
 }

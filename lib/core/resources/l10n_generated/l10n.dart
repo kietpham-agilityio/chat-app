@@ -440,6 +440,26 @@ class S {
     );
   }
 
+  /// `There was an error getting typing status.`
+  String get errorFailedToGetTypingStatus {
+    return Intl.message(
+      'There was an error getting typing status.',
+      name: 'errorFailedToGetTypingStatus',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Failed to parse typing status. Please try again.`
+  String get errorFailedToParseTypingStatus {
+    return Intl.message(
+      'Failed to parse typing status. Please try again.',
+      name: 'errorFailedToParseTypingStatus',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Email Address`
   String get generalEmailAddress {
     return Intl.message(

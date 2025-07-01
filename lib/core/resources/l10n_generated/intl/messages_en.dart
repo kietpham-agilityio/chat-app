@@ -78,6 +78,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "errorFailedToGetOrCreateChatRoom":
             MessageLookupByLibrary.simpleMessage(
                 "Failed to get or create chat room. Please try again."),
+        "errorFailedToGetTypingStatus": MessageLookupByLibrary.simpleMessage(
+            "There was an error getting typing status."),
         "errorFailedToGetUserData": MessageLookupByLibrary.simpleMessage(
             "Failed to get user data. Please try again."),
         "errorFailedToGettingAmIBlocked": MessageLookupByLibrary.simpleMessage(
@@ -91,6 +93,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Failed to load user info. Please try again."),
         "errorFailedToMarkMessagesAsRead": MessageLookupByLibrary.simpleMessage(
             "Failed to mark messages as read. Please try again."),
+        "errorFailedToParseTypingStatus": MessageLookupByLibrary.simpleMessage(
+            "Failed to parse typing status. Please try again."),
         "errorFailedToParseUserData": MessageLookupByLibrary.simpleMessage(
             "Failed to parse user data. Please try again."),
         "errorFailedToPickImage": MessageLookupByLibrary.simpleMessage(

@@ -39,6 +39,8 @@
   "errorFailedToCheckIfUserIsBlocked": "Failed to check if user is blocked. Please try again.",
   "errorFailedToBlockUser": "Failed to block user. Please try again.",
   "errorFailedToUnblockUser": "Failed to unblock user. Please try again.",
+  "errorFailedToGetTypingStatus": "There was an error getting typing status.",
+  "errorFailedToParseTypingStatus": "Failed to parse typing status. Please try again.",
   "generalEmailAddress": "Email Address",
   "generalEmailAddressHint": "Enter your email address",
   "generalPassword": "Password",
