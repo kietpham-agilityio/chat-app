@@ -48,12 +48,12 @@ void main() {
     blocTest<SignUpCubit, SignUpState>(
       'emits updated phoneNumber when phoneNumberChanged is called',
       build: () => SignUpCubit(authRepository),
-      act: (cubit) => cubit.phoneNumberChanged(AuthMocks.mockphoneNumber),
+      act: (cubit) => cubit.phoneNumberChanged(AuthMocks.mockPhoneNumber),
       expect: () => [
         isA<SignUpState>().having(
           (s) => s.phoneNumber.value,
           'phoneNumber',
-          AuthMocks.mockphoneNumber,
+          AuthMocks.mockPhoneNumber,
         ),
       ],
     );
@@ -61,12 +61,12 @@ void main() {
     blocTest<SignUpCubit, SignUpState>(
       'emits updated phoneNumber when phoneNumberValidation is called',
       build: () => SignUpCubit(authRepository),
-      act: (cubit) => cubit.phoneNumberValidation(AuthMocks.mockphoneNumber),
+      act: (cubit) => cubit.phoneNumberValidation(AuthMocks.mockPhoneNumber),
       expect: () => [
         isA<SignUpState>().having(
           (s) => s.phoneNumber.value,
           'phoneNumber',
-          AuthMocks.mockphoneNumber,
+          AuthMocks.mockPhoneNumber,
         ),
       ],
     );

@@ -47,7 +47,6 @@ scripts:
         lib/core/utils/*
         lib/main.dart
         lib/firebase_options.dart
-        lib/screens/auth/views/*
         lib/screens/chat/views/*
         lib/screens/home/views/*
         lib/screens/my_account/views/*

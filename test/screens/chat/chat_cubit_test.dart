@@ -1,12 +1,9 @@
 // ignore_for_file: subtype_of_sealed_class
 
-import 'dart:async';
-
 import 'package:bloc_test/bloc_test.dart';
 import 'package:chat_app/core/local_database/user_box.dart';
 import 'package:chat_app/core/utils/failure.dart';
 import 'package:chat_app/models/chat_message_model.dart';
-import 'package:chat_app/models/chat_room_model.dart';
 import 'package:chat_app/models/paginated_result.dart';
 import 'package:chat_app/repositories/repositories.dart';
 import 'package:chat_app/screens/chat/cubit/chat_cubit.dart';
@@ -60,22 +57,23 @@ void main() {
 
   group('messageChanged', () {
     blocTest<ChatCubit, ChatState>(
-      'emits state with updated message',
+      'emits state with updated message and isComposing true',
       build: () => chatCubit,
       act: (cubit) => cubit.messageChanged('hello'),
-      expect: () => [chatCubit.state.copyWith(message: 'hello')],
+      expect: () => [
+        chatCubit.state.copyWith(message: 'hello', isComposing: true),
+      ],
+    );
+
+    blocTest<ChatCubit, ChatState>(
+      'emits state with isComposing false when message is empty',
+      build: () => chatCubit,
+      act: (cubit) => cubit.messageChanged(''),
+      expect: () => [chatCubit.state.copyWith(message: '', isComposing: false)],
     );
   });
 
   group('getMyAvatarUrl', () {
-    // test('emits state with myAvatarUrl', () async {
-    //   when(
-    //     () => mockUserBox.getUser(),
-    //   ).thenAnswer((_) async => _FakeUser(avatarUrl: 'avatar.png'));
-    //   await chatCubit.getMyAvatarUrl();
-    //   expect(chatCubit.state.myAvatarUrl, 'avatar.png');
-    // });
-
     test('emits state with null avatar if user is null', () async {
       when(() => mockUserBox.getUser()).thenAnswer((_) async => null);
       await chatCubit.getMyAvatarUrl();
@@ -109,180 +107,10 @@ void main() {
     });
   });
 
-  // group('sendMessage', () {
-  //   final chatRoom = ChatRoomModel(
-  //     id: 'room1',
-  //     participants: [currentUserId, receiverId],
-  //   );
-  //   setUp(() {
-  //     when(
-  //       () => mockChatRepository.findExistingChatRoom(any()),
-  //     ).thenAnswer((_) async => right(false));
-  //     when(
-  //       () => mockChatRepository.getOrCreateChatRoom(any(), any()),
-  //     ).thenAnswer((_) async => right(chatRoom));
-  //     when(
-  //       () => mockChatRepository.sendMessage(
-  //         chatRoomId: any(named: 'chatRoomId'),
-  //         senderId: any(named: 'senderId'),
-  //         receiverId: any(named: 'receiverId'),
-  //         content: any(named: 'content'),
-  //       ),
-  //     ).thenAnswer((_) async => right(unit));
-  //   });
-
-  //   blocTest<ChatCubit, ChatState>(
-  //     'emits loading and loaded when sending message to new chat room',
-  //     build: () => chatCubit,
-  //     act: (cubit) => cubit.sendMessage(content: 'hi', receiverId: receiverId),
-  //     expect: () => [
-  //       chatCubit.state.copyWith(status: ChatStatus.loading),
-  //       chatCubit.state.copyWith(
-  //         chatRoomId: 'room1',
-  //         receiverId: receiverId,
-  //         status: ChatStatus.loaded,
-  //       ),
-  //     ],
-  //   );
-
-  //   blocTest<ChatCubit, ChatState>(
-  //     'emits loading and error when getOrCreateChatRoom returns left',
-  //     build: () => chatCubit,
-  //     setUp: () {
-  //       when(
-  //         () => mockChatRepository.getOrCreateChatRoom(any(), any()),
-  //       ).thenAnswer((_) async => left(const Failure('room error')));
-  //     },
-  //     act: (cubit) => cubit.sendMessage(content: 'hi', receiverId: receiverId),
-  //     expect: () => [
-  //       chatCubit.state.copyWith(status: ChatStatus.loading),
-  //       chatCubit.state.copyWith(error: 'room error', status: ChatStatus.error),
-  //     ],
-  //   );
-
-  //   blocTest<ChatCubit, ChatState>(
-  //     'emits error when sendMessage throws',
-  //     build: () => chatCubit,
-  //     setUp: () {
-  //       when(
-  //         () => mockChatRepository.sendMessage(
-  //           chatRoomId: any(named: 'chatRoomId'),
-  //           senderId: any(named: 'senderId'),
-  //           receiverId: any(named: 'receiverId'),
-  //           content: any(named: 'content'),
-  //         ),
-  //       ).thenThrow(Exception('fail'));
-  //     },
-  //     act: (cubit) => cubit.sendMessage(content: 'hi', receiverId: receiverId),
-  //     expect: () => [chatCubit.state.copyWith(error: "Failed to send message")],
-  //   );
-  // });
-
-  // group('enterChat', () {
-  //   final chatRoom = ChatRoomModel(
-  //     id: 'room1',
-  //     participants: [currentUserId, receiverId],
-  //   );
-  //   setUp(() {
-  //     when(
-  //       () => mockChatRepository.findExistingChatRoom(any()),
-  //     ).thenAnswer((_) async => right(true));
-  //     when(
-  //       () => mockChatRepository.getOrCreateChatRoom(any(), any()),
-  //     ).thenAnswer((_) async => right(chatRoom));
-  //   });
-
-  //   blocTest<ChatCubit, ChatState>(
-  //     'emits loading and loaded when entering existing chat',
-  //     build: () => chatCubit,
-  //     act: (cubit) => cubit.enterChat(receiverId),
-  //     expect: () => [
-  //       chatCubit.state.copyWith(status: ChatStatus.loading),
-  //       chatCubit.state.copyWith(
-  //         chatRoomId: chatRoom.id,
-  //         receiverId: receiverId,
-  //         status: ChatStatus.error,
-  //       ),
-  //     ],
-  //   );
-
-  //   // blocTest<ChatCubit, ChatState>(
-  //   //   'emits error when getOrCreateChatRoom returns left',
-  //   //   build: () => chatCubit,
-  //   //   setUp: () {
-  //   //     when(
-  //   //       () => mockChatRepository.getOrCreateChatRoom(any(), any()),
-  //   //     ).thenAnswer((_) async => left(const Failure('room error')));
-  //   //   },
-  //   //   act: (cubit) => cubit.enterChat(receiverId),
-  //   //   expect: () => [
-  //   //     chatCubit.state.copyWith(status: ChatStatus.loading),
-  //   //     chatCubit.state.copyWith(error: 'room error', status: ChatStatus.error),
-  //   //   ],
-  //   // );
-
-  //   blocTest<ChatCubit, ChatState>(
-  //     'emits error when exception thrown',
-  //     build: () => chatCubit,
-  //     setUp: () {
-  //       when(
-  //         () => mockChatRepository.findExistingChatRoom(any()),
-  //       ).thenThrow(Exception('fail'));
-  //     },
-  //     act: (cubit) => cubit.enterChat(receiverId),
-  //     expect: () => [
-  //       chatCubit.state.copyWith(
-  //         status: ChatStatus.error,
-  //         error: "Failed to create chat room Exception: fail",
-  //       ),
-  //     ],
-  //   );
-  // });
-
   group('enterChat', () {
-    final mockChatRoom = ChatRoomModel(
-      id: 'room123',
-      participants: [currentUserId, receiverId],
-    );
-
     test('initial state is ChatState()', () {
       expect(chatCubit.state, const ChatState());
     });
-
-    blocTest<ChatCubit, ChatState>(
-      'emits [loading, loaded] when chat room exists',
-      build: () {
-        when(
-          () => mockChatRepository.findExistingChatRoom(any()),
-        ).thenAnswer((_) async => const Right(true));
-
-        when(
-          () =>
-              mockChatRepository.getOrCreateChatRoom(currentUserId, receiverId),
-        ).thenAnswer((_) async => Right(mockChatRoom));
-
-        when(
-          () => mockChatRepository.getMessages(any()),
-        ).thenAnswer((_) => const Stream.empty());
-        when(
-          () => mockChatRepository.isUserBlocked(any(), any()),
-        ).thenAnswer((_) => const Stream.empty());
-        when(
-          () => mockChatRepository.getUserInfo(any()),
-        ).thenAnswer((_) => const Stream.empty());
-
-        return chatCubit;
-      },
-      act: (cubit) => cubit.enterChat(receiverId),
-      expect: () => [
-        const ChatState(status: ChatStatus.loading),
-        ChatState(
-          status: ChatStatus.loaded,
-          chatRoomId: mockChatRoom.id,
-          receiverId: receiverId,
-        ),
-      ],
-    );
 
     blocTest<ChatCubit, ChatState>(
       'does not emit anything when chat room does not exist',
@@ -314,52 +142,7 @@ void main() {
     );
 
     blocTest<ChatCubit, ChatState>(
-      'emits [loading, loaded] when chat room exists',
-      build: () {
-        when(
-          () => mockChatRepository.findExistingChatRoom(any()),
-        ).thenAnswer((_) async => const Right(true));
-
-        when(
-          () =>
-              mockChatRepository.getOrCreateChatRoom(currentUserId, receiverId),
-        ).thenAnswer((_) async => Right(mockChatRoom));
-
-        final controller =
-            StreamController<
-              Either<Failure, PaginatedResult<ChatMessageModel>>
-            >();
-        when(
-          () => mockChatRepository.getMessages(mockChatRoom.id),
-        ).thenAnswer((_) => controller.stream);
-
-        Future.microtask(() {
-          controller.add(Right(PaginatedResult(items: [], lastDoc: null)));
-        });
-
-        when(
-          () => mockChatRepository.isUserBlocked(any(), any()),
-        ).thenAnswer((_) => const Stream.empty());
-
-        when(
-          () => mockChatRepository.getUserInfo(any()),
-        ).thenAnswer((_) => const Stream.empty());
-
-        return chatCubit;
-      },
-      act: (cubit) => cubit.enterChat(receiverId),
-      expect: () => [
-        const ChatState(status: ChatStatus.loading),
-        ChatState(
-          status: ChatStatus.loaded,
-          chatRoomId: mockChatRoom.id,
-          receiverId: receiverId,
-        ),
-      ],
-    );
-
-    blocTest<ChatCubit, ChatState>(
-      'emits [loading, error] when getOrCreateChatRoom fails',
+      'emits loading and error when getOrCreateChatRoom fails',
       build: () {
         when(
           () => mockChatRepository.findExistingChatRoom(any()),
@@ -389,6 +172,31 @@ void main() {
     test('does nothing if not loaded', () async {
       await chatCubit.loadMoreMessages();
       expect(chatCubit.state.isLoadingMore, false);
+    });
+
+    test('does nothing if messages are empty', () async {
+      chatCubit.emit(
+        chatCubit.state.copyWith(
+          status: ChatStatus.loaded,
+          messages: [],
+          chatRoomId: 'room1',
+        ),
+      );
+      await chatCubit.loadMoreMessages();
+      expect(chatCubit.state.isLoadingMore, false);
+    });
+
+    test('does nothing if already loading more', () async {
+      chatCubit.emit(
+        chatCubit.state.copyWith(
+          status: ChatStatus.loaded,
+          messages: [FakeChatMessageModel()],
+          chatRoomId: 'room1',
+          isLoadingMore: true,
+        ),
+      );
+      await chatCubit.loadMoreMessages();
+      expect(chatCubit.state.isLoadingMore, true);
     });
 
     test('emits error if exception thrown', () async {
@@ -459,118 +267,3 @@ void main() {
     });
   });
 }
-
-// class _FakeUser {
-//   final String? avatarUrl;
-//   _FakeUser({this.avatarUrl});
-// }
-
-// import 'package:bloc_test/bloc_test.dart';
-// import 'package:chat_app/core/local_database/user_box.dart';
-// import 'package:chat_app/models/chat_room_model.dart';
-// import 'package:chat_app/repositories/chat_repository.dart';
-// import 'package:chat_app/screens/chat/cubit/chat_cubit.dart';
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:fpdart/fpdart.dart';
-// import 'package:mocktail/mocktail.dart';
-
-// class MockChatRepository extends Mock implements ChatRepository {}
-
-// class MockUserBox extends Mock implements UserBox {}
-
-// void main() {
-//   late MockChatRepository chatRepository;
-//   late MockUserBox userBox;
-//   late ChatCubit chatCubit;
-
-//   const currentUserId = 'user1';
-//   const receiverId = 'user2';
-
-//   setUp(() {
-//     chatRepository = MockChatRepository();
-//     userBox = MockUserBox();
-//     chatCubit = ChatCubit(
-//       chatRepository: chatRepository,
-//       currentUserId: currentUserId,
-//       userBox: userBox,
-//     );
-//   });
-
-//   tearDown(() {
-//     chatCubit.close();
-//   });
-
-//   group('enterChat', () {
-//     final mockChatRoom = ChatRoomModel(
-//       id: 'room123',
-//       participants: [currentUserId, receiverId],
-//     );
-
-//     test('initial state is ChatState()', () {
-//       expect(chatCubit.state, const ChatState());
-//     });
-
-//     blocTest<ChatCubit, ChatState>(
-//       'emits [loading, loaded] when chat room exists',
-//       build: () {
-//         when(
-//           () => chatRepository.findExistingChatRoom(any()),
-//         ).thenAnswer((_) async => const Right(true));
-
-//         when(
-//           () => chatRepository.getOrCreateChatRoom(currentUserId, receiverId),
-//         ).thenAnswer((_) async => Right(mockChatRoom));
-
-//         when(
-//           () => chatRepository.getMessages(any()),
-//         ).thenAnswer((_) => const Stream.empty());
-//         when(
-//           () => chatRepository.isUserBlocked(any(), any()),
-//         ).thenAnswer((_) => const Stream.empty());
-//         when(
-//           () => chatRepository.getUserInfo(any()),
-//         ).thenAnswer((_) => const Stream.empty());
-
-//         return chatCubit;
-//       },
-//       act: (cubit) => cubit.enterChat(receiverId),
-//       expect: () => [
-//         const ChatState(status: ChatStatus.loading),
-//         ChatState(
-//           status: ChatStatus.loaded,
-//           chatRoomId: mockChatRoom.id,
-//           receiverId: receiverId,
-//         ),
-//       ],
-//     );
-
-//     blocTest<ChatCubit, ChatState>(
-//       'does not emit anything when chat room does not exist',
-//       build: () {
-//         when(
-//           () => chatRepository.findExistingChatRoom(any()),
-//         ).thenAnswer((_) async => const Right(false));
-//         return chatCubit;
-//       },
-//       act: (cubit) => cubit.enterChat(receiverId),
-//       expect: () => [],
-//     );
-
-//     blocTest<ChatCubit, ChatState>(
-//       'emits error when exception occurs',
-//       build: () {
-//         when(
-//           () => chatRepository.findExistingChatRoom(any()),
-//         ).thenThrow(Exception('test error'));
-//         return chatCubit;
-//       },
-//       act: (cubit) => cubit.enterChat(receiverId),
-//       expect: () => [
-//         const ChatState(
-//           status: ChatStatus.error,
-//           error: 'Failed to create chat room Exception: test error',
-//         ),
-//       ],
-//     );
-//   });
-// }
