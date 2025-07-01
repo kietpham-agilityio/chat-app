@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:chat_app/core/local_database/hive_local_db.dart';
-import 'package:chat_app/core/notifications/notifications_controller.dart';
 import 'package:chat_app/core/notifications/notifications_model.dart'
     show
         NotificationEntity,
@@ -14,7 +13,10 @@ import 'package:chat_app/core/notifications/notifications_model.dart'
         ReplyNotification,
         NotificationType;
 import 'package:chat_app/core/notifications/notifications_setup.dart';
+import 'package:chat_app/models/chat_message_model.dart';
 import 'package:chat_app/repositories/auth_repository.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class NotificationsService {
   static NotificationEntity entity = NotificationEntity.initialize();
@@ -27,8 +29,11 @@ class NotificationsService {
     await _requestNotificationPermission();
     await _setupFCM();
     await getToken(authRepository);
+  }
+
+  static Future<void> setNotificationListeners() async {
     await awesomeNotifications.setListeners(
-      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+      onActionReceivedMethod: onActionReceivedMethod,
     );
   }
 
@@ -58,6 +63,8 @@ class NotificationsService {
       onFcmTokenHandle: myFcmTokenHandle,
       onFcmSilentDataHandle: mySilentDataHandle,
       onNativeTokenHandle: myNativeTokenHandle,
+      licenseKeys: null,
+      debug: true,
     );
   }
 
@@ -93,6 +100,11 @@ class NotificationsService {
   @pragma('vm:entry-point')
   static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
     log('Silent Data: ${silentData.data}');
+    final data = silentData.data;
+    final type = data?['payload.type'];
+    final accountId = data?['payload.accountId'];
+
+    log('[FCM Silent] Type: $type, Account: $accountId');
   }
 
   // when receiving native token
@@ -100,6 +112,71 @@ class NotificationsService {
   static Future<void> myNativeTokenHandle(String token) async {
     log('Native Token Handle: $token');
   }
+
+  @pragma('vm:entry-point')
+  static Future<void> onActionReceivedMethod(
+    ReceivedAction receivedAction,
+  ) async {
+    log('Received Action: ${receivedAction.toMap()}');
+    // if (receivedAction.actionType == ActionType.SilentBackgroundAction) {
+    switch (receivedAction.buttonKeyPressed) {
+      case 'NAVIGATE':
+        final data = receivedAction.payload ?? {};
+        NotificationHandler.handleTapNavigate(data, entity);
+        log('Navigate: ${data['type']}');
+        break;
+      case 'REPLY':
+        final replyText = receivedAction.buttonKeyInput;
+        log('Reply: $replyText');
+        final receiverId = receivedAction.payload?['accountId'];
+        final senderId = FirebaseAuth.instance.currentUser?.uid;
+
+        if (replyText.isNotEmpty && receiverId != null && senderId != null) {
+          final users = [senderId, receiverId]..sort();
+          final chatRoomId = users.join("_");
+
+          final batch = FirebaseFirestore.instance.batch();
+
+          final chatroom = FirebaseFirestore.instance.collection("chatRooms");
+
+          final messageRef = chatroom.doc(chatRoomId).collection('messages');
+
+          final messageDoc = messageRef.doc();
+
+          final message = ChatMessageModel(
+            id: messageDoc.id,
+            chatRoomId: chatRoomId,
+            senderId: senderId,
+            receiverId: receiverId,
+            content: replyText,
+            timestamp: Timestamp.now(),
+            readByUserIds: [senderId],
+          );
+
+          //add message to sub collection
+          batch.set(messageDoc, message.toMap());
+
+          //update chatroom
+
+          batch.update(chatroom.doc(chatRoomId), {
+            "lastMessage": replyText,
+            "lastMessageSenderId": senderId,
+            "lastMessageTime": message.timestamp,
+          });
+          await batch.commit();
+        }
+        break;
+      case 'LIKE':
+        log('Ontap Like action button');
+        break;
+      default:
+        final data = receivedAction.payload ?? {};
+        NotificationHandler.handleTapNavigate(data, entity);
+        log('Ontap notification: ${data['type']}');
+    }
+  }
+
+  // }
 }
 
 class NotificationHandler {
