@@ -18,10 +18,12 @@ import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+@pragma('vm:entry-point')
 class NotificationsService {
   static NotificationEntity entity = NotificationEntity.initialize();
 
   static AwesomeNotifications awesomeNotifications = AwesomeNotifications();
+
   static AwesomeNotificationsFcm awesomeFCM = AwesomeNotificationsFcm();
 
   Future<void> initialize(AuthRepository authRepository) async {
@@ -34,6 +36,7 @@ class NotificationsService {
   static Future<void> setNotificationListeners() async {
     await awesomeNotifications.setListeners(
       onActionReceivedMethod: onActionReceivedMethod,
+      onDismissActionReceivedMethod: onDismissActionReceivedMethod,
     );
   }
 
@@ -48,7 +51,7 @@ class NotificationsService {
         defaultPrivacy: NotificationPrivacy.Private,
         soundSource: 'resource://raw/notifications',
       ),
-    ]);
+    ], debug: true);
   }
 
   NotificationsService configure({
@@ -118,7 +121,6 @@ class NotificationsService {
     ReceivedAction receivedAction,
   ) async {
     log('Received Action: ${receivedAction.toMap()}');
-    // if (receivedAction.actionType == ActionType.SilentBackgroundAction) {
     switch (receivedAction.buttonKeyPressed) {
       case 'NAVIGATE':
         final data = receivedAction.payload ?? {};
@@ -173,10 +175,16 @@ class NotificationsService {
         final data = receivedAction.payload ?? {};
         NotificationHandler.handleTapNavigate(data, entity);
         log('Ontap notification: ${data['type']}');
+        break;
     }
   }
 
-  // }
+  @pragma('vm:entry-point')
+  static Future<void> onDismissActionReceivedMethod(
+    ReceivedAction? receivedAction,
+  ) async {
+    log('Dismissed Action: ${receivedAction?.toMap()}');
+  }
 }
 
 class NotificationHandler {

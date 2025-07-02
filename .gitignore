@@ -54,3 +54,5 @@ lib/core/resources/assets_generated
 firebase.json
 **/google-services.json
 **/GoogleService-Info.plist
+**/firebase-service-account.json
+**/node_modules
