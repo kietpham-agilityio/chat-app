@@ -17,6 +17,7 @@ import 'package:chat_app/models/chat_message_model.dart';
 import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 @pragma('vm:entry-point')
 class NotificationsService {
@@ -25,6 +26,8 @@ class NotificationsService {
   static AwesomeNotifications awesomeNotifications = AwesomeNotifications();
 
   static AwesomeNotificationsFcm awesomeFCM = AwesomeNotificationsFcm();
+
+  static int badgeCount = 0;
 
   Future<void> initialize(AuthRepository authRepository) async {
     await _setupNotification();
@@ -37,6 +40,8 @@ class NotificationsService {
     await awesomeNotifications.setListeners(
       onActionReceivedMethod: onActionReceivedMethod,
       onDismissActionReceivedMethod: onDismissActionReceivedMethod,
+      onNotificationCreatedMethod: onNotificationCreatedMethod,
+      onNotificationDisplayedMethod: onNotificationDisplayedMethod,
     );
   }
 
@@ -50,6 +55,7 @@ class NotificationsService {
         importance: NotificationImportance.High,
         defaultPrivacy: NotificationPrivacy.Private,
         soundSource: 'resource://raw/notifications',
+        // channelShowBadge: true,
       ),
     ], debug: true);
   }
@@ -66,7 +72,7 @@ class NotificationsService {
       onFcmTokenHandle: myFcmTokenHandle,
       onFcmSilentDataHandle: mySilentDataHandle,
       onNativeTokenHandle: myNativeTokenHandle,
-      licenseKeys: null,
+      // licenseKeys: null,
       debug: true,
     );
   }
@@ -120,6 +126,7 @@ class NotificationsService {
   static Future<void> onActionReceivedMethod(
     ReceivedAction receivedAction,
   ) async {
+    await Firebase.initializeApp();
     log('Received Action: ${receivedAction.toMap()}');
     switch (receivedAction.buttonKeyPressed) {
       case 'NAVIGATE':
@@ -184,6 +191,20 @@ class NotificationsService {
     ReceivedAction? receivedAction,
   ) async {
     log('Dismissed Action: ${receivedAction?.toMap()}');
+  }
+
+  @pragma('vm:entry-point')
+  static Future<void> onNotificationCreatedMethod(
+    ReceivedNotification? receivedNotification,
+  ) async {
+    log('🔢 onNotificationCreatedMethod');
+  }
+
+  @pragma('vm:entry-point')
+  static Future<void> onNotificationDisplayedMethod(
+    ReceivedNotification? receivedNotification,
+  ) async {
+    log('🔢 onNotificationDisplayedMethod');
   }
 }
 
