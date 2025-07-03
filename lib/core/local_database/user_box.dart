@@ -5,6 +5,7 @@ abstract class UserBox {
   Future<void> createEmptyUser();
   Future<UserDBModel?> getUser();
   Future<void> updateUser({
+    String? uid,
     String? fullName,
     String? email,
     String? phoneNumber,
@@ -36,6 +37,7 @@ class UserBoxImpl implements UserBox {
 
   @override
   Future<void> updateUser({
+    String? uid,
     String? fullName,
     String? email,
     String? phoneNumber,
@@ -52,6 +54,11 @@ class UserBoxImpl implements UserBox {
     if (user == null) return;
 
     bool hasChanged = false;
+
+    if (uid != null && uid != user.uid) {
+      user.uid = uid;
+      hasChanged = true;
+    }
 
     if (fullName != null && fullName != user.fullName) {
       user.fullName = fullName;
