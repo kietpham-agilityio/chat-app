@@ -8,6 +8,7 @@ name: modular
 
 packages:
   - .
+  - packages/**
 
 scripts:
   postbootstrap: >
@@ -67,3 +68,6 @@ scripts:
   coverage:
     run: brew install lcov && melos run test
     description: Run unit testing and generate html coverage report.
+
+  server: |
+    cd packages/chat-backend && npx node server.js
