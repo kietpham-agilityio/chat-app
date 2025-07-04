@@ -46,18 +46,29 @@ class NotificationsService {
   }
 
   Future<void> _setupNotification() async {
-    await awesomeNotifications.initialize(null, [
-      NotificationChannel(
-        channelKey: NotificationSetup.channelKey,
-        channelName: NotificationSetup.channelName,
-        channelDescription: NotificationSetup.channelDescription,
-        playSound: true,
-        importance: NotificationImportance.High,
-        defaultPrivacy: NotificationPrivacy.Private,
-        soundSource: 'resource://raw/notifications',
-        // channelShowBadge: true,
-      ),
-    ], debug: true);
+    await awesomeNotifications.initialize(
+      null,
+      [
+        NotificationChannel(
+          channelKey: NotificationSetup.channelKey,
+          channelName: NotificationSetup.channelName,
+          channelDescription: NotificationSetup.channelDescription,
+          channelGroupKey: NotificationSetup.channelGroupKey,
+          playSound: true,
+          importance: NotificationImportance.High,
+          defaultPrivacy: NotificationPrivacy.Private,
+          soundSource: 'resource://raw/notifications',
+          channelShowBadge: true,
+        ),
+      ],
+      channelGroups: [
+        NotificationChannelGroup(
+          channelGroupKey: NotificationSetup.channelGroupKey,
+          channelGroupName: NotificationSetup.channelGroupName,
+        ),
+      ],
+      debug: true,
+    );
   }
 
   NotificationsService configure({
@@ -184,12 +195,16 @@ class NotificationsService {
         log('Ontap notification: ${data['type']}');
         break;
     }
+    await awesomeNotifications.decrementGlobalBadgeCounter();
+    int badge = await awesomeNotifications.getGlobalBadgeCounter();
+    log('🔢 Current Badge Count: $badge');
   }
 
   @pragma('vm:entry-point')
   static Future<void> onDismissActionReceivedMethod(
     ReceivedAction? receivedAction,
   ) async {
+    await awesomeNotifications.decrementGlobalBadgeCounter();
     log('Dismissed Action: ${receivedAction?.toMap()}');
   }
 
@@ -204,7 +219,8 @@ class NotificationsService {
   static Future<void> onNotificationDisplayedMethod(
     ReceivedNotification? receivedNotification,
   ) async {
-    log('🔢 onNotificationDisplayedMethod');
+    int badge = await awesomeNotifications.getGlobalBadgeCounter();
+    log('📛 Badge Counter: $badge');
   }
 }
 
