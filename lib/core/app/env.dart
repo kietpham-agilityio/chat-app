@@ -33,4 +33,7 @@ final class CAEnv {
   );
   static const String iosClientId = String.fromEnvironment('IOS_CLIENT_ID');
   static const String iosBundleId = String.fromEnvironment('IOS_BUNDLE_ID');
+
+  // Mock data
+  static const String accountId = String.fromEnvironment('ACCOUNT_ID');
 }

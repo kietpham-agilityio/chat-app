@@ -5,21 +5,24 @@
       "name": "Run Debug",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart"
+      "program": "lib/main.dart",
+      "args": ["--dart-define-from-file", ".env"]
     },
     {
       "name": "Run Profile",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "flutterMode": "profile"
+      "flutterMode": "profile",
+      "args": ["--dart-define-from-file", ".env"]
     },
     {
       "name": "Run Release",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "args": ["--dart-define-from-file", ".env"]
     }
   ]
 }

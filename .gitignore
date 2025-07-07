@@ -47,6 +47,9 @@ app.*.map.json
 /android/app/release
 /android/app/.cxx
 
+# iOS
+/ios/build
+
 # Flutter gen
 lib/core/resources/assets_generated
 

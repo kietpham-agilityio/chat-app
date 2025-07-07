@@ -1,8 +1,13 @@
+import 'dart:io';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:chat_app/core/app/env.dart';
 import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
 import 'package:chat_app/core/extensions/timestamp_extensions.dart';
 import 'package:chat_app/core/local_database/user_db_model.dart';
 import 'package:chat_app/core/notifications/notifications_service.dart';
+import 'package:chat_app/core/notifications/notifications_setup.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/router/app_router.dart' show AppPaths;
 import 'package:chat_app/core/widgets/widgets.dart'
@@ -87,7 +92,38 @@ class _HomeScreenState extends State<HomeScreen> {
               appBar: CAAppBar(
                 title: CATitleMediumText(text: S.of(context).homeTitle),
                 leading: _Avatar(),
-                actions: [CAIconButtons(icon: CAAssets.plus())],
+                actions: [
+                  CAIconButtons(
+                    icon: CAAssets.plus(),
+                    onPressed: () async {
+                      // Mock notification for iOS
+                      if (Platform.isIOS) {
+                        NotificationsService.awesomeNotifications
+                            .createNotification(
+                              content: NotificationContent(
+                                id: 1,
+                                channelKey: NotificationSetup.channelKey,
+                                title: 'New message',
+                                body: 'Hi Kiet!',
+                                payload: {
+                                  'accountId': CAEnv.accountId,
+                                  'type': 'chat.details',
+                                  'accountName': 'Kiet Pham',
+                                },
+                              ),
+                              actionButtons: [
+                                NotificationActionButton(
+                                  key: 'REPLY',
+                                  label: 'Reply',
+                                  requireInputText: true,
+                                  actionType: ActionType.SilentAction,
+                                ),
+                              ],
+                            );
+                      }
+                    },
+                  ),
+                ],
               ),
               body: Column(
                 children: [
