@@ -1,28 +1,79 @@
 {
   "version": "0.2.0",
   "configurations": [
+    // DEV
     {
-      "name": "Run Debug",
+      "name": "Run DEV (Debug)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart",
-      "args": ["--dart-define-from-file", ".env"]
+      "program": "lib/main_dev.dart",
+      "args": ["--flavor", "dev", "--dart-define-from-file", ".env"]
     },
     {
-      "name": "Run Profile",
+      "name": "Run DEV (Profile)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart",
       "flutterMode": "profile",
-      "args": ["--dart-define-from-file", ".env"]
+      "program": "lib/main_dev.dart",
+      "args": ["--flavor", "dev", "--dart-define-from-file", ".env"]
     },
     {
-      "name": "Run Release",
+      "name": "Run DEV (Release)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main.dart",
       "flutterMode": "release",
-      "args": ["--dart-define-from-file", ".env"]
+      "program": "lib/main_dev.dart",
+      "args": ["--flavor", "dev", "--dart-define-from-file", ".env"]
+    },
+
+    // STAGING
+    {
+      "name": "Run STAGING (Debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_staging.dart",
+      "args": ["--flavor", "staging", "--dart-define-from-file", ".env.stag"]
+    },
+    {
+      "name": "Run STAGING (Profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main_staging.dart",
+      "args": ["--flavor", "staging", "--dart-define-from-file", ".env.stag"]
+    },
+    {
+      "name": "Run STAGING (Release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main_prod.dart",
+      "args": ["--flavor", "staging", "--dart-define-from-file", ".env.stag"]
+    },
+
+    // PROD
+    {
+      "name": "Run PROD (Debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_prod.dart",
+      "args": ["--flavor", "staging", "--dart-define-from-file", ".env.prod"]
+    },
+    {
+      "name": "Run PROD (Profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main_prod.dart",
+      "args": ["--flavor", "staging", "--dart-define-from-file", ".env.prod"]
+    },
+    {
+      "name": "Run PROD (Release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main_prod.dart",
+      "args": ["--flavor", "prod", "--dart-define-from-file", ".env.prod"]
     }
   ]
 }

@@ -36,4 +36,7 @@ final class CAEnv {
 
   // Mock data
   static const String accountId = String.fromEnvironment('ACCOUNT_ID');
+
+  // Environment
+  static const String env = String.fromEnvironment('APP_ENVIRONMENT');
 }
