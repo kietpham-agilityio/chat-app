@@ -32,7 +32,7 @@
       "request": "launch",
       "type": "dart",
       "program": "lib/main_staging.dart",
-      "args": ["--flavor", "staging", "--dart-define-from-file", ".env.stag"]
+      "args": ["--flavor", "stag", "--dart-define-from-file", ".env.stag"]
     },
     {
       "name": "Run STAGING (Profile)",
@@ -40,7 +40,7 @@
       "type": "dart",
       "flutterMode": "profile",
       "program": "lib/main_staging.dart",
-      "args": ["--flavor", "staging", "--dart-define-from-file", ".env.stag"]
+      "args": ["--flavor", "stag", "--dart-define-from-file", ".env.stag"]
     },
     {
       "name": "Run STAGING (Release)",
@@ -48,7 +48,7 @@
       "type": "dart",
       "flutterMode": "release",
       "program": "lib/main_prod.dart",
-      "args": ["--flavor", "staging", "--dart-define-from-file", ".env.stag"]
+      "args": ["--flavor", "stag", "--dart-define-from-file", ".env.stag"]
     },
 
     // PROD
@@ -57,7 +57,7 @@
       "request": "launch",
       "type": "dart",
       "program": "lib/main_prod.dart",
-      "args": ["--flavor", "staging", "--dart-define-from-file", ".env.prod"]
+      "args": ["--flavor", "prod", "--dart-define-from-file", ".env.prod"]
     },
     {
       "name": "Run PROD (Profile)",
@@ -65,7 +65,7 @@
       "type": "dart",
       "flutterMode": "profile",
       "program": "lib/main_prod.dart",
-      "args": ["--flavor", "staging", "--dart-define-from-file", ".env.prod"]
+      "args": ["--flavor", "prod", "--dart-define-from-file", ".env.prod"]
     },
     {
       "name": "Run PROD (Release)",

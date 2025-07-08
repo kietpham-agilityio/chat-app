@@ -16,13 +16,15 @@ android {
             dimension = "env"
             // uncomment the following line if you want to add a suffix to the applicationId
             // applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
             resValue("string", "app_name", "Chat App (DEV)")
         }
-        create("staging") {
+        create("stag") {
             dimension = "env"
             // uncomment the following line if you want to add a suffix to the applicationId
-            // applicationIdSuffix = ".staging"
-            resValue("string", "app_name", "Chat App (STAGING)")
+            // applicationIdSuffix = ".stag"
+            versionNameSuffix = "-stag"
+            resValue("string", "app_name", "Chat App (STAG)")
         }
         create("prod") {
             dimension = "env"
