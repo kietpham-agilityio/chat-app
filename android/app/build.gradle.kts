@@ -9,6 +9,29 @@ plugins {
 }
 
 android {
+    flavorDimensions += "env"
+
+    productFlavors {
+        create("dev") {
+            dimension = "env"
+            // uncomment the following line if you want to add a suffix to the applicationId
+            // applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            resValue("string", "app_name", "Chat App (DEV)")
+        }
+        create("stag") {
+            dimension = "env"
+            // uncomment the following line if you want to add a suffix to the applicationId
+            // applicationIdSuffix = ".stag"
+            versionNameSuffix = "-stag"
+            resValue("string", "app_name", "Chat App (STAG)")
+        }
+        create("prod") {
+            dimension = "env"
+            resValue("string", "app_name", "Chat App")
+        }
+    }
+
     namespace = "com.example.chat_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion

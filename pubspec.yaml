@@ -141,12 +141,6 @@ flutter_gen:
   integrations:
     flutter_svg: true
 
-flutter_icons:
-  android: true
-  ios: true
-  remove_alpha_ios: true
-  image_path: "assets/images/img_logo.png"
-
 flutter_native_splash:
   color: "#FFFFFF"
   image: "assets/images/img_splash.png"
