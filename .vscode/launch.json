@@ -6,24 +6,24 @@
       "name": "Run DEV (Debug)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main_dev.dart",
-      "args": ["--flavor", "dev", "--dart-define-from-file", ".env"]
+      "program": "lib/main.dart",
+      "args": ["--flavor", "dev", "--dart-define-from-file", ".env.dev"]
     },
     {
       "name": "Run DEV (Profile)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
-      "program": "lib/main_dev.dart",
-      "args": ["--flavor", "dev", "--dart-define-from-file", ".env"]
+      "program": "lib/main.dart",
+      "args": ["--flavor", "dev", "--dart-define-from-file", ".env.dev"]
     },
     {
       "name": "Run DEV (Release)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",
-      "program": "lib/main_dev.dart",
-      "args": ["--flavor", "dev", "--dart-define-from-file", ".env"]
+      "program": "lib/main.dart",
+      "args": ["--flavor", "dev", "--dart-define-from-file", ".env.dev"]
     },
 
     // STAGING
@@ -31,7 +31,7 @@
       "name": "Run STAGING (Debug)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main_staging.dart",
+      "program": "lib/main.dart",
       "args": ["--flavor", "stag", "--dart-define-from-file", ".env.stag"]
     },
     {
@@ -39,7 +39,7 @@
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
-      "program": "lib/main_staging.dart",
+      "program": "lib/main.dart",
       "args": ["--flavor", "stag", "--dart-define-from-file", ".env.stag"]
     },
     {
@@ -47,7 +47,7 @@
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",
-      "program": "lib/main_prod.dart",
+      "program": "lib/main.dart",
       "args": ["--flavor", "stag", "--dart-define-from-file", ".env.stag"]
     },
 
@@ -56,7 +56,7 @@
       "name": "Run PROD (Debug)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main_prod.dart",
+      "program": "lib/main.dart",
       "args": ["--flavor", "prod", "--dart-define-from-file", ".env.prod"]
     },
     {
@@ -64,7 +64,7 @@
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
-      "program": "lib/main_prod.dart",
+      "program": "lib/main.dart",
       "args": ["--flavor", "prod", "--dart-define-from-file", ".env.prod"]
     },
     {
@@ -72,7 +72,7 @@
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",
-      "program": "lib/main_prod.dart",
+      "program": "lib/main.dart",
       "args": ["--flavor", "prod", "--dart-define-from-file", ".env.prod"]
     }
   ]

@@ -61,5 +61,6 @@ firebase.json
 
 # Environment
 .env
+.env.dev
 .env.prod
 .env.stag

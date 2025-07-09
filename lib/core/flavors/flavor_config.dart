@@ -1,17 +1,17 @@
-enum Flavor { dev, staging, prod }
+enum Flavor { dev, stag, prod }
 
 class FlavorConfig {
-  final Flavor flavor;
-  final String name;
-  final String baseUrl;
-
-  static FlavorConfig? _instance;
-
   FlavorConfig._({
     required this.flavor,
     required this.name,
     required this.baseUrl,
   });
+
+  final Flavor flavor;
+  final String name;
+  final String baseUrl;
+
+  static FlavorConfig? _instance;
 
   factory FlavorConfig({
     required Flavor flavor,
@@ -29,9 +29,9 @@ class FlavorConfig {
     return _instance!;
   }
 
-  static bool isDev() => instance.flavor == Flavor.dev;
+  static bool isDev(String env) => env == Flavor.dev.name;
 
-  static bool isStaging() => instance.flavor == Flavor.staging;
+  static bool isStag(String env) => env == Flavor.stag.name;
 
-  static bool isProd() => instance.flavor == Flavor.prod;
+  static bool isProd(String env) => env == Flavor.prod.name;
 }
