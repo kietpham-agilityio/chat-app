@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' show log;
 
 import 'package:chat_app/core/router/router_guard.dart' show RouterGuard;
 import 'package:chat_app/screens/auth/views/login_screen.dart';
@@ -42,6 +43,16 @@ class AppRouter {
             builder: (_, state) {
               final receiverName = state.uri.queryParameters['receiverName'];
               final receiverId = state.uri.queryParameters['receiverId'];
+
+              AppRouteTracker.currentLocation = AppPaths.chat.path;
+              AppRouteTracker.currentChattingWithId = receiverId;
+
+              log(
+                'AppRouteTracker.currentChattingWithId: ${AppRouteTracker.currentChattingWithId}',
+              );
+              log(
+                'AppRouteTracker.currentLocation: ${AppRouteTracker.currentLocation}',
+              );
 
               return ChatMessageScreen(
                 receiverId: receiverId ?? '',
@@ -130,4 +141,9 @@ class AuthNotifier extends ChangeNotifier {
     _authSub.cancel();
     super.dispose();
   }
+}
+
+class AppRouteTracker {
+  static String currentLocation = '';
+  static String? currentChattingWithId;
 }

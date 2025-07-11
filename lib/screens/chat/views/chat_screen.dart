@@ -1,3 +1,4 @@
+import 'package:chat_app/core/app/my_app.dart';
 import 'package:chat_app/core/extensions/context_extensions.dart';
 import 'package:chat_app/core/extensions/datetime_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
@@ -213,7 +214,7 @@ class _ViewState extends State<_View> {
     _chatCubit = context.read<ChatCubit>();
     _chatCubit.enterChat(widget.receiverId);
     _scrollController.addListener(_onScroll);
-
+    ChatSessionManager.setCurrentUser(widget.receiverId);
     super.initState();
   }
 
@@ -222,7 +223,7 @@ class _ViewState extends State<_View> {
     _messageController.dispose();
     _scrollController.dispose();
     _chatCubit.leaveRoom();
-
+    ChatSessionManager.clearCurrentUser();
     super.dispose();
   }
 
