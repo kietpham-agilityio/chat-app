@@ -8,10 +8,13 @@ import 'package:chat_app/core/widgets/text.dart';
 import 'package:chat_app/core/widgets/widgets.dart'
     show CAAppBar, CAAssets, CAIconButtons, CATitleMediumText;
 import 'package:chat_app/screens/auth/states/auth_bloc.dart';
+import 'package:chat_app/screens/profile/cubit/profile_cubit.dart';
+import 'package:chat_app/screens/profile/cubit/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -23,70 +26,99 @@ class ProfileScreen extends StatelessWidget {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
-      child: Scaffold(
-        appBar: CAAppBar(
-          title: CATitleMediumText(text: S.of(context).profileTitle),
-          leading: CAIconButtons(
-            icon: CAAssets.arrowLeft(
-              semanticsLabel: S.of(context).semanticGoBack,
+      child: BlocProvider(
+        create: (context) => ProfileCubit(),
+        child: Scaffold(
+          appBar: CAAppBar(
+            title: CATitleMediumText(text: S.of(context).profileTitle),
+            leading: CAIconButtons(
+              icon: CAAssets.arrowLeft(
+                semanticsLabel: S.of(context).semanticGoBack,
+              ),
+              onPressed: () => context.pop(),
             ),
-            onPressed: () => context.pop(),
           ),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 32),
-              _Avatar(hive),
-              SizedBox(height: 6),
-              _FullName(hive),
-              SizedBox(height: 18),
-              _PhoneNumber(hive),
-              SizedBox(height: 24),
-              CAListTile(
-                semanticsLabel: S.of(context).semanticGoToEditProfile,
-                title: Text(S.of(context).profileMyAccountBtn),
-                leading: CAAssets.user(),
-                onTap: () {
-                  final user = hive.get('userBox');
-                  context.pushNamed(
-                    AppPaths.myAccount.name,
-                    queryParameters: {
-                      'email': user?.email,
-                      'fullName': user?.fullName,
-                      'phoneNumber': user?.phoneNumber,
-                      'country': user?.country,
-                      'avatarUrl': user?.avatarUrl,
-                    },
-                  );
-                },
+          body: LoaderOverlay(
+            child: BlocListener<ProfileCubit, ProfileState>(
+              listener: (context, state) {
+                if (state.status == ProfileStatus.loading) {
+                  context.loaderOverlay.show();
+                } else {
+                  context.loaderOverlay.hide();
+                }
+              },
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 32),
+                    _Avatar(hive),
+                    SizedBox(height: 6),
+                    _FullName(hive),
+                    SizedBox(height: 18),
+                    _PhoneNumber(hive),
+                    SizedBox(height: 24),
+                    CAListTile(
+                      semanticsLabel: S.of(context).semanticGoToEditProfile,
+                      title: Text(S.of(context).profileMyAccountBtn),
+                      leading: CAAssets.user(),
+                      onTap: () {
+                        final user = hive.get('userBox');
+                        context.pushNamed(
+                          AppPaths.myAccount.name,
+                          queryParameters: {
+                            'email': user?.email,
+                            'fullName': user?.fullName,
+                            'phoneNumber': user?.phoneNumber,
+                            'country': user?.country,
+                            'avatarUrl': user?.avatarUrl,
+                          },
+                        );
+                      },
+                    ),
+                    CAListTile(
+                      title: Text('Notifications'),
+                      leading: CAAssets.bell(),
+                      trailing: BlocSelector<ProfileCubit, ProfileState, bool>(
+                        selector: (state) => state.isNotificationEnabled,
+                        builder: (context, isNotificationEnabled) {
+                          return Switch(
+                            value: isNotificationEnabled,
+                            onChanged: context
+                                .read<ProfileCubit>()
+                                .onPushNotificationToggleChanged,
+                          );
+                        },
+                      ),
+                    ),
+                    CAListTile(
+                      title: Text('Privacy and safety'),
+                      leading: CAAssets.shield(),
+                    ),
+                    CAListTile(
+                      title: Text('Data and storage'),
+                      leading: CAAssets.pieChart(),
+                    ),
+                    CAListTile(
+                      title: Text('Devices'),
+                      leading: CAAssets.smartPhone(),
+                    ),
+                    CAListTile(title: Text('FAQ'), leading: CAAssets.help()),
+                    CAListTile(
+                      title: Text('Settings'),
+                      leading: CAAssets.settings(),
+                    ),
+                    CAListTile(
+                      title: Text(S.of(context).profileLogoutBtn),
+                      leading: CAAssets.logOut(),
+                      onTap: () => context.read<AuthBloc>().add(
+                        const AuthLogoutPressed(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              CAListTile(
-                title: Text('Notifications'),
-                leading: CAAssets.bell(),
-              ),
-              CAListTile(
-                title: Text('Privacy and safety'),
-                leading: CAAssets.shield(),
-              ),
-              CAListTile(
-                title: Text('Data and storage'),
-                leading: CAAssets.pieChart(),
-              ),
-              CAListTile(
-                title: Text('Devices'),
-                leading: CAAssets.smartPhone(),
-              ),
-              CAListTile(title: Text('FAQ'), leading: CAAssets.help()),
-              CAListTile(title: Text('Settings'), leading: CAAssets.settings()),
-              CAListTile(
-                title: Text(S.of(context).profileLogoutBtn),
-                leading: CAAssets.logOut(),
-                onTap: () =>
-                    context.read<AuthBloc>().add(const AuthLogoutPressed()),
-              ),
-            ],
+            ),
           ),
         ),
       ),
