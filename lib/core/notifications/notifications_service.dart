@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' show log;
 import 'dart:io';
 
@@ -18,6 +19,7 @@ import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
 class NotificationsService {
@@ -121,10 +123,61 @@ class NotificationsService {
   static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
     log('Silent Data: ${silentData.data}');
     final data = silentData.data;
-    final type = data?['payload.type'];
-    final accountId = data?['payload.accountId'];
 
-    log('[FCM Silent] Type: $type, Account: $accountId');
+    log(
+      '[FCM Silent] Type: ${data?['type']}, accountId: ${data?['accountId']}, accountName: ${data?['accountName']}',
+    );
+    final prefs = await SharedPreferences.getInstance();
+    log(
+      'current_chatting_user_id: ${prefs.getString('current_chatting_user_id') ?? ''}',
+    );
+
+    if (silentData.createdLifeCycle == NotificationLifeCycle.Foreground &&
+        (prefs.getString('current_chatting_user_id') ?? '') ==
+            data?['accountId']) {
+      return;
+    }
+
+    List<NotificationActionButton>? actionButtons;
+
+    try {
+      final actionBtnsRaw = data?['actionBtns'];
+      if (actionBtnsRaw != null && actionBtnsRaw.isNotEmpty) {
+        final decoded = jsonDecode(actionBtnsRaw);
+
+        if (decoded is List) {
+          actionButtons = decoded.map<NotificationActionButton>((item) {
+            return NotificationActionButton(
+              key: item['key'],
+              label: item['label'],
+              requireInputText: item['requireInputText'] ?? false,
+              autoDismissible: item['autoDismissible'] ?? true,
+              actionType: item['actionType'] == 'SilentAction'
+                  ? ActionType.SilentAction
+                  : ActionType.Default,
+            );
+          }).toList();
+        }
+      }
+    } catch (e, st) {
+      log('[FCM Silent] Failed to parse actionBtns: $e\n$st');
+    }
+
+    await awesomeNotifications.createNotification(
+      content: NotificationContent(
+        id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+        channelKey: NotificationSetup.channelKey,
+        title: data?['title'],
+        body: data?['body'],
+        payload: {
+          'accountId': data?['accountId'],
+          'type': data?['type'],
+          'accountName': data?['accountName'],
+        },
+        wakeUpScreen: true,
+      ),
+      actionButtons: actionButtons,
+    );
   }
 
   // when receiving native token
