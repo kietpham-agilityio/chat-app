@@ -82,7 +82,6 @@ dependencies:
 
   # Functional programming in Dart and Flutter. All the main functional programming types and patterns fully documented, tested, and with examples.
   fpdart: ^1.1.1
-  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

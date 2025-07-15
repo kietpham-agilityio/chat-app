@@ -19,7 +19,6 @@ import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
 class NotificationsService {
@@ -127,14 +126,14 @@ class NotificationsService {
     log(
       '[FCM Silent] Type: ${data?['type']}, accountId: ${data?['accountId']}, accountName: ${data?['accountName']}',
     );
-    final prefs = await SharedPreferences.getInstance();
-    log(
-      'current_chatting_user_id: ${prefs.getString('current_chatting_user_id') ?? ''}',
-    );
+
+    await HiveLocalDb.instance.init(isForeground: false);
+    final notifsBox = await HiveLocalDb.instance.notificationsBox
+        .getNotificationsBox();
+    log('current_chatting_user_id: ${notifsBox?.currentChattingWithId ?? ''}');
 
     if (silentData.createdLifeCycle == NotificationLifeCycle.Foreground &&
-        (prefs.getString('current_chatting_user_id') ?? '') ==
-            data?['accountId']) {
+        (notifsBox?.currentChattingWithId ?? '') == data?['accountId']) {
       return;
     }
 
