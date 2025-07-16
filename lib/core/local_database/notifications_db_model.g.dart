@@ -18,7 +18,7 @@ class NotificationsDBModelAdapter extends TypeAdapter<NotificationsDBModel> {
     };
     return NotificationsDBModel(
       currentChattingWithId: fields[0] as String,
-      isNotificationEnabled: fields[1] as bool,
+      isNotificationEnabled: fields[1] as bool?,
     );
   }
 

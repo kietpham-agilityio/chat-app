@@ -1,4 +1,6 @@
+// import 'package:chat_app/core/extensions/string_extensions.dart';
 import 'package:chat_app/core/extensions/string_extensions.dart';
+import 'package:chat_app/core/local_database/hive_local_db.dart';
 import 'package:chat_app/core/local_database/user_db_model.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/router/app_router.dart';
@@ -6,7 +8,13 @@ import 'package:chat_app/core/widgets/circle_avatar.dart';
 import 'package:chat_app/core/widgets/list_tile.dart';
 import 'package:chat_app/core/widgets/text.dart';
 import 'package:chat_app/core/widgets/widgets.dart'
-    show CAAppBar, CAAssets, CAIconButtons, CATitleMediumText;
+    show
+        CAAppBar,
+        CAAssets,
+        CAIconButtons,
+        CATitleMediumText,
+        CADialogManager,
+        CADialog;
 import 'package:chat_app/screens/auth/states/auth_bloc.dart';
 import 'package:chat_app/screens/profile/cubit/profile_cubit.dart';
 import 'package:chat_app/screens/profile/cubit/profile_state.dart';
@@ -15,6 +23,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -26,28 +35,48 @@ class ProfileScreen extends StatelessWidget {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
-      child: BlocProvider(
-        create: (context) => ProfileCubit(),
-        child: Scaffold(
-          appBar: CAAppBar(
-            title: CATitleMediumText(text: S.of(context).profileTitle),
-            leading: CAIconButtons(
-              icon: CAAssets.arrowLeft(
-                semanticsLabel: S.of(context).semanticGoBack,
+      child: LoaderOverlay(
+        child: BlocProvider(
+          create: (context) =>
+              ProfileCubit(HiveLocalDb.instance)..fetchNotification(),
+          child: BlocListener<ProfileCubit, ProfileState>(
+            listener: (BuildContext context, ProfileState state) {
+              if (state.status == ProfileStatus.loading) {
+                context.loaderOverlay.show();
+              } else {
+                context.loaderOverlay.hide();
+              }
+
+              if (state.status == ProfileStatus.openSettings) {
+                CADialogManager.showDialog(
+                  context: context,
+                  dialog: CADialog(
+                    title: 'Access required',
+                    content: 'Open settings to allow notifications',
+                    confirmButtonTitle: 'Open Settings',
+                    cancelButtonTitle: S.of(context).chatMessageCancelBtn,
+                    onCancel: () => context.pop(),
+                    onConfirm: () async {
+                      if (context.mounted) {
+                        context.pop();
+                      }
+                      await openAppSettings();
+                    },
+                  ),
+                );
+              }
+            },
+            child: Scaffold(
+              appBar: CAAppBar(
+                title: CATitleMediumText(text: S.of(context).profileTitle),
+                leading: CAIconButtons(
+                  icon: CAAssets.arrowLeft(
+                    semanticsLabel: S.of(context).semanticGoBack,
+                  ),
+                  onPressed: () => context.pop(),
+                ),
               ),
-              onPressed: () => context.pop(),
-            ),
-          ),
-          body: LoaderOverlay(
-            child: BlocListener<ProfileCubit, ProfileState>(
-              listener: (context, state) {
-                if (state.status == ProfileStatus.loading) {
-                  context.loaderOverlay.show();
-                } else {
-                  context.loaderOverlay.hide();
-                }
-              },
-              child: SingleChildScrollView(
+              body: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

@@ -6,12 +6,12 @@ part 'notifications_db_model.g.dart';
 class NotificationsDBModel extends HiveObject {
   NotificationsDBModel({
     this.currentChattingWithId = '',
-    this.isNotificationEnabled = false,
+    this.isNotificationEnabled,
   });
 
   @HiveField(0)
   String currentChattingWithId;
 
   @HiveField(1)
-  bool isNotificationEnabled;
+  bool? isNotificationEnabled;
 }

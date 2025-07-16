@@ -19,6 +19,7 @@ import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 @pragma('vm:entry-point')
 class NotificationsService {
@@ -91,9 +92,18 @@ class NotificationsService {
 
   Future<void> _requestNotificationPermission() async {
     bool isAllowed = await awesomeNotifications.isNotificationAllowed();
+    final notifisBox = await HiveLocalDb.instance.notificationsBox
+        .getNotificationsBox();
+
     if (!isAllowed) {
       // show a dialog to ask for permission
-      awesomeNotifications.requestPermissionToSendNotifications();
+      await Permission.notification.request().then((
+        PermissionStatus status,
+      ) async {
+        bool recheckPermission = await awesomeNotifications
+            .isNotificationAllowed();
+        notifisBox?.isNotificationEnabled ??= recheckPermission;
+      });
     }
   }
 
@@ -132,10 +142,20 @@ class NotificationsService {
         .getNotificationsBox();
     log('current_chatting_user_id: ${notifsBox?.currentChattingWithId ?? ''}');
 
-    if (silentData.createdLifeCycle == NotificationLifeCycle.Foreground &&
-        (notifsBox?.currentChattingWithId ?? '') == data?['accountId']) {
-      return;
-    }
+    // if (silentData.createdLifeCycle == NotificationLifeCycle.Foreground &&
+    //     (notifsBox?.currentChattingWithId ?? '') == data?['accountId']) {
+    //   return;
+    // } else if (!(notifsBox?.isNotificationEnabled ?? false)) {
+    //   return;
+    // }
+
+    final isInCurrentChat =
+        silentData.createdLifeCycle == NotificationLifeCycle.Foreground &&
+        (notifsBox?.currentChattingWithId ?? '') == data?['accountId'];
+
+    final isNotificationDisabled = !(notifsBox?.isNotificationEnabled ?? false);
+
+    if (isInCurrentChat || isNotificationDisabled) return;
 
     List<NotificationActionButton>? actionButtons;
 
