@@ -8,7 +8,8 @@ abstract class NotificationsBox {
 
   Future<void> editBox({
     String? currentChattingWithId,
-    bool? isNotificationEnabled,
+    bool? isNotifsEnabledInApp,
+    bool? isNotifsEnabledDevice,
   });
 
   Future<NotificationsDBModel?> getNotificationsBox();
@@ -30,7 +31,8 @@ class NotificationsBoxImpl implements NotificationsBox {
   @override
   Future<void> editBox({
     String? currentChattingWithId,
-    bool? isNotificationEnabled,
+    bool? isNotifsEnabledInApp,
+    bool? isNotifsEnabledDevice,
   }) async {
     final object = box.getAt(0);
 
@@ -44,9 +46,15 @@ class NotificationsBoxImpl implements NotificationsBox {
       hasChanged = true;
     }
 
-    if (isNotificationEnabled != null &&
-        isNotificationEnabled != object.isNotificationEnabled) {
-      object.isNotificationEnabled = isNotificationEnabled;
+    if (isNotifsEnabledInApp != null &&
+        isNotifsEnabledInApp != object.isNotificationEnabled) {
+      object.isNotificationEnabled = isNotifsEnabledInApp;
+      hasChanged = true;
+    }
+
+    if (isNotifsEnabledDevice != null &&
+        isNotifsEnabledDevice != object.isNotifsEnabledDevice) {
+      object.isNotifsEnabledDevice = isNotifsEnabledDevice;
       hasChanged = true;
     }
 

@@ -103,6 +103,7 @@ class NotificationsService {
         bool recheckPermission = await awesomeNotifications
             .isNotificationAllowed();
         notifisBox?.isNotificationEnabled ??= recheckPermission;
+        notifisBox?.isNotifsEnabledDevice ??= recheckPermission;
       });
     }
   }
@@ -141,13 +142,6 @@ class NotificationsService {
     final notifsBox = await HiveLocalDb.instance.notificationsBox
         .getNotificationsBox();
     log('current_chatting_user_id: ${notifsBox?.currentChattingWithId ?? ''}');
-
-    // if (silentData.createdLifeCycle == NotificationLifeCycle.Foreground &&
-    //     (notifsBox?.currentChattingWithId ?? '') == data?['accountId']) {
-    //   return;
-    // } else if (!(notifsBox?.isNotificationEnabled ?? false)) {
-    //   return;
-    // }
 
     final isInCurrentChat =
         silentData.createdLifeCycle == NotificationLifeCycle.Foreground &&

@@ -19,17 +19,20 @@ class NotificationsDBModelAdapter extends TypeAdapter<NotificationsDBModel> {
     return NotificationsDBModel(
       currentChattingWithId: fields[0] as String,
       isNotificationEnabled: fields[1] as bool?,
+      isNotifsEnabledDevice: fields[2] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, NotificationsDBModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.currentChattingWithId)
       ..writeByte(1)
-      ..write(obj.isNotificationEnabled);
+      ..write(obj.isNotificationEnabled)
+      ..writeByte(2)
+      ..write(obj.isNotifsEnabledDevice);
   }
 
   @override

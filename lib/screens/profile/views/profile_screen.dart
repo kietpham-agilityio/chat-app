@@ -25,8 +25,35 @@ import 'package:hive/hive.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen>
+    with WidgetsBindingObserver {
+  late ProfileCubit _profileCubit;
+  @override
+  void initState() {
+    super.initState();
+    _profileCubit = ProfileCubit(HiveLocalDb.instance);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _profileCubit.fetchNotification();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,47 +63,50 @@ class ProfileScreen extends StatelessWidget {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: LoaderOverlay(
-        child: BlocProvider(
-          create: (context) =>
-              ProfileCubit(HiveLocalDb.instance)..fetchNotification(),
-          child: BlocListener<ProfileCubit, ProfileState>(
-            listener: (BuildContext context, ProfileState state) {
-              if (state.status == ProfileStatus.loading) {
-                context.loaderOverlay.show();
-              } else {
-                context.loaderOverlay.hide();
-              }
-
-              if (state.status == ProfileStatus.openSettings) {
-                CADialogManager.showDialog(
-                  context: context,
-                  dialog: CADialog(
-                    title: 'Access required',
-                    content: 'Open settings to allow notifications',
-                    confirmButtonTitle: 'Open Settings',
-                    cancelButtonTitle: S.of(context).chatMessageCancelBtn,
-                    onCancel: () => context.pop(),
-                    onConfirm: () async {
-                      if (context.mounted) {
-                        context.pop();
-                      }
-                      await openAppSettings();
-                    },
-                  ),
-                );
-              }
-            },
-            child: Scaffold(
-              appBar: CAAppBar(
-                title: CATitleMediumText(text: S.of(context).profileTitle),
-                leading: CAIconButtons(
-                  icon: CAAssets.arrowLeft(
-                    semanticsLabel: S.of(context).semanticGoBack,
-                  ),
-                  onPressed: () => context.pop(),
-                ),
+        child: Scaffold(
+          appBar: CAAppBar(
+            title: CATitleMediumText(text: S.of(context).profileTitle),
+            leading: CAIconButtons(
+              icon: CAAssets.arrowLeft(
+                semanticsLabel: S.of(context).semanticGoBack,
               ),
-              body: SingleChildScrollView(
+              onPressed: () => context.pop(),
+            ),
+          ),
+          body: BlocProvider(
+            create: (context) => _profileCubit..fetchNotification(),
+            child: BlocListener<ProfileCubit, ProfileState>(
+              listener: (BuildContext context, ProfileState state) {
+                context.loaderOverlay.show();
+
+                if (state.status == ProfileStatus.loading ||
+                    state.status == ProfileStatus.initial) {
+                  context.loaderOverlay.show();
+                } else {
+                  context.loaderOverlay.hide();
+                }
+
+                if (state.status == ProfileStatus.openSettings) {
+                  CADialogManager.showDialog(
+                    context: context,
+                    dialog: CADialog(
+                      title: 'Access required',
+                      content: 'Open settings to allow notifications',
+                      confirmButtonTitle: 'Open Settings',
+                      cancelButtonTitle: S.of(context).chatMessageCancelBtn,
+                      onCancel: () => context.pop(),
+                      onConfirm: () async {
+                        await openAppSettings().then((_) {
+                          if (context.mounted) {
+                            context.pop();
+                          }
+                        });
+                      },
+                    ),
+                  );
+                }
+              },
+              child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

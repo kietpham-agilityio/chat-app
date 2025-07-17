@@ -1,4 +1,6 @@
 import 'package:chat_app/core/app/app_provider.dart';
+import 'package:chat_app/core/local_database/hive_local_db.dart';
+import 'package:chat_app/core/notifications/notifications_service.dart';
 import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/router/app_router.dart';
 import 'package:chat_app/core/themes/app_theme.dart';
@@ -22,6 +24,24 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    final user = await HiveLocalDb.instance.userBox.getUser();
+    if (state == AppLifecycleState.resumed &&
+        (user?.fullName.isNotEmpty ?? false)) {
+      final recheckPermission = await NotificationsService.awesomeNotifications
+          .isNotificationAllowed();
+
+      final notifisBox = await HiveLocalDb.instance.notificationsBox
+          .getNotificationsBox();
+
+      if (notifisBox?.isNotifsEnabledDevice != recheckPermission) {
+        notifisBox?.isNotificationEnabled = recheckPermission;
+        notifisBox?.isNotifsEnabledDevice = recheckPermission;
+      }
+    }
   }
 
   // This widget is the root of your application.

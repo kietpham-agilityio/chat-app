@@ -7,6 +7,7 @@ class NotificationsDBModel extends HiveObject {
   NotificationsDBModel({
     this.currentChattingWithId = '',
     this.isNotificationEnabled,
+    this.isNotifsEnabledDevice,
   });
 
   @HiveField(0)
@@ -14,4 +15,7 @@ class NotificationsDBModel extends HiveObject {
 
   @HiveField(1)
   bool? isNotificationEnabled;
+
+  @HiveField(2)
+  bool? isNotifsEnabledDevice;
 }
