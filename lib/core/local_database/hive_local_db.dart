@@ -1,3 +1,5 @@
+import 'package:chat_app/core/local_database/notifications_box.dart';
+import 'package:chat_app/core/local_database/notifications_db_model.dart';
 import 'package:chat_app/core/local_database/user_box.dart';
 import 'package:chat_app/core/local_database/user_db_model.dart';
 import 'package:hive/hive.dart';
@@ -10,22 +12,37 @@ class HiveLocalDb {
   static HiveLocalDb get instance => _instance;
 
   static late final UserBox _userBox;
+  static late final NotificationsBox _notificationsBox;
 
-  Future<void> init() async {
+  Future<void> init({bool isForeground = true}) async {
     final dir = await getApplicationDocumentsDirectory();
     Hive.init(dir.path);
 
     Hive.registerAdapter(UserDBModelAdapter());
 
+    Hive.registerAdapter(NotificationsDBModelAdapter());
+
     final userBox = await Hive.openBox<UserDBModel>('userBox');
+
+    final notificationsBox = await Hive.openBox<NotificationsDBModel>(
+      'notificationsBox',
+    );
 
     _userBox = UserBoxImpl(userBox);
     if (userBox.values.isEmpty) {
       _userBox.createEmptyUser();
     }
+
+    _notificationsBox = NotificationsBoxImpl(notificationsBox);
+    if (notificationsBox.values.isEmpty) {
+      _notificationsBox.initial();
+    } else if (isForeground) {
+      _notificationsBox.editBox(currentChattingWithId: '');
+    }
   }
 
   UserBox get userBox => _userBox;
+  NotificationsBox get notificationsBox => _notificationsBox;
 
   Future<void> clearAll() async {
     await _userBox.clear();

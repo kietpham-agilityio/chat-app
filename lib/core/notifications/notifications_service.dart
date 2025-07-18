@@ -19,7 +19,7 @@ import 'package:chat_app/repositories/auth_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 @pragma('vm:entry-point')
 class NotificationsService {
@@ -92,9 +92,19 @@ class NotificationsService {
 
   Future<void> _requestNotificationPermission() async {
     bool isAllowed = await awesomeNotifications.isNotificationAllowed();
+    final notifisBox = await HiveLocalDb.instance.notificationsBox
+        .getNotificationsBox();
+
     if (!isAllowed) {
       // show a dialog to ask for permission
-      awesomeNotifications.requestPermissionToSendNotifications();
+      await Permission.notification.request().then((
+        PermissionStatus status,
+      ) async {
+        bool recheckPermission = await awesomeNotifications
+            .isNotificationAllowed();
+        notifisBox?.isNotificationEnabled ??= recheckPermission;
+        notifisBox?.isNotifsEnabledDevice ??= recheckPermission;
+      });
     }
   }
 
@@ -127,16 +137,19 @@ class NotificationsService {
     log(
       '[FCM Silent] Type: ${data?['type']}, accountId: ${data?['accountId']}, accountName: ${data?['accountName']}',
     );
-    final prefs = await SharedPreferences.getInstance();
-    log(
-      'current_chatting_user_id: ${prefs.getString('current_chatting_user_id') ?? ''}',
-    );
 
-    if (silentData.createdLifeCycle == NotificationLifeCycle.Foreground &&
-        (prefs.getString('current_chatting_user_id') ?? '') ==
-            data?['accountId']) {
-      return;
-    }
+    await HiveLocalDb.instance.init(isForeground: false);
+    final notifsBox = await HiveLocalDb.instance.notificationsBox
+        .getNotificationsBox();
+    log('current_chatting_user_id: ${notifsBox?.currentChattingWithId ?? ''}');
+
+    final isInCurrentChat =
+        silentData.createdLifeCycle == NotificationLifeCycle.Foreground &&
+        (notifsBox?.currentChattingWithId ?? '') == data?['accountId'];
+
+    final isNotificationDisabled = !(notifsBox?.isNotificationEnabled ?? false);
+
+    if (isInCurrentChat || isNotificationDisabled) return;
 
     List<NotificationActionButton>? actionButtons;
 
