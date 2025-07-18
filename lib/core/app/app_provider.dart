@@ -14,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart'
         MultiRepositoryProvider,
         ReadContext,
         RepositoryProvider;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AppProvider extends StatelessWidget {
   const AppProvider({required this.child, super.key});
@@ -30,6 +31,7 @@ class AppProvider extends StatelessWidget {
             auth: FirebaseAuth.instance,
             firestore: FirebaseFirestore.instance,
             firebaseStorage: FirebaseStorage.instance,
+            supabase: Supabase.instance,
           ),
         ),
         RepositoryProvider<ChatRepository>(

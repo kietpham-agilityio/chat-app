@@ -8,10 +8,10 @@ import 'package:chat_app/screens/chat/views/chat_screen.dart';
 import 'package:chat_app/screens/home/views/home_screen.dart';
 import 'package:chat_app/screens/my_account/views/my_account_screen.dart';
 import 'package:chat_app/screens/profile/views/profile_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AppRouter {
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -131,7 +131,7 @@ class AuthNotifier extends ChangeNotifier {
   late final StreamSubscription _authSub;
 
   AuthNotifier._internal() {
-    _authSub = FirebaseAuth.instance.authStateChanges().listen((user) {
+    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((user) {
       notifyListeners();
     });
   }

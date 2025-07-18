@@ -55,6 +55,21 @@ class UserModel extends Equatable {
     );
   }
 
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      uid: json['id'] ?? '',
+      fullName: json['full_name'] ?? '',
+      email: json['email'] ?? '',
+      phoneNumber: json['phone_number'] ?? '',
+      country: json['country'] ?? '',
+      blockedUsers: List<String>.from(json['blocked_users'] ?? []),
+      avatarUrl: json['avatar_url'],
+      fcmToken: json['fcm_token'] != null
+          ? List<String>.from(json['fcm_token'])
+          : null,
+    );
+  }
+
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return UserModel(
@@ -84,12 +99,12 @@ class UserModel extends Equatable {
   Map<String, dynamic> toMap() {
     return {
       'email': email,
-      'fullName': fullName,
-      'phoneNumber': phoneNumber,
-      'blockedUsers': blockedUsers,
+      'full_name': fullName,
+      'phone_number': phoneNumber,
+      'blocked_users': blockedUsers,
       'country': country,
-      if (avatarUrl != null) 'avatarUrl': avatarUrl,
-      if (fcmToken != null) 'fcmToken': fcmToken,
+      if (avatarUrl != null) 'avatar_url': avatarUrl,
+      if (fcmToken != null) 'fcm_token': fcmToken,
     };
   }
 

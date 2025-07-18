@@ -39,4 +39,10 @@ final class CAEnv {
 
   // Environment
   static const String env = String.fromEnvironment('APP_ENVIRONMENT');
+
+  // Supabase
+  static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+  static const String supabaseAnonKey = String.fromEnvironment(
+    'SUPABASE_ANON_KEY',
+  );
 }

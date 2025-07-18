@@ -7,22 +7,26 @@ import 'package:chat_app/core/resources/l10n_generated/l10n.dart';
 import 'package:chat_app/core/utils/failure.dart';
 import 'package:chat_app/models/models.dart' show UserModel;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart' show User, FirebaseAuth;
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:firebase_storage/firebase_storage.dart' show FirebaseStorage;
 import 'package:fpdart/fpdart.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthRepository {
   const AuthRepository({
     required this.auth,
     required this.firestore,
     required this.firebaseStorage,
+    required this.supabase,
   });
 
   final FirebaseAuth auth;
   final FirebaseFirestore firestore;
   final FirebaseStorage firebaseStorage;
+  final Supabase supabase;
 
-  Stream<User?> get authStateChanges => auth.authStateChanges();
+  Stream<AuthState?> get authStateChanges =>
+      supabase.client.auth.onAuthStateChange;
 
   Future<Either<Failure, UserModel>> signUp({
     required String fullName,
@@ -35,21 +39,20 @@ class AuthRepository {
         ? S()
         : S.current;
     try {
-      // Create a new user with the given credentials
-      final userCredential = await auth.createUserWithEmailAndPassword(
+      final res = await supabase.client.auth.signUp(
         email: email,
         password: password,
       );
 
       // Get the user that was just created
-      final firebaseUser = userCredential.user;
-      if (firebaseUser == null) {
+      final supabaseUser = res.user;
+      if (supabaseUser == null) {
         return left(Failure(current.errorUserNotFound));
       }
 
       // Create a new [UserModel] from the created user
       final user = UserModel(
-        uid: firebaseUser.uid,
+        uid: supabaseUser.id,
         fullName: fullName,
         email: email,
         phoneNumber: phoneNumber,
@@ -71,15 +74,21 @@ class AuthRepository {
         ? S()
         : S.current;
     try {
-      final doc = await firestore.collection('users').doc(uid).get();
+      // final doc = await firestore.collection('users').doc(uid).get();
+      final doc = await supabase.client
+          .from('profiles')
+          .select()
+          .eq('id', uid)
+          .single();
 
-      if (!doc.exists) {
+      if (doc == {}) {
         return left(Failure(current.errorUserDataNotFound));
       }
 
-      log('User id: ${doc.id}');
+      log('User id: ${doc['id']}');
 
-      final user = UserModel.fromFirestore(doc);
+      // final user = UserModel.fromFirestore(doc);
+      final user = UserModel.fromJson(doc);
 
       await HiveLocalDb.instance.userBox.updateUser(
         fullName: user.fullName,
@@ -90,7 +99,7 @@ class AuthRepository {
       );
 
       return right(user);
-    } catch (_) {
+    } catch (e) {
       return left(Failure(current.errorFailedToGetUserData));
     }
   }
@@ -100,13 +109,19 @@ class AuthRepository {
         ? S()
         : S.current;
     try {
-      await firestore
-          .collection('users')
-          .doc(user.uid)
-          .set(user.toMap())
-          .timeout(const Duration(seconds: 5));
+      await supabase.client.from('profiles').insert({
+        'id': user.uid,
+        'full_name': user.fullName,
+        'phone_number': user.phoneNumber,
+        'email': user.email,
+        'country': user.country,
+        'created_at': DateTime.now().toIso8601String(),
+        if (user.avatarUrl != null) 'avatar_url': user.avatarUrl,
+        if (user.fcmToken != null) 'fcm_token': user.fcmToken,
+      }).select();
+
       return right(unit);
-    } catch (_) {
+    } catch (e) {
       return left(Failure(current.errorFailedToGetUserData));
     }
   }
@@ -122,9 +137,7 @@ class AuthRepository {
       String? avatarUrl;
       if (avatar != null) {
         final ref = firebaseStorage.ref().child('avatars/${user.uid}.jpg');
-        final task = await ref
-            .putFile(avatar)
-            .timeout(const Duration(seconds: 5));
+        final task = await ref.putFile(avatar);
         final url = await task.ref.getDownloadURL().timeout(
           const Duration(seconds: 5),
         );
@@ -145,8 +158,7 @@ class AuthRepository {
       await firestore
           .collection('users')
           .doc(user.uid)
-          .update(newUserData.toMap())
-          .timeout(const Duration(seconds: 5));
+          .update(newUserData.toMap());
 
       await HiveLocalDb.instance.userBox.updateUser(
         fullName: user.fullName,
@@ -159,19 +171,15 @@ class AuthRepository {
       final roomsSnapshot = await firestore
           .collection('chatRooms')
           .where('participants', arrayContains: user.uid)
-          .get()
-          .timeout(const Duration(seconds: 5));
+          .get();
 
       for (final doc in roomsSnapshot.docs) {
         final chatRoomRef = firestore.collection('chatRooms').doc(doc.id);
 
-        await chatRoomRef
-            .update({
-              'participantsName.${user.uid}': user.fullName.toLowerCase(),
-              if (avatarUrl != null)
-                'participantsAvatar.${user.uid}': avatarUrl,
-            })
-            .timeout(const Duration(seconds: 5));
+        await chatRoomRef.update({
+          'participantsName.${user.uid}': user.fullName.toLowerCase(),
+          if (avatarUrl != null) 'participantsAvatar.${user.uid}': avatarUrl,
+        });
       }
 
       return right(unit);
@@ -189,9 +197,9 @@ class AuthRepository {
 
       final fcmToken = userDB?.fcmToken;
 
-      await removeFcmToken(fcmToken ?? '').timeout(const Duration(seconds: 5));
+      await removeFcmToken(fcmToken ?? '');
 
-      await auth.signOut().timeout(const Duration(seconds: 5));
+      await supabase.client.auth.signOut();
 
       return right(unit);
     } catch (_) {
@@ -204,11 +212,25 @@ class AuthRepository {
         ? S()
         : S.current;
     try {
-      await firestore.collection('users').doc(auth.currentUser!.uid).update({
-        'fcmToken': FieldValue.arrayUnion([token]),
-      });
+      final response = await supabase.client
+          .from('profiles')
+          .select('fcm_tokens')
+          .eq('id', supabase.client.auth.currentUser?.id ?? '')
+          .single();
+
+      final List<dynamic> tokens = response['fcm_tokens'] ?? [];
+
+      if (!tokens.contains(token)) {
+        tokens.add(token);
+
+        await supabase.client
+            .from('profiles')
+            .update({'fcm_tokens': tokens})
+            .eq('id', supabase.client.auth.currentUser?.id ?? '');
+      }
+
       return right(unit);
-    } catch (_) {
+    } catch (e) {
       return left(Failure(current.errorFailedToAddFCMToken));
     }
   }
@@ -219,11 +241,25 @@ class AuthRepository {
         : S.current;
 
     try {
-      await firestore.collection('users').doc(auth.currentUser!.uid).update({
-        'fcmToken': FieldValue.arrayRemove([token]),
-      });
+      final response = await supabase.client
+          .from('profiles')
+          .select('fcm_tokens')
+          .eq('id', supabase.client.auth.currentUser?.id ?? '')
+          .single();
+
+      final List<dynamic> tokens = response['fcm_tokens'] ?? [];
+
+      if (tokens.contains(token)) {
+        tokens.remove(token);
+
+        await supabase.client
+            .from('profiles')
+            .update({'fcm_tokens': tokens})
+            .eq('id', supabase.client.auth.currentUser?.id ?? '');
+      }
+
       return right(unit);
-    } catch (_) {
+    } catch (e) {
       return left(Failure(current.errorFailedToRemoveFCMToken));
     }
   }
@@ -236,21 +272,20 @@ class AuthRepository {
         ? S()
         : S.current;
     try {
-      final userCredential = await auth
-          .signInWithEmailAndPassword(email: email, password: password)
-          .timeout(const Duration(seconds: 5));
+      final res = await supabase.client.auth.signInWithPassword(
+        password: password,
+        email: email,
+      );
 
-      final firebaseUser = userCredential.user;
-      if (firebaseUser == null) {
+      final supabaseUser = res.user;
+      if (supabaseUser == null) {
         return left(Failure(current.errorUserNotFound));
       }
 
-      final userData = await getUserData(
-        firebaseUser.uid,
-      ).timeout(const Duration(seconds: 5));
+      final userData = await getUserData(supabaseUser.id);
 
       return userData;
-    } catch (_) {
+    } catch (e) {
       return left(Failure(current.errorFailedToSignIn));
     }
   }
