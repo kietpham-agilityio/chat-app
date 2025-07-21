@@ -10,6 +10,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:firebase_storage/firebase_storage.dart' show FirebaseStorage;
 import 'package:fpdart/fpdart.dart';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart' as p;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthRepository {
@@ -74,7 +76,6 @@ class AuthRepository {
         ? S()
         : S.current;
     try {
-      // final doc = await firestore.collection('users').doc(uid).get();
       final doc = await supabase.client
           .from('profiles')
           .select()
@@ -87,7 +88,6 @@ class AuthRepository {
 
       log('User id: ${doc['id']}');
 
-      // final user = UserModel.fromFirestore(doc);
       final user = UserModel.fromJson(doc);
 
       await HiveLocalDb.instance.userBox.updateUser(
@@ -109,16 +109,7 @@ class AuthRepository {
         ? S()
         : S.current;
     try {
-      await supabase.client.from('profiles').insert({
-        'id': user.uid,
-        'full_name': user.fullName,
-        'phone_number': user.phoneNumber,
-        'email': user.email,
-        'country': user.country,
-        'created_at': DateTime.now().toIso8601String(),
-        if (user.avatarUrl != null) 'avatar_url': user.avatarUrl,
-        if (user.fcmToken != null) 'fcm_token': user.fcmToken,
-      }).select();
+      await supabase.client.from('profiles').insert(user.toMap()).select();
 
       return right(unit);
     } catch (e) {
@@ -134,14 +125,28 @@ class AuthRepository {
         ? S()
         : S.current;
     try {
+      final supabase = Supabase.instance.client;
+
       String? avatarUrl;
+
+      // 1. Upload avatar if provided
       if (avatar != null) {
-        final ref = firebaseStorage.ref().child('avatars/${user.uid}.jpg');
-        final task = await ref.putFile(avatar);
-        final url = await task.ref.getDownloadURL().timeout(
-          const Duration(seconds: 5),
-        );
-        avatarUrl = url;
+        final fileExt = p.extension(avatar.path);
+        final fileName = 'avatar$fileExt';
+        final filePath = '${user.uid}/$fileName';
+        final fileBytes = await avatar.readAsBytes();
+
+        final contentType = lookupMimeType(avatar.path) ?? 'image/jpeg';
+
+        await supabase.storage
+            .from('avatars')
+            .uploadBinary(
+              filePath,
+              fileBytes,
+              fileOptions: FileOptions(upsert: true, contentType: contentType),
+            );
+
+        avatarUrl = supabase.storage.from('avatars').getPublicUrl(filePath);
       }
 
       final newUserData = UserModel(
@@ -155,11 +160,12 @@ class AuthRepository {
         avatarUrl: avatarUrl,
       );
 
-      await firestore
-          .collection('users')
-          .doc(user.uid)
-          .update(newUserData.toMap());
+      await supabase
+          .from('profiles')
+          .update(newUserData.toMap())
+          .eq('id', user.uid);
 
+      // 4. Update Hive local
       await HiveLocalDb.instance.userBox.updateUser(
         fullName: user.fullName,
         email: user.email,
@@ -167,23 +173,8 @@ class AuthRepository {
         avatarUrl: avatarUrl,
       );
 
-      // handle update user info in chatRooms(Client Side)
-      final roomsSnapshot = await firestore
-          .collection('chatRooms')
-          .where('participants', arrayContains: user.uid)
-          .get();
-
-      for (final doc in roomsSnapshot.docs) {
-        final chatRoomRef = firestore.collection('chatRooms').doc(doc.id);
-
-        await chatRoomRef.update({
-          'participantsName.${user.uid}': user.fullName.toLowerCase(),
-          if (avatarUrl != null) 'participantsAvatar.${user.uid}': avatarUrl,
-        });
-      }
-
       return right(unit);
-    } catch (_) {
+    } catch (e, _) {
       return left(Failure(current.errorFailedToUpdateUserData));
     }
   }

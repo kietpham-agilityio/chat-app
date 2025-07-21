@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:image_picker/image_picker.dart' show ImagePicker, ImageSource;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'my_account_event.dart';
 part 'my_account_state.dart';
@@ -20,8 +21,9 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
   MyAccountBloc({
     required AuthRepository authRepository,
     FirebaseAuth? firebaseAuth,
+    Supabase? supabase,
   }) : _authRepository = authRepository,
-       _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _supabase = supabase ?? Supabase.instance,
        super(const MyAccountState()) {
     on<InitialEvent>(_onInitial);
     on<FullNameChangedEvent>(_onFullNameChanged);
@@ -35,7 +37,7 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
   }
 
   final AuthRepository _authRepository;
-  final FirebaseAuth _firebaseAuth;
+  final Supabase _supabase;
 
   Future<void> _onInitial(
     InitialEvent event,
@@ -209,7 +211,8 @@ class MyAccountBloc extends Bloc<MyAccountEvent, MyAccountState> {
     emit(state.copyWith(status: MyAccountStatus.loading));
 
     final user = UserModel(
-      uid: _firebaseAuth.currentUser?.uid ?? '',
+      // uid: _firebaseAuth.currentUser?.uid ?? '',
+      uid: _supabase.client.auth.currentUser?.id ?? '',
       fullName: state.fullName.value.toLowerCase(),
       email: state.email.value,
       phoneNumber: state.phoneNumber.value,
