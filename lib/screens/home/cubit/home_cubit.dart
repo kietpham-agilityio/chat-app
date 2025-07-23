@@ -30,18 +30,4 @@ class HomeCubit extends Cubit<HomeState> {
     final convos = await _repository.fetchUserConversations(userId);
     emit(state.copyWith(conversations: convos, status: HomeStatus.success));
   }
-
-  void dispose() {
-    // _convoChannel?.unsubscribe();
-    // _memberChannel?.unsubscribe();
-    // _profileChannel?.unsubscribe();
-  }
-
-  @override
-  Future<void> close() {
-    // _convoChannel?.unsubscribe();
-    // _memberChannel?.unsubscribe();
-    // _profileChannel?.unsubscribe();
-    return super.close();
-  }
 }

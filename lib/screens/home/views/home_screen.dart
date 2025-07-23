@@ -60,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _cubit.dispose();
     _conversationRepository.unsubscribe();
     super.dispose();
   }
