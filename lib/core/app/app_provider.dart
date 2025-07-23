@@ -1,7 +1,7 @@
 import 'package:chat_app/core/notifications/notifications_service.dart';
 import 'package:chat_app/core/router/app_router.dart';
 import 'package:chat_app/repositories/repositories.dart'
-    show AuthRepository, ChatRepository;
+    show AuthRepository, ChatRepository, ConversationRepository;
 import 'package:chat_app/screens/auth/states/auth_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseFirestore;
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
@@ -39,7 +39,13 @@ class AppProvider extends StatelessWidget {
           create: (context) => ChatRepository(
             auth: FirebaseAuth.instance,
             firestore: FirebaseFirestore.instance,
+            supabase: Supabase.instance,
           ),
+        ),
+        RepositoryProvider<ConversationRepository>(
+          lazy: true,
+          create: (context) =>
+              ConversationRepository(supabase: Supabase.instance),
         ),
         RepositoryProvider<NotificationsService>(
           lazy: false,

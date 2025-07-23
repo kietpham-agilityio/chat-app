@@ -1,51 +1,47 @@
 import 'dart:async';
 
-import 'package:chat_app/core/utils/failure.dart';
+import 'package:chat_app/models/conversation.dart';
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
-import 'package:chat_app/repositories/chat_repository.dart';
+import 'package:chat_app/repositories/repositories.dart'
+    show ConversationRepository;
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fpdart/fpdart.dart';
 
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  HomeCubit({required ChatRepository chatRepository})
-    : _chatRepository = chatRepository,
+  HomeCubit({required ConversationRepository conversationRepository})
+    : _repository = conversationRepository,
       super(const HomeState());
 
-  final ChatRepository _chatRepository;
+  final ConversationRepository _repository;
 
-  StreamSubscription<Either<Failure, List<ChatRoomModel>>>? _chatRoomSub;
+  Future<void> start(String userId) async {
+    // Listen realtime changes
+    _repository.listenToRelatedTables(
+      userId: userId,
+      onChanged: () async {
+        final convos = await _repository.fetchUserConversations(userId);
+        emit(state.copyWith(conversations: convos, status: HomeStatus.success));
+      },
+    );
 
-  void initialize(String currentUserId) {
-    emit(state.copyWith(status: HomeStatus.loading));
-
-    _chatRoomSub?.cancel();
-    _chatRoomSub = _chatRepository
-        .getChatRooms(currentUserId)
-        .listen(
-          (either) => either.fold(
-            (failure) => emit(
-              state.copyWith(
-                status: HomeStatus.failure,
-                errorMessage: failure.message,
-              ),
-            ),
-            (chatRooms) => emit(
-              state.copyWith(chats: chatRooms, status: HomeStatus.success),
-            ),
-          ),
-        );
+    // Initial fetch
+    final convos = await _repository.fetchUserConversations(userId);
+    emit(state.copyWith(conversations: convos, status: HomeStatus.success));
   }
 
   void dispose() {
-    _chatRoomSub?.cancel();
+    // _convoChannel?.unsubscribe();
+    // _memberChannel?.unsubscribe();
+    // _profileChannel?.unsubscribe();
   }
 
   @override
   Future<void> close() {
-    _chatRoomSub?.cancel();
+    // _convoChannel?.unsubscribe();
+    // _memberChannel?.unsubscribe();
+    // _profileChannel?.unsubscribe();
     return super.close();
   }
 }

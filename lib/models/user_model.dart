@@ -98,11 +98,13 @@ class UserModel extends Equatable {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': uid,
       'email': email,
       'full_name': fullName,
       'phone_number': phoneNumber,
       'blocked_users': blockedUsers,
       'country': country,
+      'created_at': DateTime.now().toIso8601String(),
       if (avatarUrl != null) 'avatar_url': avatarUrl,
       if (fcmToken != null) 'fcm_token': fcmToken,
     };

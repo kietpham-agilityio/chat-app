@@ -24,9 +24,10 @@ import 'package:chat_app/core/widgets/widgets.dart'
         CATitleMediumText,
         CASnackBar,
         CAIconButtons;
+import 'package:chat_app/models/conversation.dart';
 import 'package:chat_app/models/models.dart' show ChatRoomModel;
 import 'package:chat_app/repositories/repositories.dart'
-    show AuthRepository, ChatRepository;
+    show AuthRepository, ChatRepository, ConversationRepository;
 import 'package:chat_app/screens/chat/views/chat_screen.dart';
 import 'package:chat_app/screens/home/cubit/home_cubit.dart';
 import 'package:chat_app/screens/search/views/search_screen.dart';
@@ -37,6 +38,7 @@ import 'package:flutter_bloc/flutter_bloc.dart'
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,16 +49,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final HomeCubit _cubit;
+  late final ConversationRepository _conversationRepository;
 
   @override
   void initState() {
-    _cubit = HomeCubit(chatRepository: context.read<ChatRepository>());
+    _conversationRepository = context.read<ConversationRepository>();
+    _cubit = HomeCubit(conversationRepository: _conversationRepository);
     super.initState();
   }
 
   @override
   void dispose() {
     _cubit.dispose();
+    _conversationRepository.unsubscribe();
     super.dispose();
   }
 
@@ -73,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
             notificationsService.initialize(context.read<AuthRepository>());
 
             return _cubit
-              ..initialize(FirebaseAuth.instance.currentUser?.uid ?? '');
+              ..start(Supabase.instance.client.auth.currentUser?.id ?? '');
           },
           child: BlocListener<HomeCubit, HomeState>(
             listener: (context, state) {
@@ -174,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: BlocBuilder<HomeCubit, HomeState>(
                       builder: (context, state) {
                         if (state.status == HomeStatus.success &&
-                            state.chats.isEmpty) {
+                            state.conversations.isEmpty) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Column(
@@ -197,30 +202,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
 
                         return ListView.builder(
-                          itemCount: state.chats.length,
+                          itemCount: state.conversations.length,
                           itemBuilder: (_, index) {
-                            final otherUserId = state.chats[index].participants
-                                .firstWhere(
-                                  (id) =>
-                                      id !=
-                                      FirebaseAuth.instance.currentUser?.uid,
-                                );
-                            return _ChatListTile(
-                              chatRoom: state.chats[index],
-                              currentUserId:
-                                  FirebaseAuth.instance.currentUser?.uid ?? '',
-                              otherUserId: otherUserId,
+                            return _ChatListTileSupabase(
+                              conversation: state.conversations[index],
+
                               onTap: () {
-                                final outherUserName =
-                                    state
-                                        .chats[index]
-                                        .participantsName[otherUserId] ??
-                                    "Unknown";
                                 context.pushNamed(
                                   AppPaths.chat.name,
                                   queryParameters: {
-                                    'receiverId': otherUserId,
-                                    'receiverName': outherUserName,
+                                    'receiverId':
+                                        state.conversations[index].partnerId,
+                                    'receiverName':
+                                        state.conversations[index].partnerName,
                                   },
                                 );
                               },
@@ -373,6 +367,88 @@ class _ChatListTile extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _ChatListTileSupabase extends StatelessWidget {
+  const _ChatListTileSupabase({
+    required this.conversation,
+    required this.onTap,
+  });
+
+  final Conversation conversation;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isMe = conversation.senderByMe();
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CAListTile(
+          semanticsLabel: S
+              .of(context)
+              .semanticChatWith(conversation.partnerName),
+          leading: CACircleAvatar(
+            url: conversation.partnerAvatar,
+            avatarSize: 40,
+          ),
+          // tileColor: hasUnread ? context.colorScheme.tertiary : null,
+          // trailing: hasUnread
+          //     ? Container(
+          //         height: 10,
+          //         width: 10,
+          //         decoration: BoxDecoration(
+          //           color: context.colorScheme.primary,
+          //           shape: BoxShape.circle,
+          //         ),
+          //       )
+          //     : const SizedBox(),
+          title: CATitleMediumText(
+            text: conversation.partnerName.capitalizeWords(),
+          ),
+          // subtitle: conversation.isTypingByUser[otherUserId] ?? false
+          //     ? LoadingDots()
+          //     : Row(
+          //         children: [
+          //           Flexible(
+          //             child: CABodyMediumText(
+          //               text: isMe
+          //                   ? 'You: ${conversation.lastMessage ?? ''}'
+          //                   : conversation.lastMessage ?? '',
+          //               overflow: TextOverflow.ellipsis,
+          //               maxLines: 1,
+          //             ),
+          //           ),
+          //           const SizedBox(width: 8),
+          //           CABodyMediumText(
+          //             text: conversation.lastMessageTime?.timeAgo() ?? '',
+          //           ),
+          //         ],
+          //       ),
+          subtitle: Row(
+            children: [
+              Flexible(
+                child: CABodyMediumText(
+                  text: isMe
+                      ? 'You: ${conversation.lastMessageContent ?? ''}'
+                      : conversation.lastMessageContent ?? '',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+              const SizedBox(width: 8),
+              CABodyMediumText(
+                text: conversation.lastMessageAt?.timeAgo() ?? '',
+              ),
+            ],
+          ),
+          onTap: onTap,
+        ),
+        const CADivider(),
+      ],
     );
   }
 }

@@ -18,12 +18,19 @@ import 'package:cloud_firestore/cloud_firestore.dart'
         Timestamp;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ChatRepository {
-  const ChatRepository({required this.firestore, required this.auth});
+  const ChatRepository({
+    required this.firestore,
+    required this.auth,
+    required this.supabase,
+  });
 
   final FirebaseFirestore firestore;
   final FirebaseAuth auth;
+
+  final Supabase supabase;
 
   CollectionReference get _chatRooms => firestore.collection("chatRooms");
 

@@ -26,3 +26,27 @@ extension TimestampExtension on Timestamp {
     }
   }
 }
+
+extension DateTimeExtension on DateTime {
+  String timeAgo() {
+    final now = DateTime.now();
+    final diff = now.difference(this);
+
+    final isSameDay = now.year == year && now.month == month && now.day == day;
+
+    if (isSameDay) {
+      return DateFormat('hh:mm a', 'en').format(this);
+    } else if (diff.inDays < 7) {
+      return DateFormat.E('en').format(this); // e.g., Mon, Tue
+    } else if (diff.inDays < 30) {
+      final weeks = (diff.inDays / 7).floor();
+      return '${weeks}w';
+    } else if (diff.inDays < 365) {
+      final months = (diff.inDays / 30).floor();
+      return '${months}mo';
+    } else {
+      final years = (diff.inDays / 365).floor();
+      return '${years}y';
+    }
+  }
+}
